@@ -1,0 +1,21 @@
+/*编一C程序，它能读入一串整数（以-9999为结束标记），再以与输入次序相反的次序输出这串整数（输入、出时，两个相邻的整数用空格隔开)。
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）*/
+
+#include "stdafx.h"
+#include<stdio.h>
+#define MAX 100
+void main()
+{
+	int i=0,k,a[MAX];
+	printf("请输入一串整数，以-9999作为结束标记:\n");
+	do{
+		scanf("%d",&a[i]);
+		if(a[i]==-9999)
+			break;
+		i++;
+	}while(9);
+	k=i;
+	printf("这串整数的相反次序是:\n");
+	for(i=k-1;i>=0;i--)
+		printf("%d",a[i]);
+}

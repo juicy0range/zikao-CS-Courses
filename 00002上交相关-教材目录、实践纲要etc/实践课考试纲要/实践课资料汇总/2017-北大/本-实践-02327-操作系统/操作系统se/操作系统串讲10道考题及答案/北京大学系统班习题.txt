@@ -1,0 +1,171 @@
+ [原创]刚做完系统班上机题第二题
+
+/*******************************************************************/
+//请分别用FIFO、OPT算法实现“页面置换”的模拟。模拟程序的要求如下：
+//
+//输入：页面流文件，其中存储的是一系列页面号，用来模拟待换入的页面。
+//
+//输出：对于每一个页面流文件，标出所使用的算法，
+//并且：每换入一个页面（即：每读入一个页面号），判断是否有页面需要被换出。
+//若有，把被换出的页面号输出到屏幕；若没有，则要在输出中用特殊标记说明。
+//
+//初始条件：采用三个页框，初始时均为空。
+//
+//测试说明：测试教师将事先准备好一组文件，
+//从中为每个程序随机指定一至三个作为输入文件
+//（被测试者需从键盘输入指定文件的文件名），并查看程序输出结果。
+//测试用例：书上p119页，在本地盘建立一个test.txt文件，内容为例中的页面号
+//例如：test文本内容为：
+//      4 3 2 1 4 3 5 4 3 2 1 5jjjjjjjjj
+//      kkkk
+//      jklilkjjj
+/******************************************************************/
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+#include "iostream.h"
+
+void FIFO(int page[],int n){
+int mem[3]={0,0,0};
+int flag = 0;
+int i,j;
+int d=0;
+int count = 0;
+
+cout<<endl<<"# 代表无命中"<<"   "<<"！后跟的数字代表被换出的页"<<endl;
+cout<<endl<<"FIFO算法："<<endl;
+//  mem[2]=page[0];
+//  mem[1]=page[1];
+//  mem[0]=page[2];
+//  cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<endl;
+
+  for(i = 0; i<n; i++){
+   flag = 0;
+   for(j = 0; j<3; j++){
+    if(mem[j] == page) flag = 1;
+   }
+   if(flag) cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   #"<<endl;
+   else {
+    count++;
+    d = mem[2];
+    mem[2] = mem[1];
+    mem[1] = mem[0];
+    mem[0]=page;
+    cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   !"<<d<<endl;
+    
+   }
+  }
+  cout<<endl<<"共产生缺页中断："<<count<<"次!"<<endl;
+
+
+
+};
+int max(int a,int b){
+return a>b?a:b;
+}
+void OPT(int page[],int n){
+int mem[3]={0,0,0};
+int flag = 0;
+int i,j,s;
+int d=0;
+int count = 0;
+int c0=99;
+int c1=99;
+int c2=99;
+
+cout<<endl<<"# 代表无命中"<<"   "<<"！后跟的数字代表被换出的页"<<endl;
+cout<<endl<<"OPT算法："<<endl;
+mem[2]=page[0];
+mem[1]=page[1];
+mem[0]=page[2];
+cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<endl;
+
+for(i = 3; i<n; i++){
+  flag = 0;
+  for(j = 0; j<3; j++){
+   if(mem[j] == page) flag = 1;
+  }
+  if(flag) cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   #"<<endl;
+  else {
+   for(s = i+1; s<n; s++){
+    if (mem[0] == page[s]) c0 = s;
+    else {
+     if(mem[1] == page[s]) c1 = s;
+     else {
+      if(mem[2] == page[s]) {
+       c2 =s;
+      }
+      else if(c0!=99 && c1!=99 && c2!=99) break;
+     }
+    }
+    
+   }
+//  cout<<endl<<c0<<c1<<c2<<" ";
+   if (c0 >= c1 && c0 >= c2) {
+    d = mem[0];
+    mem[0] = page;
+    cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   !"<<d<<endl;
+   }
+   else if (c1 >= c0 && c1 >= c2) {
+     d = mem[1];
+     mem[1] = page;
+     cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   !"<<d<<endl;
+    }
+   else {
+     d = mem[2];
+     mem[2] = page;
+     cout<<mem[0]<<' '<<mem[1]<<' '<<mem[2]<<"   !"<<d<<endl;
+    }
+   count++;
+   c0 = c1 = c2 = 99;
+      
+  }
+}
+cout<<endl<<"共产生缺页中断："<<count+3<<"次!"<<endl; 
+};
+void main(){
+FILE *fp;
+char pt;
+char str[10];
+int i = 0;
+int j = 0;
+int page[50];
+int flag = 1;
+
+for(i=0; i<50; i++){
+  page = -1;
+}
+// cout<<"请输入文件路径：";  题目要求读入文件路径，打开时有小错误，改成指定文件名方式
+// gets(str);
+fp = fopen("test.txt","r+");
+if(fp==NULL) {
+  cout<<endl<<"找不到该文件"<<endl;
+  exit(0);
+}
+while((pt = fgetc(fp)) != EOF){
+  i = 0;
+  if(pt>='0' && pt<='9'){
+   str = pt;
+   i++;
+   flag = 1;
+   str = '\0';
+   page[j] = atoi(str);
+   j++;
+  // cout<<endl<<page[j++];
+  
+  }
+  else {
+   if (pt == '\n') break;
+  }
+}
+cout<<j<<endl;
+i = 0;
+while(page != -1) {
+  cout<<" "<<page;
+  i++;
+}
+
+FIFO(page,j);
+OPT(page,j);
+}
+

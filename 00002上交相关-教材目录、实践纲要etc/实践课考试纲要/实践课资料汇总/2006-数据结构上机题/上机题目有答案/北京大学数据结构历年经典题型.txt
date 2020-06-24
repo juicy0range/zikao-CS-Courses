@@ -1,0 +1,220 @@
+ 北京大学数据结构历年经典题型
+
+1月11号上午题
+
+第一题：利用二*树扩充前序序列创建二*树，并求后序和中序以及２度节点的个数．
+
+　　　　例如：扩充前序序列：Ａ＊Ｂ＊＊表示：Ａ是树根，无左孩子，右孩子是Ｂ，Ｂ无子孙，＊表示空
+
+根据给定的二*树扩充后的后序序列，构造二*树（原创）
+
+程序我已调试通过，大家一百龇判?/P>
+
+#include <stdio.h>
+#include <string.h>
+#include <malloc.h>
+#include <stdlib.h>
+#define MAX 100
+void exit(int);
+typedef struct node{
+char d;
+struct node *lchild,*rchild;
+}tnode;
+int postnum;
+void mktree(char post[],tnode **t)
+{
+if (--postnum<0)
+  return;
+      if(post[postnum]=='.')
+  *t=NULL;
+else
+{
+  
+  *t=malloc(sizeof(tnode));
+  (*t)->d=post[postnum];
+  mktree(post,&((*t)->rchild));
+  mktree(post,&((*t)->lchild));
+};
+};
+
+void preorder(tnode *r)
+{
+if (r)
+{
+  preorder(r->lchild);
+  preorder(r->rchild);
+  printf("%c",r->d);
+}
+}
+
+void main()
+{
+tnode *r;
+char post[MAX];
+printf("请输入后序扩充序列:");
+    gets(post);
+postnum=strlen(post);
+mktree(post,&r);
+    printf("后序序列:");
+preorder(r);
+printf("\n");
+}
+
+
+第二题：对冒泡进行优化，使其用尽可能少的趟数，打印排序后的结果并打印比较趟数．
+
+//泡沫排序
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<iostream.h>
+#define MAX 1000
+void InputData( int *a,int *len );
+void BubbleSort( int *a,int len );
+
+void main( )
+{
+int a[MAX],len=0;
+InputData(a,&len);
+BubbleSort( a,len );
+}
+void InputData( int *a,int *len )
+{
+int d;
+printf("请输入数据(输入-1表示结束\n");
+do{
+  scanf("%d",&d);
+  if( d==-1 )
+   break;
+  a[(*len)++]=d;
+}while(1);
+}
+void BubbleSort( int *a,int len )
+{
+int lastexchange,i,j,temp,step;
+i=0;step=0;
+while(i<len-1)
+{
+  step++;
+  lastexchange=len-1;
+  for( j=len-1;j>i;j-- )
+  {
+   if( a[j]<a[j-1] )
+   {
+    temp=a[j];
+    a[j]=a[j-1];
+    a[j-1]=temp;
+    lastexchange=j;
+   }
+  }
+  i=lastexchange;
+}
+printf("排序趟数是:%d\n",step);
+printf("泡沫排序的结果是:\n");
+j=0;
+for(i=0;i<len;i++)
+{
+  printf("%4d",a[i]);
+  if((++j)%5==0 )
+   printf("\n");
+}
+printf("\n");
+}
+
+
+//对冒泡的优化
+int counter=0;//趟数
+void bubblesort(int a[],int n)
+{
+int lastexchange,j,i=n-1;
+
+while(i>0)
+{
+   lastexchange=0;
+   counter++;
+   for(j=0;j<i;j++)
+   {
+    if(a[j+1]<a[j])
+    {
+     交换a[j]和a[j+1];
+      lastexchange=j;
+    }
+   }
+
+   i=lastexchange;
+}
+}
+
+1月11号下午的题
+1,输入无权无向图，n,vi,vj,…………，并且输出该图的邻接矩阵，再进行深度遍历（DFS），输出结果 v0,v2,v4……
+
+2,输入一组数，以空格分开，以-9999结束，用插入法小到大排序并输出，并且输出与关键字比较的次数；
+
+以下为经典题型:
+
+1 ．编一C程序，它能根据读入的数据构造有向图G，并输出G的邻接矩阵及G的拓扑序列。图的输入形式为  i0  j0   i1  j1   i2  j2   ...im  jm   -1  -1（-1，-1为有向边输入结束标记，其余的值都>=0且<n。）n，它们都是整数，n是有向图G的顶点个数且40>n>0，顶点名字依次是V0,V1,V2,…Vn-1； ik  jk 表示向图G的有向边<Vik,Vjk>。
+
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+       
+
+2． 编一C程序，它能读入两组整数（每组整数都以-9999为结束标记，个数都不大于1000），并以从小到大的次序输出既在第一组整数中也在第二组整数中的所有整数（同一个整数不能输出两次）。（输入时，两个相邻的整数用空格隔开)。
+
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+
+3．编一C程序，它能读入两组整数（每组整数都是66个整数），它们分别是下三角矩阵A和下三角矩阵B的按行优先排列的元素（A和B的其它元素均为零）。计算并输出矩阵A与B的乘积。
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+
+4．编一C程序，它能对输入的一串整数（不多于1000个，以-9999为结束标记）到数组a中，再对a的元素进行直接插入排序（从小到大排序），输出排序结果和所用关键字比较次数。（输入时，两个相邻的整数用空格隔开)。
+
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+
+5．  编一C程序，它能根据输入的二*树前序和中序序列来构造该二*树，并能输出该二*树的后序序列和该二*树叶的结点的个数以及该二*树高度。（输入次序是：表示前序序列的字符串、表示中序序列的字符串）。
+
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+
+6．编一C程序，它能读入一串（n个）整数（以-9999为结束标记），并判断第1个整数在后(n-1)个整数中出现的次数，再输出该次数。（输入时，两个相邻的整数用空格隔开)。
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+
+7．  编一C程序，它能根据输入的二*树中序和后序序列来构造该二*树，并能输出该二*树的前序序列和该二*树的度为2的结点的个数并能判断该二*树是否为二*排序树（若是输出Yes；否则输出No）。（输入次序是：表示中序序列的字母串、表示后序序列的字母串）。
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+
+8．编一C程序，它能读入一串整数（以-9999为结束标记），再以与输入次序相反的次序输出这串整数（输入、出时，两个相邻的整数用空格隔开)。
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+
+9．  编一C程序，它能根据输入的完全二*树层次序列来构造该完全二*树，并能输出该完全二*树的后序序列和叶结点的个数。（完全二*树层次序列是从1层到最高层、同层内从左到右的次序排列的结点序列）。
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+
+10．编一C程序，它能读入6个字符串（每个串长度都不大于80，可能含空格字符），依次判断前5个串是否为第6个串的子串，若是则输出YES；否则输出NO。
+
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+
+11．  编一C程序，它能根据输入的二*树层次序列和中序序列来构造该二*树，并能输出该二*树的后序序列和叶结点的个数。（二*树层次序列是从1层到最高层、同层内从左到右的次序排列的结点序列）。
+
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）
+
+
+12. 编一C程序，它能根据读入的数据构造有向图G，并输出G的DFS遍历序列（从V0开始），图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1，-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。
+
+（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+
+ 

@@ -1,0 +1,307 @@
+[原创][4.虚拟存储管理器的页面调度/十大题型]算法全实现
+三、 虚拟存储管理器的页面调度
+
+页面调度算法主要有：FIFO，最近最少使用调度算法（LRU），最近最不常用调度算法（LFU），最佳算法（OPT） 
+
+1． 输入：
+页面流文件，其中存储的是一系列页面号（页面号用整数表示，用空格作为分隔符），用来模拟待换入的页面。
+下面是一个示意：
+1 2 3 4 1 2 5 1 2 3 4 5
+2． 处理要求：
+程序运行时，首先提示“请输入页面流文件的文件名：”，输入一个文件名后，程序将读入该文件中的有关数据。
+初始条件：采用三个页框，初始时均为空。
+根据第二次机会算法对数据进行处理。
+3． 输出要求：
+每换入一个页面（即：每读入一个页面号），判断是否有页面需要被换出。若有，把被换出的页面号输出到屏幕上；
+若没有，则输出一个“*”号。
+4． 文件名约定
+提交的源程序名字：sourceXXX.c或者sourceXXX.cpp（依据所用语言确定）
+输入文件名字：可由用户指定
+其中：XXX为账号。
+5． 测试说明：测试教师将事先准备好一组文件（格式为*.txt），从中为每个程序随机指定一至三个作为输入文件
+（被测试者需从键盘输入指定文件的文件名），并查看程序输出结果。
+6． 第二次机会算法：对FIFO算法做如下简单的修改：发生替换时，先检查最老页面的R（访问）位。如果为0，
+那么此页面是最早被换入的，而且近期没有被访问，可以立刻被替换掉；如果R位为1，就清除R位，并修改它的装入时间，
+使它就像刚被装入的新页面一样，然后继续搜索可替换的最老页面。
+我没做出来~~~~
+
+
+  页面调度算法主要有：FIFO，最近最少使用调度算法（LRU），最近最不常用调度算法（LFU），最佳算法（OPT） 
+这几种算法的调度都有可能在考试中碰到。 
+关于这一类型，大家还可以参看书本251页的实验指导。 
+如2001年考题： 
+要求： 
+
+1。实现三种算法： FIFO，最近最少使用调度算法（LRU），最近最不常用调度算法（LFU） 
+2。页面序列从指定的文本文件（TXT文件）中取出 
+3。输出： 
+
+第一行：每次淘汰的页面号 
+第二行：显示缺页的总次数 
+本程序包括:FIFO，最近最少使用调度算法（LRU），最近最不常用调度算法（LFU） 第二次机会算法
+#include<stdio.h>
+#include<string.h>
+#include<iostream.h>
+
+const int MAXSIZE=1000;//定义最大页面数
+const int MAXQUEUE=3;//定义页框数
+
+typedef struct node{
+int loaded;
+int hit;
+}page;
+
+page pages[MAXQUEUE]; //定义页框表
+int queue[MAXSIZE];
+int quantity;
+
+//初始化结构函数
+void initial()
+{
+int i;
+
+for(i=0;i<MAXQUEUE;i++){
+  pages[i].loaded=-1;
+  pages[i].hit=0;
+}
+for(i=0;i<MAXSIZE;i++){
+  queue[i]=-1;
+}
+
+quantity=0;
+}
+
+//初始化页框函数
+void init()
+{
+int i;
+
+for(i=0;i<MAXQUEUE;i++){
+  pages[i].loaded=-1;
+  pages[i].hit=0;
+}
+}
+
+//读入页面流
+void readData()
+{
+FILE *fp;
+char fname[20];
+
+int i;
+
+cout<<"请输入页面流文件名:";
+cin>>fname;
+
+if((fp=fopen(fname,"r"))==NULL){
+  cout<<"错误,文件打不开,请检查文件名";
+}
+else{
+  while(!feof(fp)){
+   fscanf(fp,"%d ",&queue[quantity]);
+   quantity++;
+  }
+}
+
+cout<<"读入的页面流:";
+for(i=0;i<quantity;i++){
+  cout<<queue[i]<<"  ";
+}
+}
+
+//FIFO调度算法
+
+void FIFO()
+{
+int i,j,p,flag;
+int absence=0;
+
+p=0;
+
+cout<<endl<<"----------------------------------------------------"<<endl;
+cout<<"FIFO调度算法页面调出流:";
+for(i=0;i<quantity;i++){
+  flag=0;
+  for(j=0;j<MAXQUEUE;j++){
+   if(pages[j].loaded==queue[i]){
+    flag=1;
+   }
+  }
+  if(flag==0){
+   if(absence>=MAXQUEUE){
+    cout<<pages[p].loaded<<"  ";
+   }
+   pages[p].loaded=queue[i];
+   p=(p+1)%MAXQUEUE;
+   absence++;
+  }
+}
+absence-=MAXQUEUE;
+cout<<endl<<"总缺页数:"<<absence<<endl;
+
+}
+
+
+//最近最少使用调度算法（LRU）
+void LRU()
+{
+int absence=0;
+int i,j;
+int flag;
+
+
+for(i=0;i<MAXQUEUE;i++){
+  pages[i].loaded=queue[i];
+}
+
+cout<<endl<<"----------------------------------------------------"<<endl;
+cout<<"最近最少使用调度算法(LRU)页面流:";
+
+for(i=MAXQUEUE;i<quantity;i++){
+  flag=-1;
+  for(j=0;j<MAXQUEUE;j++){
+   if(queue[i]==pages[j].loaded){
+    flag=j;
+   }
+  }
+  //CAUTION pages[0]是队列头
+  if(flag==-1){
+   //缺页处理
+   cout<<pages[0].loaded<<"  ";
+   for(j=0;j<MAXQUEUE-1;j++){
+    pages[j]=pages[j+1];
+   }
+   pages[MAXQUEUE-1].loaded=queue[i];
+   absence++;
+  }
+  else{
+   //页面已载入
+   pages[quantity]=pages[flag];
+   for(j=flag;j<MAXQUEUE-1;j++){
+    pages[j]=pages[j+1];
+   }
+   pages[MAXQUEUE-1]=pages[quantity];
+  }
+
+  
+}
+
+cout<<endl<<"总缺页数:"<<absence<<endl;
+}
+
+
+//最近最不常用调度算法(LFU)
+void LFU()
+{
+int i,j,p;
+int absence=0;
+int flag;
+
+for(i=0;i<MAXQUEUE;i++){
+  pages[i].loaded=queue[i];
+}
+
+cout<<endl<<"----------------------------------------------------"<<endl;
+cout<<"最近最不常用调度算法(LFU)页面流:";
+
+for(i=MAXQUEUE;i<quantity;i++){
+  flag=-1;
+  for(j=0;j<MAXQUEUE;j++){
+   if(pages[j].loaded==queue[i]){
+    flag=1;
+    pages[j].hit++;
+   }
+  }
+  if(flag==-1){
+   //缺页中断
+   p=0;
+   for(j=0;j<MAXQUEUE;j++){
+    if(pages[j].hit<pages[p].hit){
+     p=j;
+    }
+   }
+   cout<<pages[p].loaded<<"  ";
+   pages[p].loaded=queue[i];
+   for(j=0;j<MAXQUEUE;j++){
+    pages[j].hit=0;
+   }
+   absence++;
+  }
+}
+cout<<endl<<"总缺页数:"<<absence<<endl;
+}
+
+//第二次机会算法
+void second()
+{
+int i,j,t;
+int absence=0;
+int flag,temp;
+
+for(i=0;i<MAXQUEUE;i++){
+  pages[i].loaded=queue[i];
+}
+
+cout<<endl<<"----------------------------------------------------"<<endl;
+cout<<"第二次机会算法页面流:";
+
+for(i=MAXQUEUE;i<quantity;i++){
+  flag=-1;
+  for(j=0;j<MAXQUEUE;j++){
+    if(pages[j].loaded==queue[i]){
+    flag=1;
+    pages[j].hit=1;
+   }
+  }
+  if(flag==-1){
+   //缺页处理
+   t=0;
+   while(t==0){
+    if(pages[0].hit==0){
+     cout<<pages[0].loaded<<"  ";
+     for(j=0;j<MAXQUEUE-1;j++){
+      pages[j]=pages[j+1];
+     }
+     pages[MAXQUEUE-1].loaded=queue[i];
+     pages[MAXQUEUE-1].hit=0;
+
+     
+     t=1;
+    }
+    else{
+     temp=pages[0].loaded;
+     for(j=0;j<MAXQUEUE-1;j++){
+      pages[j]=pages[j+1];
+     }
+     pages[MAXQUEUE-1].loaded=temp;
+     pages[MAXQUEUE-1].hit=0;
+    }
+   }
+   absence++;
+  }
+}
+cout<<endl<<"总缺页数:"<<absence<<endl;
+}
+
+
+
+void main()
+{
+
+initial();
+
+readData();
+
+FIFO();
+init();
+
+LRU();
+init();
+
+LFU();
+init();
+
+second();
+
+}
+

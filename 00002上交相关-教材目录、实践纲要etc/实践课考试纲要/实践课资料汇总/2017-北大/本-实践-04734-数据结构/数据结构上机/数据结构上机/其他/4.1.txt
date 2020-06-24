@@ -1,0 +1,115 @@
+/*1.编一C程序，它能根据输入的二叉树中序和后序序列来构造该二叉树，并能输出该二叉树的前序序列
+和该二叉树的度为2的结点的个数并能判断该二叉树是否为二叉排序树（若是输出Yes；否则输出No）。（输入次序是：表示中序序列的字母串、表示后序序列的字母串）。(此题补充了求1度结点的个数)
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）*/
+#include"stdafx.h"
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+void exit(int);
+#define MAX 1000
+typedef struct node{
+	char d;
+	struct node *lchild,*rchild;
+}Tnode;
+void MK(char in[],char is,char ie,char post[],char posts,char poste,Tnode **r)
+{
+	int i;
+	if(is>ie||posts>poste)
+		*r=NULL;
+	else{
+		*r=(Tnode *)malloc(sizeof(Tnode));
+		(*r)->d=post[poste];
+		for(i=is;i<=ie;i++)
+			if(in[i]==post[poste]){
+			MK(in,is,i-1,post,posts,posts+i-is-1,&(*r)->lchild);
+			MK(in,i+1,ie,post,posts+i-is,poste-1,&(*r)->rchild);
+			break;
+			}
+			if(i>ie){
+				printf("输入错误!\n");
+				exit(1);
+			}
+	}
+}
+void preorder(Tnode *r)
+{
+	if(r){
+		printf("%c",r->d);
+	    preorder(r->lchild);
+	    preorder(r->rchild);
+	}
+}
+int one(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))
+		return 0;
+	if((r->lchild)&&(r->rchild))
+		return one(r->lchild)+one(r->rchild);
+	else
+		return 1+one(r->lchild)+one(r->rchild);
+}
+int two(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))
+		return 0;
+	if((r->lchild)&&(r->rchild))
+		return 1+two(r->lchild)+two(r->rchild);
+	else{
+		return two(r->lchild)+two(r->rchild);
+		/*if((r->lchild)&&(!r->rchild))
+			return two(r->lchild);
+		else
+			return two(r->rchild);*/
+	}
+}
+int check(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))
+		return 1;
+	if((r->lchild)&&(!r->rchild)){
+		if(r->lchild->d<r->d)
+			return check(r->lchild);
+		else
+			return 0;
+	}
+	else{
+		if((!r->lchild)&&(r->rchild)){
+			if(r->rchild->d>r->d)
+				return check(r->rchild);
+			else
+				return 0;
+		}
+		if((r->lchild->d<r->d)&&(r->rchild->d>r->d))
+			return (check(r->lchild)&&check(r->rchild));
+		else
+			return 0;
+	}
+}
+void main()
+{
+	Tnode *r=NULL;
+	char in[MAX],post[MAX];
+	printf("请输入中序序列:\n");
+	gets(in);
+	printf("请输入后序序列:\n");
+	gets(post);
+	MK(in,0,strlen(in)-1,post,0,strlen(post)-1,&r);
+	printf("\n该二叉树的前序遍历序列为:\n");
+	preorder(r);
+	printf("\n该二叉树的一度结点个数为:%d\n",one(r));
+	printf("\n该二叉树的二度结点个数为:%d\n",two(r));
+	printf("\n该二叉树是否为二叉排序树(若是输出Yes,否则输出No):\n");
+	if(check(r))
+		printf("Yes\n");
+	else
+		printf("No\n");
+}
+
+
+
+
+
+		          
+
+
+

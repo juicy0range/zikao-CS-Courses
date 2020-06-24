@@ -1,0 +1,3 @@
+a.exe  3
+c.doc  1
+b.txt  2

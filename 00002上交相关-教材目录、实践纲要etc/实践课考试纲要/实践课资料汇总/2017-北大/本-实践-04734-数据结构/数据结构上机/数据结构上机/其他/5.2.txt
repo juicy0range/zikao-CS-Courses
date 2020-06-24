@@ -1,0 +1,54 @@
+/* 编一C程序，它能根据读入的数据构造有向图G，并输出G的DFS遍历序列（从V0开始），图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1，-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。（注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）*/
+#include "stdafx.h"
+#include<stdio.h>
+#include<stdlib.h>
+void exit(int);
+#define MAX 100
+typedef struct{
+	int a[MAX][MAX];//边表
+	int vexnum;//顶点个数
+}MGraph;
+typedef enum{False,True}Boolean;
+Boolean visited[MAX];
+void Input(MGraph *g)
+{
+	int i,j,n;
+	printf("请输入顶点个数，必须在[1...%d]范围内:\n",MAX);
+	scanf("%d",&n);
+	if(n<0||n>MAX){
+		printf("顶点个数必须在[1...%d]范围内!\n",MAX);
+		exit(1);
+	}
+	g->vexnum=n;
+	for(i=0;i<n;i++)
+		for(j=0;j<n;j++)
+			g->a[i][j]=0;
+	printf("请输入边的结点i,j,必须在[0...%d]:\n",n-1);
+	do{
+		scanf("%d%d",&i,&j);
+		if(i==-1&&j==-1)
+			break;
+		if(i<0||i>=n||j<0||j>=n){
+			printf("边的结点i,j,必须在[0...%d]范围内,请重新输入:\n",n-1);
+			continue;
+		}
+		g->a[i][j]=1;
+	}while(9);
+}
+void DFSM(MGraph *g,int i)
+{
+	int j;
+	printf("V%-3d",i);
+	visited[i]=True;
+	for(j=0;j<g->vexnum;j++)
+		if(g->a[i][j]==1&&!visited[j])
+			DFSM(g,j);
+}
+void main()
+{
+	MGraph g;
+	Input(&g);
+	printf("\n图G的DFS遍历序列如下所示:\n");
+	DFSM(&g,0);
+	printf("\n");
+}

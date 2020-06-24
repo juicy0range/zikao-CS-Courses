@@ -1,0 +1,183 @@
+计算机应用专业上机考试辅导---数据结构（1）  
+2004-3-5 15:00:43  北京自考热线  wushile  阅读1448次 
+/*编一C程序，它能读入集合A的一串整数（以-9999为结束标记，整数个数小于1000） 
+和集合B的一串整数（以-9999为结束标记，整数个数小于1000），计算出A与B的交集， 
+并以由小到大的次序输出A与B的交集中的所有整数（输入整数时，相邻的两个用空格隔开。 为A或B输入时，同一个数可能出现多次，而A与B的交集中同一个数不能出现多次）。 （注：程序的可执行文件名必须是 e2.exe） 
+*/  
+
+//注意调试程序时要多输入重复数据调试；本程序是根据青龙提供的程序改编，消除了重复数据的错误！； 
+
+#include <iostream.h> 
+#include <stdio.h> 
+
+void BuCountbbleSort(int r[],int n) 
+{//冒泡排序 
+ int i,j,k; 
+ int exchange; 
+ for(i=0;i<=n;i++) 
+ { 
+  exchange=0; 
+  for(j=n-1;j>=i;j--) 
+  if(r[j+1]<r[j]) 
+  { 
+   k=r[j+1]; 
+   r[j+1]=r[j]; 
+   r[j]=k; 
+   exchange=1; 
+   } 
+ if(!exchange) 
+ break; 
+ } 
+} 
+
+
+int BingJi(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求集合的并集 
+ int i=0,j=0,k=0; 
+ while(i<=Countaa&&j<=Countbb) 
+ { 
+  if(m[i]<n[j]) 
+  {//如果 m[i]<n[j]则取小的值m[i],然后i++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+  }//endif 
+  else if(m[i]>n[j]) 
+  {//如果 m[i]>n[j]则取小的值n[j],然后j++; 
+   l[k]=n[j]; 
+   k++; 
+   j++; 
+  }//end elseif 
+  else 
+  {//如果 m[i]==n[j],可以任取一个值，然后i++;j++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+   j++; 
+  }//endelse 
+ }//endwhile 
+
+ if(i>Countaa) 
+ {//如果i>Countaa,即数组m[i]中的元数个数较少， 
+  //则把n[j]中的剩余元素，都付给l[]。 
+  while(j<=Countbb) 
+  { 
+   l[k]=n[j]; 
+   j++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+ if(j>Countbb) 
+ {//如果j>Countbb,即数组n[i]中的元数个数较少， 
+  //则把m[j]中的剩余元素，都付给l[]。 
+  while(i<=Countaa) 
+  { 
+   l[k]=m[i]; 
+   i++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+return k;//返回生成的数组的元数个数 
+}//end BuCountbbleSort 
+
+int JiaoJi(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求集合的交集 
+
+ /////////////////////////////////// 
+ //消除数组m[]中的重复元素 
+int w,x,y; 
+ for(w=0;w<=Countaa;w++) 
+ { 
+  for(x=w+1;x<=Countaa;x++) 
+  { 
+   if(m[w]==m[x]) 
+   { 
+    Countaa--; 
+    for(y=x;y<=Countaa;y++) 
+    { 
+     m[y]=m[y+1];     
+    }//endfor 
+    x--; 
+   }//endif     
+  }//endfor   
+ }//endfor 
+
+ /* 
+ //测试消除数组中的重复元素的效果用下列循环输出 
+ int z; 
+ for(z=0;z<=Countaa;z++) 
+ { 
+  printf("%d",m[z]);  
+ } 
+ printf("\n"); 
+ */ 
+
+ //消除结束 
+ /////////////////////////////////// 
+  
+
+/////////////////////////////////// 
+ //求交集 
+ int i=0,j=0,k=0;  
+while(i<=Countaa) 
+ { 
+  for(j=0;j<=Countbb;j++) 
+  {//用集合的第一个元素分别和另一个集合的各元素相比较 
+   //然后再用第二个元素(直到最后一个元素)和另一个集合的各元素相比较 
+   if(m[i]==n[j]) 
+   {//如果有相同的就保存到l[]中，这样同时消掉了n[]中的重复元素 
+    l[k]=m[i]; 
+    k++; 
+    break; 
+   }//endif 
+}//endfor 
+  i++; 
+ }//endwhile 
+ //求交集结束 
+ ////////////////////////////////// 
+  
+ return k; 
+} 
+
+void main() 
+{ 
+ int a[1000], b[1000],c[2000]; 
+ int exchange=0; 
+ int i,CountA,CountB,CountC; 
+
+ printf("input a\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+   break; 
+ }//endfor 
+ CountA=i-1; 
+
+ BuCountbbleSort(a,CountA);//先将集合A排序 
+
+ printf("\ninput b\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&b[i]); 
+  if(b[i]==-9999) 
+   break; 
+ }//endfor 
+ CountB=i-1; 
+
+ BuCountbbleSort(b,CountB);//集合B排序 
+
+// CountC=BingJi(a,b,c,CountA,CountB); 
+ CountC=JiaoJi(a,b,c,CountA,CountB); 
+  
+ printf("\n\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+}
+ 
+ 

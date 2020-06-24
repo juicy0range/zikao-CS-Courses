@@ -1,0 +1,97 @@
+数据结构上机题
+
+/*求两个数组中相同的无素,并将其从小到大输出*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void inputdata(int a[], int *pn)
+{
+int i;
+*pn=0;
+scanf("%d",&i);
+while(i!=-9999)
+{
+  a[(*pn)++]=i;
+  scanf("%d",&i);
+}
+return;
+}
+
+void uniset(int a[],int na,int b[],int nb,int c[],int *pnc)
+{
+int i,j,k,exist;
+i=0;
+*pnc=0;
+while(i<na)
+{
+exist=0;
+for(k=1;k<=*pnc;k++)
+if(a[i]==c[k])
+  {
+   exist=1;
+   break;
+  }
+if(!exist) c[++(*pnc)]=a[i];
+i++;
+}
+j=0;
+while(j<nb)
+{
+exist=0;
+for(k=1;k<=*pnc;k++)
+if(b[j]==c[k])
+  {
+   exist=1;
+   break;
+  }
+if(!exist) c[++(*pnc)]=b[j];
+j++;  
+}
+return;
+}
+
+
+void insertsort(int a[],int n)
+/* a:a[1]..a[n], asc */
+{
+int ctime=0,i,j;
+for(i=2;i<=n;i++)
+{
+ctime++;
+if(a[i-1]>a[i])
+{
+a[0]=a[i];
+j=i-1;
+do{
+   a[j+1]=a[j];
+   j--;
+   ctime++;
+}while(a[0]<a[j]);
+a[j+1]=a[0];
+}
+}
+return;
+} 
+
+
+int main()
+{
+int a[100],b[100],c[200];
+int n1,n2,n3,i;
+printf("please input some integers,terminate with -9999 : \n");
+inputdata(a,&n1);
+printf("please input some integers,terminate with -9999 : \n");
+inputdata(b,&n2);
+
+uniset(a,n1,b,n2,c,&n3);
+insertsort(c,n3);
+printf("A Union B=");
+for(i=1;i<=n3;i++) printf("%d ",c[i]);
+printf("\n\n");
+
+system("PAUSE");
+return 0;
+}
+

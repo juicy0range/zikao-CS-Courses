@@ -1,0 +1,234 @@
+/*它能读入集合A的一串整数（以-9999为结束标记，整数个数小于1000）和集合B 的一串整数（以-9999为结束标记，整数个数小于1000），
+计算并
+以从小到大的次序输出A-B 的所有元素(最后集合中同一个数不能出现多次)。 
+以从小到大的次序输出A交B 的所有元素(最后集合中同一个数不能出现多次)。 
+以从小到大的次序输出A并B 的所有元素(最后集合中同一个数不能出现多次)。
+
+求 交集、差集
+
+求并集还可以利用 将两个集合合并然后去掉重复的来求
+  //1排序2去重复3求
+**/ 
+
+#include <stdio.h>
+
+//**************冒泡排序(有小到大)
+void BubbleSort(int r[],int n) //r要排序的数组，n数组的元素个数
+{ 
+ int i,j,k; 
+ int exchange; 
+
+ for(i=0;i<n-1;i++) 
+ { 
+  exchange=0; 
+  for(j=n-2;j>=i;j--){ 
+  if(r[j+1]<r[j]) 
+  { 
+   k=r[j+1]; 
+   r[j+1]=r[j]; 
+   r[j]=k; 
+   exchange=1; 
+  } 
+  }
+  if(!exchange) //表示已经是有顺序的，退出循环
+  break; 
+ } 
+} 
+
+
+//********************消除数组r[]中的重复元素,并返回消除后数组剩余的元素个数 
+int DisaSameYs(int r[],int n) //n数组的元素个数
+{
+ int w,x,y; 
+ for(w=0;w<=n-1;w++) 
+ { 
+  for(x=w+1;x<=n-1;x++) 
+  { 
+   if(r[w]==r[x]) 
+   { 
+		n--; 
+		for(y=x;y<=n-1;y++) 
+		{ 
+			r[y]=r[y+1];     //将x后面的数前移，将x覆盖
+		}
+		x--;				//注意别忘了这个减减	
+   }     
+  }
+ }
+  
+ return n; 
+} 
+
+
+//******************求 交  集************************
+//countm: 数组m中元素个数
+//返回k: 数组l中元素个数
+int JiaoJi(int m[],int n[],int l[],int countm,int countn) 
+{
+int i=0,j=0,k=0;  
+for(i=0;i<countm;i++)
+ { 
+  for(j=0;j<countn;j++) 
+  {
+   if(n[j]==m[i]) 
+   {//如果有相同的就保存到l[]中
+    l[k++]=m[i]; 
+    break; 
+   }
+  }
+ }
+ return k; 
+} 
+
+
+
+
+//******************求集合 n 对 m 的 补集************************
+//用第一个集合的元素和第二个集合中的每一个元素比较，如果有相同的(则排除这个)则用(第一个集合的)下一个数继续比较，没有相同的存入集合L
+int cha(int m[],int n[],int l[],int Countaa,int Countbb) 
+{ 
+ int i=0,j=0,k=0; 
+ int exch; 
+for(i=0;i<Countaa;i++)
+{ 
+	exch=0;//交换变量为0 
+	for(j=0;j<Countbb;j++) 
+	{ 
+   
+		if(m[i]==n[j]) 
+		{//如果相同，交换变量变为1 
+		exch=1; 
+		break; 
+		}
+	}
+
+	if(exch==0) 
+	{//如果没有相同的就保存m[i]到l[]中 
+		l[k++]=m[i]; 
+	} 
+}
+ return k; 
+} 
+
+
+
+
+
+
+//******************求  并   集************************
+int BingJi(int m[],int n[],int l[],int Countaa,int Countbb) 
+{
+ int i=0,j=0,k=0; 
+ while(i<Countaa&&j<Countbb) 
+ { 
+  if(m[i]<n[j]) 
+  {//如果 m[i]<n[j]则取小的值m[i],然后i++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+  }//endif 
+  else if(m[i]>n[j]) 
+  {//如果 m[i]>n[j]则取小的值n[j],然后j++; 
+   l[k]=n[j]; 
+   k++; 
+   j++; 
+  }//end elseif 
+  else 
+  {//如果 m[i]==n[j],可以任取一个值，然后i++;j++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+   j++; 
+  }//endelse 
+ }//endwhile 
+
+ if(i>Countaa-1) 
+ {//如果i>Countaa,即数组m[i]中的元数个数较少， 
+  //则把n[j]中的剩余元素，都付给l[]。 
+  while(j<=Countbb-1) 
+  { 
+   l[k]=n[j]; 
+   j++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+ if(j>Countbb-1) 
+ {//如果j>Countbb,即数组n[i]中的元数个数较少， 
+  //则把m[j]中的剩余元素，都付给l[]。 
+  while(i<=Countaa-1) 
+  { 
+   l[k]=m[i]; 
+   i++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+return k;//返回生成的数组的元数个数 
+}//end BuCountbbleSort 
+
+
+
+
+void main() 
+{ 
+ int a[1000], b[1000],c[2000]; 
+ int exchange=0; 
+ int i,j,k,CountA,CountB,CountC; 
+
+ printf("input a,之间用空格隔开,以-9999结尾 \n"); 
+ for(i=0;i<1000;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+  break; 
+ } 
+ CountA=i; 
+ BubbleSort(a,CountA);   
+ CountA=DisaSameYs(a,CountA); 
+
+
+ printf("\ninput b,之间用空格隔开,以-9999结尾\n"); 
+ for(i=0;i<1000;i++) 
+ { 
+  scanf("%d",&b[i]); 
+  if(b[i]==-9999) 
+  break; 
+ } 
+ CountB=i; 
+ BubbleSort(b,CountB); 
+CountB=DisaSameYs(b,CountB); 
+
+
+//求差集
+ CountC=cha(a,b,c,CountA,CountB); 
+ printf("\n-----差集------\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+
+ //求并集
+ CountC=BingJi(a,b,c,CountA,CountB); 
+  printf("\n-----并集------\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+
+ //求交集
+ CountC=JiaoJi(a,b,c,CountA,CountB); 
+  printf("\n-----交集------\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+ getchar();
+} 
+
+
+
+

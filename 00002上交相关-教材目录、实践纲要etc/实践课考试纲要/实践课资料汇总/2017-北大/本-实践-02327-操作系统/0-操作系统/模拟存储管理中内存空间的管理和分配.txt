@@ -1,0 +1,210 @@
+内存空间的管理分为固定分区管理方式，可变分区管理方式，页式存储管理，段式存储管理。下面是页式存储管理和可变分区管理的两个例子： 
+如2002（？）的北京大学主考的上机试题： 
+
+内存被划分成2048块（页）。用32位字长的字存放位示图，为0的位表示该块尚未分配，为1的位表示该块已分配。 
+实习检查： 
+1、运行程序，由检查教师给出文件名，该文件中存有内存目前状况的位示图的数据（0和1的文件）。（程序应做提示，界面友好）。 
+2、你所编制的程序应读入数据，存放在相应的数据结构中。 
+3、显示友好的用户界面，由检查教师输入内存申请（总块数）。 
+4、根据申请和位示图状态，为用户分配内存，并建立页表。 
+5、输出位示图和页表。 
+
+我这个题目编了一个，但是还没有输进去，相信大家都能做出来。 
+
+数据结构：用一个数组来表示内存状况，页表。 
+函数定义：内存申请函数 
+
+以下是论坛上网友提供的另一道模拟内存分配与回收的试题的答案，具体试题不知道是什么： 
+
+#define n 10 /*假定系统允许的最大作业为，假定模拟实验中n值为10*/ 
+#define m 10 /*假定系统允许的空闲区表最大为m，假定模拟实验中m值为10*/ 
+#define minisize 100 
+
+struct 
+{ 
+float address; /*已分分区起始地址*/ 
+float length; /*已分分区长度，单位为字节*/ 
+int flag; /*已分配区表登记栏标志，用"0"表示空栏目*/ 
+}used_table[n]; /*已分配区表*/ 
+
+struct 
+{ 
+float address; /*空闲区起始地址*/ 
+float length; /*空闲区长度，单位为字节*/ 
+int flag; /*空闲区表登记栏标志，用"0"表示空栏目，用"1"表示未分配*/ 
+}free_table[m]; /*空闲区表*/ 
+
+
+allocate(J,xk) 
+char J; 
+float xk; 
+/*采用最优分配算法分配xk大小的空间*/ 
+{ 
+int i,k; 
+float ad; 
+k=-1; 
+for(i=0;i<m;i++) /*寻找空间大于xk的最小空闲区登记项k*/ 
+if(free_table[i].length>=xk&&free_table[i].flag==1) 
+if(k==-1||free_table[i].length<free_table[k].length) 
+k=i; 
+if(k==-1)/*未找到可用空闲区，返回*/ 
+{ 
+printf("无可用空闲区\n"); 
+return; 
+} 
+/*找到可用空闲区，开始分配：若空闲区大小与要求分配的空间差小于msize大小，则空闲区全部分配；若空闲区大小与要求分配的空间差大于minisize大小，则从空闲区划出一部分分配*/ 
+if(free_table[k].length-xk<=minisize) 
+{ 
+free_table[k].flag=0; 
+ad=free_table[k].address; 
+xk=free_table[k].length; 
+} 
+else 
+{ 
+free_table[k].length=free_table[k].length-xk; 
+ad=free_table[k].address+free_table[k].length; 
+} 
+/*修改已分配区表*/ 
+i=0; 
+while(used_table[i].flag!=0&&i<n) /*寻找空表目*/ 
+i++; 
+if(i>=n) /*无表目填写已分分区*/ 
+{ 
+printf("无表目填写已分分区，错误\n"); 
+/*修正空闲区表*/ 
+if(free_table[k].flag==0) 
+/*前面找到的是整个空闲分区*/ 
+free_table[k].flag=1; 
+else 
+{/*前面找到的是某个空闲分区的一部分*/ 
+free_table[k].length=free_table[k].length+xk; 
+return; 
+} 
+} 
+else 
+{/*修改已分配表*/ 
+used_table[i].address=ad; 
+used_table[i].length=xk; 
+used_table[i].flag=J; 
+} 
+return; 
+}/*主存分配函数结束*/ 
+
+reclaim(J) 
+char J; 
+/*回收作业名为J的作业所占主存空间*/ 
+{ 
+int i,k,j,s,t; 
+float S,L; 
+/*寻找已分配表中对应登记项*/ 
+s=0; 
+while((used_table[s].flag!=J||used_table[s].flag==0)&&s<n) 
+s++; 
+if(s>=n)/*在已分配表中找不到名字为J的作业*/ 
+{ 
+printf("找不到该作业\n"); 
+return; 
+} 
+/*修改已分配表*/ 
+used_table[s].flag=0; 
+/*取得归还分区的起始地址S和长度L*/ 
+S=used_table[s].address; 
+L=used_table[s].length; 
+j=-1;k=-1;i=0; 
+/*寻找回收分区的空闲上下邻，上邻表目k，下邻表目j*/ 
+while(i<m&&(j==-1||k==-1)) 
+{ 
+if(free_table[i].flag==1) 
+{ 
+if(free_table[i].address+free_table[i].length==S)k=i;/*找到上邻*/ 
+if(free_table[i].address==S+L)j=i;/*找到下邻*/ 
+} 
+i++; 
+} 
+if(k!=-1) 
+if(j!=-1) 
+/* 上邻空闲区，下邻空闲区，三项合并*/ 
+{ 
+free_table[k].length=free_table[j].length+free_table[k].length+L; 
+free_table[j].flag=0; 
+} 
+else 
+/*上邻空闲区，下邻非空闲区，与上邻合并*/ 
+free_table[k].length=free_table[k].length+L; 
+else 
+if(j!=-1) 
+/*上邻非空闲区，下邻为空闲区，与下邻合并*/ 
+{ 
+free_table[j].address=S; 
+free_table[j].length=free_table[j].length+L; 
+} 
+else 
+/*上下邻均为非空闲区，回收区域直接填入*/ 
+{ 
+/*在空闲区表中寻找空栏目*/ 
+t=0; 
+while(free_table[t].flag==1&&t<m) 
+t++; 
+if(t>=m)/*空闲区表满,回收空间失败,将已分配表复原*/ 
+{ 
+printf("主存空闲表没有空间,回收空间失败\n"); 
+used_table[s].flag=J; 
+return; 
+} 
+free_table[t].address=S; 
+free_table[t].length=L; 
+free_table[t].flag=1; 
+} 
+return; 
+}/*主存回收函数结束*/ 
+
+main( ) 
+{ 
+int i,a; 
+float xk; 
+char J; 
+/*空闲分区表初始化：*/ 
+free_table[0].address=10240; 
+free_table[0].length=102400; 
+free_table[0].flag=1; 
+for(i=1;i<m;i++) 
+free_table[i].flag=0; 
+/*已分配表初始化：*/ 
+for(i=0;i<n;i++) 
+used_table[i].flag=0; 
+while(1) 
+{ 
+printf("选择功能项（0-退出,1-分配主存,2-回收主存,3-显示主存）\n"); 
+printf("选择功项(0~3) :"); 
+scanf("%d",&a); 
+switch(a) 
+{ 
+case 0: exit(0); /*a=0程序结束*/ 
+case 1: /*a=1分配主存空间*/ 
+printf("输入作业名J和作业所需长度xk: "); 
+scanf("%*c%c%f",&J,&xk); 
+allocate(J,xk);/*分配主存空间*/ 
+break; 
+case 2: /*a=2回收主存空间*/ 
+printf("输入要回收分区的作业名"); 
+scanf("%*c%c",&J); 
+reclaim(J);/*回收主存空间*/ 
+break; 
+case 3: /*a=3显示主存情况*/ 
+/*输出空闲区表和已分配表的内容*/ 
+printf("输出空闲区表：\n起始地址 分区长度 标志\n"); 
+for(i=0;i<m;i++) 
+printf("%6.0f%9.0f%6d\n",free_table[i].address,free_table[i].length, free_table[i].flag); 
+printf(" 按任意键,输出已分配区表\n"); 
+getch(); 
+printf(" 输出已分配区表：\n起始地址 分区长度 标志\n"); 
+for(i=0;i<n;i++) 
+if(used_table[i].flag!=0) 
+printf("%6.0f%9.0f%6c\n",used_table[i].address,used_table[i].length, used_table[i].flag); 
+else 
+printf("%6.0f%9.0f%6d\n",used_table[i].address,used_table[i].length, used_table[i].flag); 
+break; 
+default:printf("没有该选项\n"); 
+}/*case*/ 
+}/*while*/ 
+}/*主函数结束*/

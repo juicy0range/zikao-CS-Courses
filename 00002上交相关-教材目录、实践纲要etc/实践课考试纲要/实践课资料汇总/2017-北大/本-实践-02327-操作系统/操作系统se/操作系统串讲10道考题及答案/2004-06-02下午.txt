@@ -1,0 +1,78 @@
+6月2日下午题，参考答案，核心的，不是全部答案！
+//*********完成作业释放内存********callback()***********************
+void callback(char *name)
+{
+int i,j,k;
+int begin,size;
+int t1,t2;
+int count;
+for(i=0; i<50 && UsedTab[i].flag!=-1; i++)
+{
+  if(!stricmp(UsedTab[i].name,name))//查找输入名字相同的使用表
+  {
+   break;
+  }
+}
+//i此时表示的是符合条件的作业的序号
+begin=UsedTab[i].begin;
+size=UsedTab[i].size;
+
+for(j=0;j<50&&FreeTab[j].flag!=-1;j++)
+{
+  if(begin==(FreeTab[j].begin+FreeTab[j].size))
+  {
+   t1=1;//上临区
+   break;
+  }
+  t1=0;
+}
+for(k=0;k<50&&FreeTab[k].flag!=-1;k++)
+{
+  if((begin+size)==FreeTab[k].begin)
+  {
+   t2=1;
+   break;
+  }
+  t2=0;
+}
+//有上下临区
+if(t1 && t2)
+{
+  FreeTab[j].size=FreeTab[j].size+size+FreeTab[k].size;
+  sort(k,FreeTab);//上下都有的删除下临区的结点
+  release(FreeTab);
+  sort(i,UsedTab);//把i后面的往前提
+  release(UsedTab);//释放最后一个结点的内存
+}
+//有上临区
+else
+{
+  if(t1||t2)
+  {
+   if(t1)
+   {
+    FreeTab[j].size=FreeTab[j].size+size;
+    sort(i,UsedTab);//把i后面的往前提
+    release(UsedTab);
+   }
+   //有下临区
+   else 
+   {
+    FreeTab[k].begin=begin;
+    FreeTab[k].size=FreeTab[k].size+size;
+    sort(i,UsedTab);//把i后面的往前提
+    release(UsedTab);
+   }
+  }
+  //无临区
+  else
+  {
+   count=TabCount(FreeTab);
+   FreeTab[count].flag=0;
+   FreeTab[count].begin=begin;
+   FreeTab[count].size=size;
+   sort(i,UsedTab);//把i后面的往前提
+   release(UsedTab);
+  }
+}
+}

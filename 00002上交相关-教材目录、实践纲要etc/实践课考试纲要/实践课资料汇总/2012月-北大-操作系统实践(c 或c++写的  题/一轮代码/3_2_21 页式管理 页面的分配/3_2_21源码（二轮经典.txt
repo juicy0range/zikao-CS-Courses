@@ -1,0 +1,208 @@
+/*
+注：二次
+
+3_2_2题1：--------------------（核心：页面分配算法）
+模拟页式存储管理方案中页面分配过程有关说明：
+1．内存空闲页面用空闲块表记录。
+空闲块表记录了全部空闲的物理块：包括首空闲块号（物理页面号）和空闲块个数（空闲页面个数）。空闲块表的数据结构如下：
+struct FreeBlockTable {
+int    first;            //首空闲块号
+int    count;        //空闲块个数
+   }struct FreeBlockTable    tables[32];
+空闲块表的初始状态存放在文件init.txt中：
+①在init.txt中有若干行，每行存放两个数，一个是首空闲块号，另一个是空闲块个数，表示一连串的空闲页面。该文件最后以0结束。
+②考试时，请自行创建init.txt文件进行自我测试；判题时，将用测试init.txt文件，文件名不改变。
+2．分配方案：只要找到空闲块就将其分配给程序，不要求程序连续存放。
+程序运行流程：
+1．初始化空闲块表，从init.txt中读取数据，并对    tables进行初始化。没有内容记录的表项填充0。
+2．在用户界面提示信息"程序长度（单位：k）："，用户输入要申请内存空间的长度；程序接收数据，并将程序长度转换成所需的内存块数，假设页面长度为4k。
+3．为程序寻找空闲页面，将找到的空闲页面分配给该程序，并修改空闲块表。
+4．建立或修改页表。
+5．重复2、3、4，直到输入为特殊字符0。
+6．输出页表（每行输出页表的一个表项，逻辑页号和内存块号之间用空格隔开）。
+示例：
+逻辑页面号  内存块号
+  0         88
+1         77
+2         66
+3         55
+7．输出当前的空闲块表（本题为32行，不包括标题行）。
+格式：首空闲块号   空闲块个数
+
+*/
+
+#include <stdio.h>
+#include <string.h>
+
+
+#define kmaxNum 32   //空闲区表的最大个数
+#define pMaxNum 100  //页表的最大数
+
+typedef struct FreeBlockTable
+{
+  int    first;            //首空闲块号
+  int    count;        //空闲块个数
+}FBTable;
+FBTable  tables[kmaxNum];
+
+typedef struct pageTableNode
+{
+  int logicalNum;    //逻辑页号
+  int physicsNum;    //物理页号
+}pTable;
+pTable  pageTable[pMaxNum];
+
+int readFile();
+int pageNCFP(int tableNum,int userTotalPage);  //返回页表项目数
+void outKxqTable(int tableNum);
+void outpageTable(int pageTableNum);
+
+void main()
+{
+	int tableNum,requstLength,userTPage,pageTableNum;
+	printf("\n功能：模拟页式存储管理方案中页面分配过程\n");
+	//读文件
+	tableNum=readFile();
+	outKxqTable(tableNum);
+
+    //--------二 用户申请，及处理
+   	printf("\n请您 输入要申请内存空间的长度数字（单位：k），按0结束申请\n");
+    scanf("%d",&requstLength);
+	while(requstLength!=0)
+	{
+
+		 if(requstLength%4==0)
+		 {
+			userTPage=requstLength/4;
+		 }
+		 else
+		 {
+			userTPage=requstLength/4+1;    //针对有内碎片的页
+		 }
+
+        pageTableNum=pageNCFP(tableNum,userTPage);
+       scanf("%d",&requstLength);
+	}
+
+	//------三 输出(只有分配成功后，才输出结果 
+	if(pageTableNum!=0)
+	{
+	    outpageTable(pageTableNum);
+        outKxqTable(tableNum);    //题中要求输出32行，其实是没用的
+	}
+  
+}
+
+
+int readFile()
+{
+    int i=0,tableNum,k,data;
+    char fName[50];
+	FILE *stream;
+	printf("\n请输入空闲区数据文件名\n");
+	gets(fName);
+	stream=fopen(fName,"r");    //打开文件
+	while(stream==NULL)
+	{
+	   printf("\n文件名或路径错误，请重新输入文件名\n");
+	   gets(fName);
+       stream=fopen(fName,"r");
+	}
+	//读文件，最后以0结束
+	fscanf(stream,"%d",&data);
+    while(data!=0)
+	{	  
+	   k=i/2;   //作为空闲区记录的下标
+	   if(i%2==0)
+	   {
+		  tables[k].first=data;
+	   }
+	   else if(i%2==1)
+	   {
+		  tables[k].count=data;
+	   }
+			  
+	  fscanf(stream,"%d",&data);
+	   ++i;	  
+	}
+    tableNum=k+1;   
+
+	//关闭
+    fclose(stream);
+	return tableNum;
+}
+
+int pageNCFP(int tableNum,int userTotalPage)
+{
+    int lj=0;   //用户请求页下标
+	int pt=0;   //页表下标
+	int i=0;    //空闲表下标
+
+
+    for(i=0;i<tableNum;i++)
+	{
+	    if(tables[i].count>0)   //有空闲块 
+		{
+            if(lj<userTotalPage) //且还需为用户分配内存块
+			{
+                // （一建页表项 并 修改空闲表块的数目
+				pageTable[pt].logicalNum=lj;
+				pageTable[pt].physicsNum=tables[i].first;   //
+				++pt;
+
+				++lj;
+				--tables[i].count;
+
+                //（二 针对空闲块连续的情况,更新页表
+				while(tables[i].count>0 && lj<userTotalPage)  
+				{
+				   pageTable[pt].logicalNum=lj;
+				   pageTable[pt].physicsNum=pageTable[pt-1].physicsNum+1;   //页表的地址
+				   ++pt;
+
+				   ++lj;
+					--tables[i].count;			   
+				}				
+				//（三 当前空闲表记录中的块数分配完之后）且（还需给用户分配物理块），就看其下一个空闲目录;否则跳出循环
+				if(tables[i].count==0 && lj<userTotalPage) 
+				{
+				}				
+				else
+				{
+					break;  //这是
+				}				
+			}
+			else 
+			{
+			   break;  //当为用户分配好内存块后，就跳出循环
+			}
+
+		}//end if
+	}//end for
+
+
+
+	
+	return pt;
+}
+
+void outKxqTable(int tableNum)
+{
+    int i;
+    printf("\n空闲区表为：\n");
+	printf("首空闲块号   空闲块个数");
+	for(i=0;i<tableNum;i++)
+	{
+	   printf("\n%d   %d   \n",tables[i].first,tables[i].count);
+	}
+}
+void outpageTable(int pageTableNum)
+{
+    int i;
+    printf("\n页表为：\n");
+	printf("逻辑页面号  内存块号");
+	for(i=0;i<pageTableNum;i++)
+	{
+	   printf("\n%d   %d   \n",pageTable[i].logicalNum,pageTable[i].physicsNum);
+	}
+}

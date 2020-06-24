@@ -1,0 +1,376 @@
+/*这只是个大概的题：原理及用例见汤书及自己的稿子
+ 2_3银行家算法
+银行家可以把一定数量的资金供多个用户周转使用，为保证资金的安全银行家规定：
+1.当一个用户对资金的最大需求量不超过银行家现有的资金就要接纳该用户;
+2.用户可以分期贷款,但垡的总数不能超过最大需求量;
+3.当银行家现有的资金不能满足用户的沿需垡数时,对用户的贷款可推迟支付,但总能使用户在有限的时间里得到贷款;
+4当用户得到所需的全部资金后,一定能在有限的时间里归还所有的资金.
+假设共有3类资源A B C,分别为10,5,7个
+进程列表存在文件中,格式为
+进程名 对A类资源需求数量  对B类资源需求数量  对c资源需求数量 
+输出每个进程的处理结果
+
+
+*/
+#include <stdio.h>
+
+#define maxRes 15   //记录最大资源数
+#define maxProc 10   //记录最大的进程数
+#define maxNum 50
+
+//参数太多了，只能定成公共变量
+int sysAllRes[maxRes]; //系统的各类资源
+int Available[maxRes]; //某个时刻的可用资源
+int Max[maxProc][maxRes];       //
+int Allocation[maxProc][maxRes];
+int Need[maxProc][maxRes];
+int Request[maxProc][maxRes];
+
+//int resNum;   //系统资源种类数
+//int procNum;  //系统当前合法请求的进程数
+//int securityArr[maxProc];  //securityArr存放此次的安全序列（即进程的下标）
+
+//数组及对应操作：分两类；一维，二维（所以读文件和输出分两类）
+int readFileSingleArr(int arr[maxRes],int type);          //type:0 代表读 系统的各类资源；1代表读 当前时刻的可用资源的数量
+int readFileDoubleArr(int arr[maxProc][maxRes],int process[maxProc],int type); //type:0 代表Max[][],1 代表 Allocation[][],2 代表Request[][]
+void outSingleArr(int arr[maxRes],int resNum,int type);
+void outDoubleArr(int arr[maxProc][maxRes],int resNum,int process[maxProc],int procNum,int type); //type:  3 代表Need[][]
+int security(int procNum,int resNum,int securityArr[maxProc]);       //安全算法
+void Bank(int proNo,int procNum,int resNum,int securityArr[]);   //银行家算法
+
+void main()
+{
+	int resNum;   //系统资源种类数
+    int procNum;  //系统当前合法请求的进程数
+	int securityArr[maxProc];  //securityArr存放此次的安全序列（即进程的下标）
+	int securityFlag,ReqProcessNum;    
+	int process[maxProc],i,j,k;
+	int reqProcess[maxProc];      //注意：放请求进程的情况(与上边的process[]区别开
+
+	printf("\n2_3实现银行家算法\n");
+    //----------- 一 initial
+    //
+    resNum=readFileSingleArr(sysAllRes,0);       //实际资源种类数
+	outSingleArr(sysAllRes,resNum,0);
+	//当前剩下的各类资源数
+    readFileSingleArr(Available,1);
+    outSingleArr(Available,resNum,1);
+
+	//各个进程需的最大各类资源数
+    procNum=readFileDoubleArr(Max,process,0);    //当前系统合法的进程数
+	outDoubleArr(Max,resNum,process,procNum,0);
+	//各个进程 已分配的各类资源数
+    readFileDoubleArr(Allocation,process,1);   //这的process没多大用
+    outDoubleArr(Allocation,resNum,process,procNum,1);
+	//计算出Need[][]
+    for(k=0;k<procNum;k++)
+	{
+	    i=process[k];
+		for(j=0;j<resNum;j++)
+		{
+		    Need[i][j]=Max[i][j]-Allocation[i][j];
+		}
+	}
+    outDoubleArr(Need,resNum,process,procNum,3);
+
+    //---  二 调用安全算法，输出此刻的安全序列
+	printf("\n-- ---------二调用安全算法-----------\n");
+    securityFlag=security(procNum,resNum,securityArr);
+	if(securityFlag==0)
+	{
+	    printf("\n系统处于不安全的状态。\n");
+	}
+	else
+	{
+	   printf("\n系统此刻的安全序列为："); 
+	   for(k=0;k<procNum;k++)
+	   {
+	      printf("P%d\t",securityArr[k]);
+	   }
+	   printf("\n");
+       //读入各进程的请求文件，遍历即可
+       ReqProcessNum=readFileDoubleArr(Request,reqProcess,2);   //请求的进程数
+       outDoubleArr(Request,resNum,reqProcess,ReqProcessNum,2);
+	   printf("\n-- ---------三 对请求进程执行银行家算法----------\n");
+       for(k=0;k<ReqProcessNum;k++)
+	   {
+	       Bank(reqProcess[k],procNum,resNum,securityArr);  //对每个请求进程调用银行家算法
+	   }
+
+	}   
+}
+
+
+
+int readFileSingleArr(int arr[maxRes],int type)
+{
+    char fName[maxNum];
+	FILE *stream;
+	int i=0;
+    //
+    if(type==0)
+	{
+	   printf("\n请输入包含系统各种资源的数量 的文件名\n");  
+	}
+	else
+	{
+	   printf("\n请输入 当前时刻的可用资源的数量 的文件名\n");  
+	}
+    gets(fName);
+    stream=fopen(fName,"r");
+	while(stream==NULL)
+	{
+	   printf("\n文件名输入有误，请重新输入。\n");
+	   gets(fName);
+       stream=fopen(fName,"r");
+	}
+	//
+    while(!feof(stream))
+	{
+	    fscanf(stream,"%d",&arr[i]);
+		++i;
+	}
+
+	//
+	fclose(stream);
+	return i;
+}   
+
+int readFileDoubleArr(int arr[maxProc][maxRes],int process[maxProc],int type)
+{
+    char fName[maxNum];
+	FILE *stream;
+	int k=0,i=0,j=0,data,m=0;   //i代表进程号；j代表资源的标号
+    //
+    if(type==0)
+	{
+	   printf("\n请输入包含(各个进程对系统各类资源 最大需求数量） 的文件名\n");  
+	}
+	else if(type==1)
+	{
+	   printf("\n请输入包含(各个进程 已分配的 系统各类资源量) 的文件名\n");  
+	}
+	else if(type==2)
+	{
+	   printf("\n请输入包含(各个进程 请求的 系统各类资源量) 的文件名\n");   
+	}
+
+	gets(fName);
+    stream=fopen(fName,"r");
+	while(stream==NULL)
+	{
+	   printf("\n文件名输入有误，请重新输入。\n");
+	   gets(fName);
+       stream=fopen(fName,"r");
+	}
+    //
+    while(!feof(stream))
+	{
+	    fscanf(stream,"%d",&data);
+		++k;
+		if(k%4==1)
+		{		
+		   i=data;   
+		   j=0;
+		   process[m]=data;
+		   ++m;
+		}
+		else
+		{
+		   arr[i][j]=data;
+		   ++j;
+		}
+	}
+
+	//
+	fclose(stream);
+	return m-1;   
+}
+
+void outSingleArr(int arr[maxRes],int resNum,int type)
+{
+	 int i=0;
+     if(type==0)
+	 {	
+		 printf("\n系统各类资源量\n");
+		
+	 }
+	 else 
+	 {
+	      printf("\n系统（当前各类资源量\n");
+	 }
+	 printf("资源A\t资源B\t资源C\n");
+     for(i=0;i<resNum;i++)
+	 {
+		 printf("%d\t",arr[i]);
+	 }
+	 printf("\n");
+}
+//type:  3:代表need[][]
+void outDoubleArr(int arr[maxProc][maxRes],int resNum,int process[maxProc],int procNum,int type)
+{
+    int i=0,j=0,k;
+	if(type==0)
+	{	
+	  printf("\n 1 每个进程的对各类资源的（最大需求量\n");
+	}
+	else if(type==1)
+	{
+	   printf("\n 2 每个进程的 已分配到的 各类资源\n");
+	}
+	else if(type==2)
+	{
+	   printf("\n--当前请求进程的情况：\n");
+	}
+	else if(type==3)
+	{
+	   printf("\n 可计算出：每个进程的(还需要 各类资源\n"); 
+	}
+
+	printf("\n进程号\t资源A\t资源B\t资源C\n");
+    for(k=0;k<procNum;k++)
+	{
+	    i=process[k];
+	    printf("%d\t",i);
+		for(j=0;j<resNum;j++)
+		{
+		   printf("%d\t",arr[i][j]);
+		}
+		printf("\n");
+	}
+    printf("\n");	
+}
+
+int security(int procNum,int resNum,int securityArr[maxProc])
+{
+   int work[maxRes],finish[maxProc],i,j;
+   int k,m=0; 
+   int needFlag;  //
+   int securityFlag;  //安全态标志
+   //-- 一 initial
+   for(j=0;j<resNum;j++)     //全局变量resNum  可供进程继续使用的各类资源
+   {
+      work[j]=Available[j];
+   }
+   for(i=0;i<procNum;i++)   //全局变量procNum
+   {
+      finish[i]=0;        //默认为0; 
+   }
+
+   //-- 二
+   for(k=1;k<=procNum;k++)  
+   {
+      for(i=0;i<procNum;i++)
+	  {
+		  //判断进程i对各类资源的请求 <系统当前各类对应可用资源
+	      for(j=0;j<resNum;j++)
+		  {
+			  if(Need[i][j]<=work[j])
+			  {
+				  needFlag=1;				 
+			  }
+			  else
+			  {
+			      needFlag=0;   //进程i 对资源j的需要 大于 系统当前可用资源
+				  break;
+			  }
+		  }
+		  //
+		  if(finish[i]==0 && needFlag==1)
+		  {
+		       for(j=0;j<resNum;j++)
+			   {
+                   work[j]=work[j]+Allocation[i][j];
+			   }
+			   finish[i]=true;  
+
+			   securityArr[m]=i;  //保存安全序列
+			   ++m;
+			   break;    //
+		  }
+	  
+	  }
+   }
+   //-- 三
+   for(i=0;i<procNum;i++)
+   {
+	   if(finish[i]==1) 
+	   {
+           securityFlag=1;		   
+	   }
+	   else
+	   {
+	      securityFlag=0;   //不安全了
+		  break;
+	   }
+   }
+
+   return securityFlag;
+}
+
+//
+void Bank(int proNo,int procNum,int resNum,int securityArr[])
+{
+     int i,j,k;
+     int NeedFlag,AvailableFlag,securityFlag;
+	 
+	 i=proNo;  //i保存进程的号
+     //看进程i请求各类资源 与其 所需的各类资源
+     for(j=0;j<resNum;j++)
+	 {
+	     if(Request[i][j]<=Need[i][j])
+		 {
+		     NeedFlag=1;
+		 }
+		 else
+		 {
+		     NeedFlag=0;
+			 printf("\n进程%d所需的资源 已超过它所宣布的最大值。\n",i);
+			 break;
+		 }
+	 }
+     //看进程i请求各类资源 与 系统剩的各类资源
+     for(j=0;j<resNum;j++)
+	 {
+		 //
+		 if(Request[i][j]<=Available[j])
+		 {
+		    AvailableFlag=1;
+		 }
+		 else
+		 {
+		     AvailableFlag=0;
+             printf("\n系统无足够的资源，进程%d需等待。\n",i);
+			 break;
+		 }
+	 }
+     //(3)
+     if(NeedFlag==1 && AvailableFlag==1)
+	 {
+		 for(k=0;k<resNum;k++)
+		 {
+			Available[k]=Available[k]-Request[i][k];
+			Allocation[i][k]=Allocation[i][k]+Request[i][k]; //不要忘了
+            Need[i][k]=Need[i][k]-Request[i][k];
+		 }	 
+
+		//(4)假设分配给进程i后，看此时系统是否安全
+		 securityFlag=security(procNum,resNum,securityArr);     //调用安全算法
+		 if(securityFlag==1)
+		 {
+			printf("\n可以把资源分配给进程%d。\n",i); 
+		 }
+		 else
+		 {
+			printf("\n假如给进程%d分配资源，系统会处于不安全态，所以进程%i只能等待。\n",i,i);
+			//恢复
+			for(j=0;j<resNum;j++)
+			{
+				Available[j]=Available[j]+Request[i][j];
+				Allocation[i][j]=Allocation[i][j]-Request[i][j]; //不要忘了
+				Need[i][j]=Need[i][j]+Request[i][j];
+			}
+		 }
+	 }
+
+}

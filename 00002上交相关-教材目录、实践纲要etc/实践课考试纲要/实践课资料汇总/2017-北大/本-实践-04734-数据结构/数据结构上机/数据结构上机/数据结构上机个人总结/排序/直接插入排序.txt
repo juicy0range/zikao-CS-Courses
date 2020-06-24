@@ -1,0 +1,68 @@
+/*
+直接插入排序:
+
+初始序列： 
+i=1 [46] 58 15 45 90 18 10 62	//比较次数:1 　交换次数 0　
+i=2 [46 58] 15 45 90 18 10 62 　　2						2
+i=3 [15 46 58] 45 90 18 10 62 　　3						2
+i=4 [15 45 46 58] 90 18 10 62	  1
+i=5 [15 45 46 58 90] 18 10 62 
+i=6 [15 18 45 46 58 90] 10 62
+i=7 [10 15 18 45 46 58 90] 62 　
+    [10 15 18 45 46 58 62 90] 　　
+**/
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream.h>
+#include <string.h>
+ 
+
+//从小到大
+void InsertSort(int a[],int n)  {
+	int bj=0,jh=0;//存放比较次数 和 交换次数
+	int i,j,temp;
+	for(i=1;i<n;i++)//循环从第二个数组元素开始，因为a[0]作为最初已排序部分 ，循环n-1次
+	{         
+		temp=a[i];//temp标记为未排序第一个元素
+		j=i-1;         
+		while (j>=0 && temp<a[j])/*将temp与已排序元素从大到小比较，寻找temp应插入的位置*/
+		{              
+			a[j+1]=a[j];               
+			j--;
+			bj++;
+			jh++;
+        }
+		if(j>=0){	//说明上面的循环是由于不满足 arr[j]>temp 而跳出
+			bj++;
+		}
+		a[j+1]=temp;      
+	} 
+	cout<<endl<<"比较次数："<<bj<<endl;
+	cout<<endl<<"交换次数："<<jh<<endl;
+} 
+
+
+void print(int a[],int na){
+	for(int i=0;i<na;i++){
+		cout<< a[i] <<" ";
+	}
+	cout<<endl;
+}
+
+void main(){
+	int a[100];
+	int na=0,i;
+
+	cout<<"请输入数组a,之间用空格隔开，以-9999结束"<<endl;
+	for(i=0;i<100;i++){
+		scanf("%d",&a[i]);
+		if(a[i]==-9999){
+			break;
+		}
+	}
+	na = i;
+	InsertSort(a,na);
+	print(a,na);
+
+	getchar();
+}

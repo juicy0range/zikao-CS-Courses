@@ -1,0 +1,131 @@
+ 作业调度题
+
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXJOB 100
+typedef struct JOBS
+{
+       char name[20];       /*作业名称*/
+       int  pre;            /*优先数*/
+       int  time;           /*作业时间*/
+       int  hour,minute;     /*作业进入时间*/
+}JOB;
+void main()
+{
+       FILE *fp;
+       int  number=0,j,k,l;
+       int  no[MAXJOB];
+       JOB  my_JOB[MAXJOB];
+       int  now_time;
+/*文件打开*/
+       if(!(fp=fopen("A.TXT","rb")))
+       {
+              printf("File Open ERROR! Press ANYKEY to EXIT.");
+              getch();
+              exit(0);
+       }
+/*读取文件内容*/
+       while(!feof(fp)&&number<MAXJOB)
+       {
+              fscanf(fp,"%s%d%d%d%d",my_JOB[number].name,&my_JOB[number].pre,&my_JOB[number].time,&my_JOB[number].hour,&my_JOB[number].minute);
+              if(feof(fp)) break; /*判断文件是否为空*/
+              number++;
+       }
+       clrscr();
+       /*先来先服务*/
+       puts("At FCFS the JOBS is:");
+       puts("JOB_NAME    RUN_TIME");
+       /*按先来先服务顺序输出作业*/
+       now_time=my_JOB[0].hour*60+my_JOB[0].minute+my_JOB[0].time;
+       printf("%7s%9d:%d\n",my_JOB[0].name,my_JOB[0].hour,my_JOB[0].minute);
+       for(j=1;j<number;j++)
+       {
+              printf("%7s",my_JOB[j].name);
+              printf("%9d:%d\n",now_time/60,now_time%60);
+              now_time+=my_JOB[j].time;
+       }
+       /*最大优先数*/
+       puts("\n\nAt Preference the JOBS is:");
+       puts("JOB_NAME    RUN_TIME");
+       /*按优先数从大到小排序，优先数大者在前*/
+       no[0]=1;
+       for(j=2;j<number;j++)
+       {
+              for(k=0;k<j-1;k++)
+                     if(my_JOB[j].pre>=my_JOB[no[k]].pre)
+                     {
+                            for(l=j-1;l>k;l--)
+                                   no[l]=no[l-1];
+                            break;
+                     }
+              no[k]=j;
+       }
+       /*按优先数从大到小输出，相同优先数按先来先服务*/
+       now_time=my_JOB[0].hour*60+ my_JOB[0].minute+ my_JOB[0].time;
+       printf("%7s%9d:%d\n",my_JOB[0].name,my_JOB[0].hour,my_JOB[0].minute);
+       while(1)
+       {
+              for(j=0;j<number-1;j++)
+              {
+              if(no[j]&&(my_JOB[no[j]].hour*60+my_JOB[no[j]].minute)<now_time)
+                     {
+                            printf("%7s",my_JOB[no[j]].name);
+                            printf("%9d:%d\n" ,now_time/60,now_time%60);
+                            now_time+= my_JOB[no[j]].time;
+                            no[j]=0;
+                            break;
+                     }
+              }
+              for(j=0;j<number-1;j++)
+                     if(no[j]) break;
+              if (j==number-1) break;
+       }
+/*短作业优先*/
+       puts("\n\nAt SHORT TIME the JOBS is:");
+       puts("JOB_NAME    RUN_TIME");
+       /*按作业时间由小到大排序，时间短者在前*/
+       no[0]=1;
+       for(j=2;j<number;j++)
+       {
+              for(k=0;k<j-1;k++)
+                     if(my_JOB[j].time<my_JOB[no[k]].time)
+                     {
+                            for(l=j-1;l>k;l--)
+                                   no[l]=no[l-1];
+                            break;
+                     }
+              no[k]=j;
+       }
+       /*按作业时间由小到大输出，相同时间按先来先服务*/
+       now_time=my_JOB[0].hour*60+ my_JOB[0].minute+ my_JOB[0].time;
+       printf("%7s%9d:%d\n",my_JOB[0].name,my_JOB[0].hour,my_JOB[0].minute);
+       while(1)
+       {
+              for(j=0;j<number-1;j++)
+              {
+              if(no[j]&&my_JOB[no[j]].hour*60+ my_JOB[no[j]].minute<now_time)
+                     {
+                            printf("%7s ",my_JOB[no[j]].name);
+                            printf("%9d:%d\n" ,now_time/60,now_time%60);
+                            now_time+= my_JOB[no[j]].time;
+                            no[j]=0;
+                            break;
+                     }
+              }
+              for(j=0;j<number-1;j++)
+                     if(no[j]) break;
+              if (j==number-1) break;
+       }
+/*最高响应比优先---暂空*/
+       puts("\n\nAt HIGHEST WAIT TIME the JOBS is:");
+       puts("JOB_NAME    RUN_TIME");
+       
+       getch();
+}
+数据文件示例
+作业名 优先级 作业时间 进系统小时 分钟
+job1 3 120 8 30
+job2 4 50 9 0
+job3 1 30 9 30
+job4 5 20 9 50
+job5 7 60 10 3

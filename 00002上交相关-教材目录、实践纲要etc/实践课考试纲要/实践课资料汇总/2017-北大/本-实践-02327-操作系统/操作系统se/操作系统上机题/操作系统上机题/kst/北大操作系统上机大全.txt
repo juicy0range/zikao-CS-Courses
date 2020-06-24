@@ -1,0 +1,1563 @@
+北大操作系统上机大全（转载）！QQ151170305
+一、 进程调度 
+进程调度算法有FIFO，优先数调度算法，时间片轮转调度算法，分级调度算法，目前主要是考FIFO和优先数调度算法（静态优先级）。 
+
+进程调度算法的数据结构主要有：进程 
+
+函数定义：建立进程函数，进程调度函数 
+
+一个网友做的一个FIFO调度算法的示例： 
+
+#include "stdio.h" 
+#define max 100 
+#define pfree 0 /*process end*/ 
+#define running 1 /*process running status*/ 
+#define aready 2 /*process aready status */ 
+#define blocking 3 /*process aready blocking status*/ 
+typedef struct node 
+{ 
+char name; 
+int status; 
+int precendence; 
+int ax,bx,cx,dx; 
+int pc; 
+int psw; 
+struct node *next; /*pcb define*/ 
+}pcb; 
+pcb *createprocess(pcb *head) 
+{ 
+pcb *p,*q; 
+
+int a,b,c,d,m,n; 
+char ID; 
+int s; 
+q=NULL; 
+printf("\ninput the first seven status pcb:"); 
+
+scanf("\n%c",&ID); 
+scanf("%d%d%d%d%d%d",&a,&b,&c,&d,&m,&n); 
+
+while(ID!='*') 
+{ 
+p=(pcb*)malloc(sizeof(pcb)); 
+p->name=ID; 
+p->ax=a; 
+p->bx=b; 
+p->cx=c; 
+p->dx=d; 
+p->pc=m; 
+p->psw=n; 
+p->precendence=pre; 
+p->status=aready; 
+if(head==NULL) 
+head=p; 
+else 
+q->next=p; 
+q=p; 
+printf("\ninput the next pcb: "); 
+scanf("\n%c",&ID); 
+scanf("%d%d%d%d%d%d",&a,&b,&c,&d,&m,&n); 
+} 
+if(q!=NULL) 
+q->next=NULL; 
+q=head; 
+while(q) 
+{ 
+printf("\n peocess name. status.ax. bx. cx. dx. pc. psw.\n "); 
+printf("%10c%5d%8d%5d%5d%5d%5d%5d%5d",q->name,q->status,q->precendence,q->ax,q->bx,q->cx,q->dx,q->pc,q->psw); 
+q=q->next; 
+} 
+return head;/*createprocess end*/ 
+} 
+void processfifo(pcb *head) /*use fifo */ 
+{ 
+pcb *p; 
+p=head; 
+printf("\n the process use fifo method.\n"); 
+printf("running the frist process:\n"); 
+while(p!=NULL) 
+{ 
+p->status=running; 
+printf("\nprocess name status. ax. bx. cx. dx. pc. psw."); 
+printf("\n%10c%5d%8d%5d%5d%5d%5d%5d",p->name,p->status,p->ax,p->bx,p->cx,p->dx,p->pc,p->psw); /*check process running status */ 
+p->status=0; 
+p=p->next; 
+} 
+printf("\ncheck weatherfer the process complete: "); 
+p=head; 
+while(p) 
+{ 
+printf("\n%3c%3d",p->name,p->status); 
+p=p->next; 
+} 
+printf("\ngame is over!\n"); 
+
+} 
+} 
+} 
+main() 
+{ 
+pcb *head; 
+head=NULL; 
+head=createprocess(head); 
+processfifo(head); 
+
+}.
+
+
+二、 模拟存储管理中内存空间的管理和分配 
+内存空间的管理分为固定分区管理方式，可变分区管理方式，页式存储管理，段式存储管理。下面是页式存储管理和可变分区管理的两个例子： 
+如2002（？）的北京大学主考的上机试题： 
+
+内存被划分成2048块（页）。用32位字长的字存放位示图，为0的位表示该块尚未分配，为1的位表示该块已分配。 
+实习检查： 
+1、运行程序，由检查教师给出文件名，该文件中存有内存目前状况的位示图的数据（0和1的文件）。（程序应做提示，界面友好）。 
+2、你所编制的程序应读入数据，存放在相应的数据结构中。 
+3、显示友好的用户界面，由检查教师输入内存申请（总块数）。 
+4、根据申请和位示图状态，为用户分配内存，并建立页表。 
+5、输出位示图和页表。 
+
+我这个题目编了一个，但是还没有输进去，相信大家都能做出来。 
+
+数据结构：用一个数组来表示内存状况，页表。 
+函数定义：内存申请函数 
+
+以下是论坛上网友提供的另一道模拟内存分配与回收的试题的答案，具体试题不知道是什么： 
+
+#define n 10 /*假定系统允许的最大作业为，假定模拟实验中n值为10*/ 
+#define m 10 /*假定系统允许的空闲区表最大为m，假定模拟实验中m值为10*/ 
+#define minisize 100 
+
+struct 
+{ 
+float address; /*已分分区起始地址*/ 
+float length; /*已分分区长度，单位为字节*/ 
+int flag; /*已分配区表登记栏标志，用"0"表示空栏目*/ 
+}used_table[n]; /*已分配区表*/ 
+
+struct 
+{ 
+float address; /*空闲区起始地址*/ 
+float length; /*空闲区长度，单位为字节*/ 
+int flag; /*空闲区表登记栏标志，用"0"表示空栏目，用"1"表示未分配*/ 
+}free_table[m]; /*空闲区表*/ 
+
+
+allocate(J,xk) 
+char J; 
+float xk; 
+/*采用最优分配算法分配xk大小的空间*/ 
+{ 
+int i,k; 
+float ad; 
+k=-1; 
+for(i=0;i<m;i++) /*寻找空间大于xk的最小空闲区登记项k*/ 
+if(free_table[i].length>=xk&&free_table[i].flag==1) 
+if(k==-1||free_table[i].length<free_table[k].length) 
+k=i; 
+if(k==-1)/*未找到可用空闲区，返回*/ 
+{ 
+printf("无可用空闲区\n"); 
+return; 
+} 
+/*找到可用空闲区，开始分配：若空闲区大小与要求分配的空间差小于msize大小，则空闲区全部分配；若空闲区大小与要求分配的空间差大于minisize大小，则从空闲区划出一部分分配*/ 
+if(free_table[k].length-xk<=minisize) 
+{ 
+free_table[k].flag=0; 
+ad=free_table[k].address; 
+xk=free_table[k].length; 
+} 
+else 
+{ 
+free_table[k].length=free_table[k].length-xk; 
+ad=free_table[k].address+free_table[k].length; 
+} 
+/*修改已分配区表*/ 
+i=0; 
+while(used_table[i].flag!=0&&i<n) /*寻找空表目*/ 
+i++; 
+if(i>=n) /*无表目填写已分分区*/ 
+{ 
+printf("无表目填写已分分区，错误\n"); 
+/*修正空闲区表*/ 
+if(free_table[k].flag==0) 
+/*前面找到的是整个空闲分区*/ 
+free_table[k].flag=1; 
+else 
+{/*前面找到的是某个空闲分区的一部分*/ 
+free_table[k].length=free_table[k].length+xk; 
+return; 
+} 
+} 
+else 
+{/*修改已分配表*/ 
+used_table[i].address=ad; 
+used_table[i].length=xk; 
+used_table[i].flag=J; 
+} 
+return; 
+}/*主存分配函数结束*/ 
+
+reclaim(J) 
+char J; 
+/*回收作业名为J的作业所占主存空间*/ 
+{ 
+int i,k,j,s,t; 
+float S,L; 
+/*寻找已分配表中对应登记项*/ 
+s=0; 
+while((used_table[s].flag!=J||used_table[s].flag==0)&&s<n) 
+s++; 
+if(s>=n)/*在已分配表中找不到名字为J的作业*/ 
+{ 
+printf("找不到该作业\n"); 
+return; 
+} 
+/*修改已分配表*/ 
+used_table[s].flag=0; 
+/*取得归还分区的起始地址S和长度L*/ 
+S=used_table[s].address; 
+L=used_table[s].length; 
+j=-1;k=-1;i=0; 
+/*寻找回收分区的空闲上下邻，上邻表目k，下邻表目j*/ 
+while(i<m&&(j==-1||k==-1)) 
+{ 
+if(free_table[i].flag==1) 
+{ 
+if(free_table[i].address+free_table[i].length==S)k=i;/*找到上邻*/ 
+if(free_table[i].address==S+L)j=i;/*找到下邻*/ 
+} 
+i++; 
+} 
+if(k!=-1) 
+if(j!=-1) 
+/* 上邻空闲区，下邻空闲区，三项合并*/ 
+{ 
+free_table[k].length=free_table[j].length+free_table[k].length+L; 
+free_table[j].flag=0; 
+} 
+else 
+/*上邻空闲区，下邻非空闲区，与上邻合并*/ 
+free_table[k].length=free_table[k].length+L; 
+else 
+if(j!=-1) 
+/*上邻非空闲区，下邻为空闲区，与下邻合并*/ 
+{ 
+free_table[j].address=S; 
+free_table[j].length=free_table[j].length+L; 
+} 
+else 
+/*上下邻均为非空闲区，回收区域直接填入*/ 
+{ 
+/*在空闲区表中寻找空栏目*/ 
+t=0; 
+while(free_table[t].flag==1&&t<m) 
+t++; 
+if(t>=m)/*空闲区表满,回收空间失败,将已分配表复原*/ 
+{ 
+printf("主存空闲表没有空间,回收空间失败\n"); 
+used_table[s].flag=J; 
+return; 
+} 
+free_table[t].address=S; 
+free_table[t].length=L; 
+free_table[t].flag=1; 
+} 
+return; 
+}/*主存回收函数结束*/ 
+
+main( ) 
+{ 
+int i,a; 
+float xk; 
+char J; 
+/*空闲分区表初始化：*/ 
+free_table[0].address=10240; 
+free_table[0].length=102400; 
+free_table[0].flag=1; 
+for(i=1;i<m;i++) 
+free_table[i].flag=0; 
+/*已分配表初始化：*/ 
+for(i=0;i<n;i++) 
+used_table[i].flag=0; 
+while(1) 
+{ 
+printf("选择功能项（0-退出,1-分配主存,2-回收主存,3-显示主存）\n"); 
+printf("选择功项(0~3) :"); 
+scanf("%d",&a); 
+switch(a) 
+{ 
+case 0: exit(0); /*a=0程序结束*/ 
+case 1: /*a=1分配主存空间*/ 
+printf("输入作业名J和作业所需长度xk: "); 
+scanf("%*c%c%f",&J,&xk); 
+allocate(J,xk);/*分配主存空间*/ 
+break; 
+case 2: /*a=2回收主存空间*/ 
+printf("输入要回收分区的作业名"); 
+scanf("%*c%c",&J); 
+reclaim(J);/*回收主存空间*/ 
+break; 
+case 3: /*a=3显示主存情况*/ 
+/*输出空闲区表和已分配表的内容*/ 
+printf("输出空闲区表：\n起始地址 分区长度 标志\n"); 
+for(i=0;i<m;i++) 
+printf("%6.0f%9.0f%6d\n",free_table[i].address,free_table[i].length, free_table[i].flag); 
+printf(" 按任意键,输出已分配区表\n"); 
+getch(); 
+printf(" 输出已分配区表：\n起始地址 分区长度 标志\n"); 
+for(i=0;i<n;i++) 
+if(used_table[i].flag!=0) 
+printf("%6.0f%9.0f%6c\n",used_table[i].address,used_table[i].length, used_table[i].flag); 
+else 
+printf("%6.0f%9.0f%6d\n",used_table[i].address,used_table[i].length, used_table[i].flag); 
+break; 
+default:printf("没有该选项\n"); 
+}/*case*/ 
+}/*while*/ 
+}/*主函数结束*/
+
+
+三、 虚拟存储管理器的页面调度 
+页面调度算法主要有：FIFO，最近最少使用调度算法（LRU），最近最不常用调度算法（LFU），最佳算法（OPT） 
+这几种算法的调度都有可能在考试中碰到。 
+关于这一类型，大家还可以参看书本251页的实验指导。 
+如2001年考题： 
+要求： 
+
+1。实现三种算法： 1。先进先出 2。 OPT 3。 LRU 
+
+2。页面序列从指定的文本文件（TXT文件）中取出 
+
+3。输出： 
+
+第一行：每次淘汰的页面号 
+
+第二行：显示缺页的总次数 
+以下是网友做的答案： 
+
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <malloc.h> 
+#define null 0 
+#define len sizeof(struct page) 
+
+struct page 
+{ int num; 
+int tag; 
+struct page *next; 
+}; 
+
+
+struct page *create(int n) /*建立分配的内存空间，并初始化，返回头结点*/ 
+{int count=1; 
+struct page *p1,*p2,*head; 
+head=p2=p1=(struct page *)malloc(len); 
+p1->tag=-1;p1->num=-1; 
+while(count<n) 
+{count++; 
+p1=(struct page *)malloc(len); 
+p1->tag=-1;p1->num=-1; 
+p2->next=p1; 
+p2=p1; 
+} 
+p2->next=null; 
+return(head); 
+} 
+
+
+void FIFO(array,n) 
+int array[],n; 
+{int *p; 
+struct page *cp,*dp,*head,*new; 
+int count=0; 
+head=create(n); 
+p=array; 
+while(*p!=-1) 
+{ cp=dp=head; 
+for(;cp->num!=*p&&cp->next!=null;) cp=cp->next; 
+if (cp->num==*p) printf(" ! " ); 
+else 
+{ count++; 
+cp=head; 
+for(;cp->tag!=-1&&cp->next!=null;) cp=cp->next; 
+if(cp->tag==-1) 
+{cp->num=*p; 
+cp->tag=0; 
+printf(" * "); 
+} 
+else 
+{new=(struct page*)malloc(len); 
+new->num=*p; 
+new->tag=0; 
+new->next=null; 
+cp->next=new; 
+head=head->next; 
+printf(" %d ",dp->num); 
+free(dp); 
+} 
+} 
+p++; 
+} 
+printf("\nQueye Zongshu : %d \n",count); 
+} 
+
+
+void LRU(array,n) 
+int array[],n; 
+{int count=0,*p=array; 
+struct page *head,*cp,*dp,*rp,*new,*endp; 
+head=create(n); 
+while(*p!=-1) 
+{cp=dp=rp=endp=head; 
+for(;endp->next!=null;) endp=endp->next; 
+for(;cp->num!=*p&&cp->next!=null;) 
+{rp=cp;cp=cp->next;} 
+if(cp->num==*p) 
+{printf(" ! "); 
+if(cp->next!=null) 
+{if(cp!=head) 
+rp->next=cp->next; 
+else head=head->next; 
+} 
+endp->next=cp; 
+cp->next=null; 
+} 
+else 
+{count++; 
+cp=rp=head; 
+for(;cp->tag!=-1&&cp->next!=null;) cp=cp->next; 
+if(cp->tag==-1) 
+{printf(" * "); 
+cp->num=*p; 
+cp->tag=0; 
+} 
+else 
+{new=(struct page *)malloc(len); 
+new->num=*p; 
+new->tag=0; 
+new->next=null; 
+cp->next=new; 
+dp=head; 
+head=head->next; 
+printf(" %d ",dp->num); 
+free(dp); 
+} 
+} 
+p++; 
+} 
+printf("\nQueye Zongshu : %d \n",count); 
+} 
+
+
+OPT(array,n) 
+int array[],n; 
+{int *p,*q,count=0,i; 
+struct page *head,*cp,*dp,*new; 
+p=array; 
+head=create(n); 
+while(*p!=-1) 
+{ cp=head; 
+for(;cp->num!=*p&&cp->next!=null;) cp=cp->next; 
+if(cp->num!=*p) 
+{ count++; 
+cp=head; 
+for(;cp->tag!=-1&&cp->next!=null;) cp=cp->next; 
+if(cp->tag==-1) 
+{printf(" * "); 
+cp->num=*p; 
+cp->tag=0; 
+} 
+else 
+{ i=1;q=p;q++;cp=head; 
+while(*q!=-1&&i<n) 
+{ for(;*q!=cp->num&&cp->next!=null;) cp=cp->next; 
+if(*q==cp->num) 
+{cp->tag=1; 
+i++; 
+} 
+q++;cp=head; 
+} 
+if(i==n) 
+{ 
+for(;cp->tag!=0;) cp=cp->next; 
+printf(" %d ",cp->num); 
+cp->num=*p; 
+} 
+else 
+{ cp=head; 
+for(;cp->tag!=0;) cp=cp->next; 
+if(cp==head) 
+{ for(;cp->next!=null;) cp=cp->next; 
+new=(struct page *)malloc(len); 
+new->num=*p; 
+new->tag=0; 
+new->next=null; 
+cp->next=new; 
+dp=head; 
+head=head->next; 
+printf(" %d ",dp->num); 
+free(dp); 
+} 
+else 
+{ printf(" %d ",cp->num); 
+cp->num=*p; 
+} 
+} 
+cp=head; 
+for(;cp->next!=null;) {cp->tag=0;cp=cp->next;} 
+cp->tag=0; 
+} 
+} 
+else printf(" ! "); 
+p++; 
+} 
+printf("\nQueye Zongshu : %d \n",count); 
+} 
+
+main() 
+{ 
+FILE *fp; 
+char pt; 
+char str[10]; 
+int i,j=0; 
+int page[50],space=0; 
+for(i=0;i<50;i++) 
+page[i]=-1; 
+fp=fopen("page.txt","r+"); 
+if(fp==NULL) 
+{ 
+printf("Cann't open the file\n"); 
+exit(0); 
+} 
+i=0; 
+while((pt=fgetc(fp))!=EOF)/*将数字字符串转化成整型—开始*/ 
+{ 
+if(pt>='0'&&pt<='9') 
+{ 
+str[i]=pt;i++; 
+space=0; 
+} 
+else 
+{ 
+if(pt==' '||pt=='\n') 
+{if(space==1) break; 
+else 
+{str[i]='\0'; 
+page[j]=atoi(str); 
+if(pt=='\n') break; 
+else 
+{ 
+space=1; 
+j++; 
+i=0; 
+} 
+} 
+} 
+} 
+}/*结束*/ 
+if(pt==EOF) {str[i]='\0';page[j]=atoi(str);} 
+i=0; 
+while(page[i]!=-1) {printf(" %d ",page[i]);i++;} 
+fclose(fp); 
+printf("\n"); 
+printf(" ! : mean no moved \n * : mean have free space \n\n"); 
+printf("FIFO "); 
+FIFO(page,3); 
+printf("\nLRU "); 
+LRU(page,3); 
+printf("\nOPT "); 
+OPT(page,3); 
+}
+
+
+四、 文件管理 
+文件管理的试题比较多，主要就是模拟*作系统中的 建立文件、打开文件、读文件、写文件、、关闭文件、 、删除文件、、建立目录、、显示目录内容、显示文件内容、、改变文件属性等*作。大家可以参考书本253页的上机指导。 
+北大2001年试题： 
+建立一个树型文件目录 
+假设程序启动运行后在根目录下且根目录为空。 
+
+实习检查： 
+1、运行程序，由检查教师给出文件名，该文件中存有相应的若干命令。（程序应做提示，界面友好）。 
+2、要求实现两个命令： 
+mkdir 目录名（目录已存在，应给出错误信息。） 
+cd 目录名（目录不存在，应给出错误信息。） 
+3、你所编制的程序应读入文件，并执行其中的每一条命令。 
+4、在屏幕上显示文件目录的结构。（界面自己设计，但要清晰明了。） 
+
+2002年北京大学的试题： 
+*作系统上机考试题 
+*作系统上机考试题 
+题目：模拟文件系统 
+要求：模拟一个文件系统，包括目录文件，普通文件，并实现对它们的一些 
+基本*作。 
+假定每个目录文件最多只能占用一个块；一个目录项包括文件名（下一级目录 
+名），文件类型，文件长度，指向文件内容（下一级目录）的指针内容。普通文件可以 
+只用目录项（FCB）代表。（详细的数据结构见后面的说明） 
+程序功能方面的要求： 
+需要实现一个命令行*作界面，包含如下命令： 
+1 改变目录 
+格式：CD〈目录名〉 
+功能：工作目录转移到指定的目录下，只要求完成改变到当前目录的某一个子目录 
+下的功能，不要求实现相对目录以及绝对目录。 
+2 创建文件 
+格式：CREATE〈文件名〉〈文件长度〉 
+功能：创立一个指定名字的新文件，即在目录中增加一项，不考虑文件内容，但必 
+须能输入文件长度。 
+3 删除文件 
+格式：DEL〈希望删除的文件名〉 
+功能：删除指定的文件 
+4 显示目录 
+格式：LSALL 
+功能：显示全部目录以及文件，输出时要求先输出接近根的目录，再输出子目录。 
+图示如图。 
+5 创建目录 
+格式：MD〈目录名〉 
+功能：在当前路径下创建指定的目录 
+6 删除目录 
+格式：RD〈目录名〉 
+功能：删除当前目录下的指定目录，如果该目录为空，则可删除，否则应提示是否 
+作删除，删除*作将该目录下的全部文件和子目录都删除。 
+对于上述功能要求，完成1-4为及格，完成1-5为良，完成1-6为优。 
+
+程序实现方面的要求： 
+1 对于重名（创建时），文件不存在（删除时），目录不存在（改变目录时）等错误* 
+作情况，程序应该作出相应处理并给出错误信息，但是程序不得因此而退出。 
+2 界面友好，程序强壮。 
+3 界面的提示符为#，提示的命令以及调试的方法应和前面的要求一致。不要自己设计命 
+令或者附加不要求的功能。 
+4 在考卷的说明部分（背面）有一段程序的源代码以及对源代码的说明，考试的编码应 
+在这个程序的基础上修改而成。这段源代码中规定了文件系统使用的数据结构和需要实 
+现的函数框架，请将你的实现代码填写到合适的位置中去，可以自己添加辅助数据结构、 
+变量、常量以及函数，但是不得改变已有的代码（如数据结构的定义以及函数的名称以 
+及参数说明）。 
+5 考试提交的源程序请命名为filesys.c。 
+6 程序设计环境使用TC2.0，在DOS*作系统下完成全部程序代码。 
+
+初始化程序代码： 
+#include "stdio.h" 
+#include "string.h" 
+#include "malloc.h" 
+struct NomalFile 
+{char name[50]; /*file name*/ 
+int type; /*0-directory file,1-common file*/ 
+int size; /*file size*/}; 
+struct DirectoryNode 
+{int tag; /*0-dump node,1-real node*/ 
+char name[50]; 
+int type; /*0-directory file 1-comman file*/ 
+union 
+{struct NomalFile *p_nomFile; /*point to comman file */ 
+struct DirectoryFile *p_dirFile; /*point to dirctory file*/ 
+}p_File; /*look on initializing code*/ 
+}; 
+struct DirectoryFile 
+{/*directory file composed by a node array*/ 
+/*nodes*/ 
+struct DirectoryNode nodesArray[10]; 
+}; 
+/*initializing file system*/ 
+void init() 
+{ 
+int i,j; 
+struct DirectoryFile root; 
+struct NomalFile * newNomFile; 
+struct DirectoryNode * newNode; 
+struct DirectoryFile * newDirFile; 
+struct DirectoryFile * curDirFile; 
+
+for (i=0;i<10;i++) /*initial a directory*/ 
+root.nodesArray[i].tag=0; 
+
+newDirFile=(struct DirectoryFile*) malloc(1100); 
+for (i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[0].tag=1; strcpy(root.nodesArray[0].name,"A"); 
+root.nodesArray[0].type=0; 
+root.nodesArray[0].p_File.p_dirFile=newDirFile; 
+
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[1].tag=1; strcpy(root.nodesArray[1].name,"B"); 
+root.nodesArray[1].type=0; 
+root.nodesArray[1].p_File.p_dirFile=newDirFile; 
+
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[2].tag=1; strcpy(root.nodesArray[2].name,"C"); 
+root.nodesArray[2].type=0; 
+root.nodesArray[2].p_File.p_dirFile=newDirFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F1"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=500; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[3].tag=1; strcpy(root.nodesArray[3].name,(*newNomFile).name); 
+root.nodesArray[3].type=(*newNomFile).type; 
+root.nodesArray[3].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile *)malloc(108); 
+strcpy((*newNomFile).name,"F2"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=50; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[4].tag=1; strcpy(root.nodesArray[4].name,(*newNomFile).name); 
+root.nodesArray[4].type=(*newNomFile).type; 
+root.nodesArray[4].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F3"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=5; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[5].tag=1; strcpy(root.nodesArray[5].name,(*newNomFile).name); 
+root.nodesArray[5].type=(*newNomFile).type; 
+root.nodesArray[5].p_File.p_nomFile=newNomFile; 
+
+curDirFile=root.nodesArray[1].p_File.p_dirFile; 
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F4"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=123; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[0].tag=1; 
+strcpy(curDirFile->nodesArray[0].name,(*newNomFile).name); 
+curDirFile->nodesArray[0].type=(*newNomFile).type; 
+curDirFile->nodesArray[0].p_File.p_nomFile=newNomFile; 
+printf("%s\n",curDirFile->nodesArray[0].p_File.p_nomFile->name); 
+curDirFile=root.nodesArray[2].p_File.p_dirFile; 
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+curDirFile->nodesArray[0].tag=1;strcpy(curDirFile->nodesArray[0].name,"D"); 
+curDirFile->nodesArray[0].type=0; 
+curDirFile->nodesArray[0].p_File.p_dirFile=newDirFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F5"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=321; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[1].tag=1; 
+strcpy(curDirFile->nodesArray[1].name,(*newNomFile).name); 
+curDirFile->nodesArray[1].type=(*newNomFile).type; 
+curDirFile->nodesArray[1].p_File.p_nomFile=newNomFile; 
+
+curDirFile=curDirFile->nodesArray[0].p_File.p_dirFile; 
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F6"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=10; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[0].tag=1; 
+strcpy(curDirFile->nodesArray[0].name,(*newNomFile).name); 
+curDirFile->nodesArray[0].type=(*newNomFile).type; 
+curDirFile->nodesArray[0].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F7"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=70; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[1].tag=1; 
+strcpy(curDirFile->nodesArray[1].name,(*newNomFile).name); 
+curDirFile->nodesArray[1].type=(*newNomFile).type; 
+curDirFile->nodesArray[1].p_File.p_nomFile=newNomFile; 
+} 
+int cd(char *str){return 0;} /*change current dirctory */ 
+int create(char *str,int num){return 0;} /*create file*/ 
+int delete(char *str){return 0;} /*delete file*/ 
+void lsall(){} /*display all directory files*/ 
+int md(char *str){return 0;} /*create dirctory*/ 
+int rd(char *str){return 0;} /* delete dirctory*/ 
+void main() 
+{ 
+}
+
+
+五、 磁盘调度 
+2001年的试题 
+磁盘调度算法 
+要求： 
+
+1。实现三种算法： 
+
+1。先来先服务 
+
+2。最短寻道优先（老师会给当前磁头的位置） 
+
+3。电梯算法 
+
+2。磁道服务顺序从指定的文本文件（TXT文件）中取出 
+
+3。输出： 
+
+第一行：磁道的服务顺序 
+
+第二行：显示移动总道数 
+
+
+参考题目：书 P130 
+以下是网友的答案： 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <malloc.h> 
+#define null 0 
+#define len sizeof(struct cidaohao) 
+
+struct cidaohao 
+{ 
+struct cidaohao *pre; 
+int num; 
+struct cidaohao *next; 
+}; 
+
+FCFS(array) 
+int array[50]; 
+{int i,j,sum=0; 
+printf("\nFCFS : "); 
+for(i=1;array[i]!=-1;i++) 
+{ 
+printf(" %d ",array[i]); 
+} 
+i=0; 
+for(i=0,j=1;array[j]!=-1;i++,j++) 
+{ 
+if(array[i]>array[j]) sum+=(array[i]-array[j]); 
+else sum+=(array[j]-array[i]); 
+} 
+return(sum); 
+} 
+
+SSTF(head,now) 
+struct cidaohao *head; 
+int now; 
+{struct cidaohao *p,*lp,*rp; 
+int sum=0,front,behind; 
+p=head; 
+printf("\nSSTF :"); 
+while(p->num!=now) p=p->next;/*确定now在连表中的位置*/ 
+lp=p->pre; 
+rp=p->next; 
+do 
+{ 
+if(p->next!=null&&p->pre!=null) 
+{front=p->num-lp->num; 
+behind=rp->num-p->num; 
+if(front>=behind) 
+{ 
+sum+=behind; 
+p=rp; 
+printf(" %d ",p->num); 
+rp=p->next; 
+} 
+else 
+{ 
+sum+=front; 
+p=lp; 
+printf(" %d ",p->num); 
+lp=p->pre; 
+} 
+} 
+else 
+{ 
+if(p->next==null) 
+{ while(lp->num!=0) 
+{ 
+sum+=p->num-lp->num; 
+p=lp; 
+printf(" %d ",p->num); 
+lp=p->pre; 
+} 
+return(sum); 
+} 
+if(p->pre==null) 
+{ 
+while(rp->num!=0) 
+{ 
+sum+=rp->num-p->num; 
+p=rp; 
+printf(" %d ",p->num); 
+rp=p->next; 
+} 
+return(sum); 
+} 
+} 
+}while(p->next!=null||p->pre!=null); 
+} 
+
+
+SCAN(head,n,m) 
+struct cidaohao *head; 
+int n,m; 
+{struct cidaohao *p,*pp; 
+int sum=0; 
+printf("\nSCAN : "); 
+p=head; 
+while(p->num!=m) p=p->next;/*确定m的位置*/ 
+pp=p; 
+if(n<m) 
+{while(pp->next!=null) 
+{ 
+sum+=pp->next->num-pp->num; 
+pp=pp->next; 
+printf(" %d ",pp->num); 
+} 
+sum+=pp->num-p->pre->num; 
+pp=p->pre; 
+if(pp->num==0) return(sum); 
+else 
+{while(pp->pre!=null) 
+{ 
+printf(" %d ",pp->num); 
+sum+=pp->num-pp->pre->num; 
+pp=pp->pre; 
+} 
+printf(" %d ",pp->num); 
+return(sum); 
+} 
+} 
+else 
+{ 
+while(pp->pre!=null) 
+{ 
+sum+=pp->num-pp->pre->num; 
+pp=pp->pre; 
+printf(" %d ",pp->num); 
+} 
+sum+=p->next->num-pp->num; 
+pp=p->next; 
+if(pp->num==0) return(sum); 
+else 
+{while(pp->next!=null) 
+{ 
+printf(" %d ",pp->num); 
+sum+=pp->next->num-pp->num; 
+pp=pp->next; 
+} 
+printf(" %d ",pp->num); 
+return(sum); 
+} 
+} 
+} 
+
+
+main() 
+{ 
+
+FILE *fp; 
+char pt; 
+char str[10]; 
+int cidao[100],i,j=1,count1=0,count2=0,count3=0,last,space=0; 
+struct cidaohao *p1,*p2,*new,*head;/*用于建立连表的变量*/ 
+struct cidaohao *p,*lp,*rp; 
+for(i=0;i<50;i++) cidao[i]=-1; 
+i=0; 
+fp=fopen("cipan.txt","r+");/*让fp指向文件*/ 
+if(fp==NULL) 
+{ 
+printf("Cann't open this file "); 
+exit(0); 
+} 
+printf("\nPlease input cidaohao now : "); 
+scanf("%d",&cidao[0]); 
+while((pt=fgetc(fp))!=EOF)/*将数字字符串转化成整型—开始*/ 
+{ 
+if(pt>='0'&&pt<='9') 
+{ 
+str[i]=pt;i++; 
+space=0; 
+} 
+else 
+{ 
+if(pt==' '||pt=='\n') 
+{if(space==1) break; 
+else 
+{str[i]='\0'; 
+cidao[j]=atoi(str); 
+if(pt=='\n') break; 
+else 
+{ 
+space=1; 
+j++; 
+i=0; 
+} 
+} 
+} 
+} 
+}/*结束*/ 
+if(pt==EOF) {str[i]='\0';cidao[j]=atoi(str);} 
+fclose(fp); 
+i=0; 
+count1=FCFS(cidao);/*FCFS调度的移动总量*/ 
+printf("\nThe Total : %d \n",count1); 
+p1=p2=head=(struct cidaohao* )malloc(len);/*开始建立双连表*/ 
+p1->pre=null; 
+p1->num=cidao[0]; 
+p1->next=null; 
+i=1; 
+while(cidao[i]!=-1) 
+{ if(cidao[i]<head->num)/*插入头结点*/ 
+{ 
+p1=(struct cidaohao *)malloc(len); 
+p1->next=head; 
+p1->pre=null; 
+p1->num=cidao[i]; 
+head->pre=p1; 
+head=p1; 
+} 
+else 
+{ 
+while(p1->next!=null&&p1->num<=cidao[i])/*搜索合适位置*/ 
+{ p2=p1; 
+p1=p1->next; 
+} 
+if (p1->num>cidao[i])/*插入中间的情况*/ 
+{ 
+new=(struct cidaohao*)malloc(len); 
+new->num=cidao[i]; 
+new->next=p1; 
+new->pre=p2; 
+p1->pre=new; 
+p2->next=new; 
+} 
+else 
+{/*插入尾部*/ 
+new=(struct cidaohao*)malloc(len); 
+new->num=cidao[i]; 
+new->next=null; 
+new->pre=p1; 
+p1->next=new; 
+} 
+p1=head;/*始终保证插入结束后p1指向头结点*/ 
+} 
+i++;/*截取下一个cidao[i]*/ 
+} 
+count2=SSTF(head,cidao[0]); 
+printf("\nThe Total : %d ",count2); 
+printf("\n\nPleast input last cipanhao : "); 
+scanf("%d",&last); 
+count3=SCAN(head,last,cidao[0]); 
+printf("\nThe Total : %d \n",count3); 
+}
+
+
+六、 作业调度 
+作业调度主要有FIFO，运算时间短的作业优先，优先数调度算法，响应比最高者优先调度算法，均衡调度算法。 
+中山大学2002 12月*作系统上机实验，实例： 
+模拟批处理作业的调度。要求： 
+1）设计你用来存放‘输入井’中作业的数据结构。 
+2）编写一个实现‘响应比最高者优先算法’的程序。（写出类C算法）
+
+
+七、 实现多道程序的转换调度（作业调度和进程调度结合在一起） 
+如2001年试题： 
+1。实现多道程序的转换调度（作业调度和进程调度结合在一起） 
+
+(1) 作业流信息是从指定文本文件（TXT文件）中读取 
+
+作业信息： 
+
+作业号 进入系统时间 估计运行时间 优先级 内存需求量 磁带机需求量 
+
+都为整型 
+
+
+(2) 作业调度算法：1。先来先服务 2，最短作业优先 （二者选一） 
+
+进程调度算法：1。先来先服务 2。基于优先级的算法（静态优先级）（二者选一） 
+
+(3) 输出：作业序列 
+
+格式：作业号 时间间隔 
+1 800-810 （/* 8：00-8：10 */） 
+2 810-900 
+1 900-930 
+平均周转时间：总的周转时间/作业总数 
+周转时间就是作业结束时间减去作业进入系统时间 
+网友的答案： 
+#include <stdio.h> 
+#include <string.h> 
+#include <process.h> 
+#include <stdlib.h> 
+#include <conio.h> 
+#define null 0 
+#define len sizeof(struct jnote) 
+
+struct jcb 
+{ 
+int state; 
+int num; 
+int in; 
+int run; 
+int pri; 
+int mem; 
+int tape; 
+}job[50]; 
+
+struct jnote 
+{ 
+int id; 
+int in; 
+int start; 
+int run; 
+int end; 
+int pri; 
+int size; 
+int tape; 
+int *maddr; 
+struct jnote *next; 
+}; 
+
+int rest=4,memory[101],*mh=memory,logo=0,fid=0; 
+struct jcb *p=job; 
+struct jnote *jh=null,*rp=null,*jp=null; 
+
+
+txt()/*从txt文件中作业流*/ 
+{ 
+FILE *fp; 
+char pt; 
+int i,space=0,j=0,data[100],h,k,count; 
+char str[10]; 
+for(i=0;i<100;i++) data[i]=-1; 
+for(i=0;i<20;i++) 
+{ 
+job[i].num=-1; 
+job[i].tape=-1; 
+job[i].state=-1; 
+} 
+i=0; 
+fp=fopen("job.txt","r+"); 
+if(fp==NULL) 
+{ 
+printf("Cann't the file\n"); 
+exit(0); 
+} 
+while((pt=getc(fp))!=EOF) 
+{if(pt>='0'&&pt<='9') 
+{ 
+str[i]=pt; 
+i++; 
+space=0; 
+} 
+else 
+{ 
+if(pt==' '||pt=='\n') 
+{if(space==1) continue; 
+else 
+{str[i]='\0'; 
+data[j]=atoi(str); 
+j++; 
+i=0; 
+space=1; 
+} 
+} 
+} 
+} 
+for(h=0,k=0;data[k]!=-1;k++,h++) 
+{ 
+job[h].num=data[k];k++; 
+job[h].in=data[k];k++; 
+job[h].run=data[k];k++; 
+job[h].pri=data[k];k++; 
+job[h].mem=data[k];k++; 
+job[h].tape=data[k]; 
+} 
+if(job[h-1].tape==-1) 
+{ 
+str[i]='\0'; 
+job[h-1].tape=atoi(str); 
+} 
+clrscr(); 
+for(i=0;job[i].num!=-1;i++); 
+return(i); 
+} 
+
+
+rpend(start,run) /* 计算进程的结束时间 */ 
+int start, run; 
+{ 
+int end=0; 
+int i=start%100+run; 
+end=(start/100+i/60)*100+i%60; 
+return(end); 
+} 
+
+
+time_time(end,in)/*计算周转时间或计算剩余的运行时间*/ 
+int in,end; 
+{int time; 
+time=end/100*60+end%100-(in/100*60+in%100); 
+return(time); 
+} 
+
+int *m_pd(int size)/*内存判断*/ 
+{ 
+int *mp,*cp; 
+int i=0; 
+mp=cp=mh; 
+while(*mp!=-1) 
+{ 
+while(*cp==0) 
+{ 
+cp++;i++; 
+} 
+if(i>=size) return(mp); 
+while(*cp==1) cp++; 
+mp=cp; 
+} 
+return(null); 
+} 
+
+
+zy_div_free(mp,msize,tape,h)/*资源分配与释放*/ 
+int *mp,msize,tape,h; 
+{int *cp,i=msize; 
+cp=mp; 
+if(h==1) 
+{ 
+for(;i>0;i--) 
+{ *cp=1; cp++;} 
+rest=rest-tape; 
+return (1); 
+} 
+if(h==2) 
+{ 
+for(;i>0;i--) 
+{ *cp=0;cp++; } 
+rest=rest+tape; 
+return (2); 
+} 
+} 
+
+
+selectrp(plogo,time)/*选择当前运行进程*/ 
+int plogo,time; 
+{ 
+struct jnote *newj; 
+struct jnote *temp; 
+if(jh==null&&rp==null) 
+{ p=job; 
+for(;p->state==0;) p++; 
+zy_div_free(mh,p->mem,p->tape,1); 
+p->state=0; 
+newj=(struct jnote *)malloc(len); 
+rp=newj; 
+rp->id=p->num; rp->in=p->in; rp->start=p->in; rp->run=p->run; rp->end=0; rp->pri=p->pri;rp->size=p->mem; rp->tape=p->tape; 
+rp->maddr=mh; rp->next=null; 
+return (0); 
+} 
+else 
+{if(jh!=null&&rp==null) 
+{ 
+rp=jh; 
+jh=jh->next; 
+rp->next=null; 
+rp->start=time; 
+if(plogo==2) selectrp(plogo,time); 
+else return (-1); 
+} 
+else 
+{if(jh!=null&&rp!=null) 
+{ 
+if(plogo==2) 
+{ 
+if(logo==0) 
+{ if(jh->pri>rp->pri) 
+{ 
+temp=jh; 
+jh=jh->next; 
+temp->next=rp; 
+printf("%d : %d --- %d \n",rp->id,rp->start,temp->in); 
+rp->run-=time_time(temp->in,rp->start); 
+rp->start=0; 
+rp=temp; 
+rp->start=rp->in; 
+return (0); 
+} 
+} 
+if(fid==1) 
+{ if(jh->pri>rp->pri) 
+{ 
+temp=jh; 
+jh=jh->next; 
+temp->next=rp; 
+rp=temp; 
+rp->start=time; 
+selectrp(plogo,time); 
+} 
+else 
+{rp->start=time; 
+return (0); 
+} 
+} 
+} 
+return (0); 
+} 
+else 
+{rp->start=time; 
+return (0); 
+} 
+} 
+} 
+return (0); 
+} 
+
+
+WORK(jlogo,plogo,count) 
+int jlogo,plogo,count; 
+{int k=count,sum=0,time,t;/*sum是周转时间之和*/ 
+struct jnote *cp,*p1,*newj; 
+int *mp; 
+selectrp(plogo,0); 
+while(k>0) 
+{ p=job; 
+do 
+{ if(p->state==0) p++; 
+while(p->state==-1&&p->num!=-1&&((logo==0&&p->in<rpend(rp->start,rp->run))||(logo==1&&p->in<=rpend(rp->start,rp->run)))) 
+{ mp=m_pd(p->mem); 
+if(rest>=p->tape) t=1; 
+else t=0; 
+if(mp!=null&&t==1) 
+{zy_div_free(mp,p->mem,p->tape,1); 
+p->state=0; 
+newj=(struct jnote *)malloc(len); 
+newj->id=p->num; newj->in=p->in; newj->start=0; newj->run=p->run; newj->end=0; 
+newj->pri=p->pri; newj->size=p->mem; newj->tape=p->tape; newj->maddr=mp; newj->next=null; 
+if(jh==null) 
+{ jh=newj; jp=jh; } 
+else 
+{if (jlogo==1) {jp->next=newj;jp=newj; }/*作业为FCFS*/ 
+else /*作业为最短运行时间优先*/ 
+{ jp=cp=jh; 
+if(newj->run>=jp->run&&jp->next!=null) 
+{ cp=jp; jp=jp->next; } 
+else 
+{if(newj->run<jp->run) 
+{ if(cp==jp) 
+{ newj->next=jp; jh=newj; } 
+else 
+{ cp->next=newj; newj->next=jp; } 
+} 
+else jp->next=newj; 
+} 
+} 
+} 
+if (plogo==2) selectrp(plogo,0); 
+} 
+p++; 
+} 
+}while(p->state==0); 
+if (logo==0) 
+{ zy_div_free(rp->maddr,rp->size,rp->tape,2); 
+logo=1; 
+} 
+else 
+{ 
+rp->end=rpend(rp->start,rp->run); /*此时计算结束时间*/ 
+printf("%d : %d --- %d \n",rp->id,rp->start,rp->end); 
+sum+=time_time(rp->end,rp->in);/*计算周转时间总和*/ 
+if(k-1==0) 
+{p1=rp;rp=rp->next;free(p1); break; } 
+time=rp->end; 
+p1=rp; 
+rp=rp->next; 
+free(p1); 
+k--; 
+fid=1; 
+selectrp(plogo,time); 
+fid=0; 
+logo=0; 
+} 
+} 
+printf("The average time : %d \n",sum/count); 
+} 
+
+init() 
+{ 
+int i; 
+for(i=0;job[i].num!=-1;i++) job[i].state=-1; 
+logo=0;fid=0; 
+} 
+
+main() 
+{ 
+int i,count; 
+count=txt();/*返回作业总数*/ 
+for(i=0;i<100;i++) memory[i]=0;memory[i]=-1;mh=memory;/*内存清0，处于未分配状态，最后一个用于标识*/ 
+printf("Job_Process\n\n"); 
+printf("FCFS_FCFS :\n"); 
+WORK(1,1,count);/*作业FCFS, 进程FCFS*/ 
+init(); 
+printf("\nSHORT_FCFS :\n"); 
+WORK(2,1,count);/*作业最短运行时间优先,进程FCFS*/ 
+printf("\n\nPlease press keybord to see the result of process is PRI "); 
+getchar(); 
+clrscr(); 
+init(); 
+printf("Job_Process\n"); 
+printf("\nFCFS_PRI :\n"); 
+WORK(1,2,count); 
+init(); 
+printf("\nSHORT_PRI :\n"); 
+WORK(2,2,count); 
+getchar(); 
+}
+
+
+八、设备管理 
+下面一个朋友提供的关于设备管理的程序，具体试题未知,你们自己分析一下吧，贴这么多累死我了。 
+#define false 0 
+#define true 1 
+#define n 4 
+#define m 10 
+struct 
+{ 
+char type[10]; /*设备类名*/ 
+int count; /*拥有设备台数*/ 
+int remain; /*现存的可用设备台数*/ 
+int address; /*该类设备在设备表中的起始地址*/ 
+}equiptype[n]; /*设备类表定义，假定系统有n个设备类型*/ 
+struct 
+{ 
+int number; /*设备绝对号*/ 
+int status; /*设备好坏状态*/ 
+int remain; /*设备是否已分配*/ 
+char jobname[4];/*占有设备的作业名*/ 
+int lnumber; /*设备相对号*/ 
+}equipment[m]; /*设备表定义，假定系统有m个设备*/ 
+allocate(J,type,mm) 
+char *J,*type; 
+int mm; 
+{ 
+int i,t,j; 
+/*查询该类设备*/ 
+i=0; 
+while(i<n&&strcmp(equiptype[i].type,type)!=0) 
+i++; 
+if(i>=n)/*没有找到该类设备*/ 
+{ 
+printf("无该类设备,设备分配失败"); 
+return(false); 
+} 
+if(equiptype[i].remain<1)/*所需设备现存可用台数不足*/ 
+{ 
+printf("该类设备不足，分配失败"); 
+return(false); 
+} 
+t=equiptype[i].address;/* 取出该类设备在设备表中的起始地址*/ 
+while(!(equipment[t].status==1 && equipment[t].remain==0)) 
+t++; 
+/*填写作业名、相对号，状态改为已分配*/ 
+equiptype[i].remain--; 
+equipment[t].remain=1; 
+strcpy(equipment[t].jobname,J); 
+equipment[t].lnumber=mm; 
+}/*设备分配函数结束*/ 
+
+reclaim (J,type) 
+char J,type; 
+{ 
+int i,t,j,k,nn; 
+i=0; 
+while(i<n&&strcmp(equiptype[i].type,type)!=0) 
+i++; 
+if(i>=n)/*没有找到该类设备*/ 
+{ 
+printf("无该类设备,设备回收失败"); 
+return(false); 
+} 
+t=equiptype[i].address; /*取出该类设备在设备表中的起始地址*/ 
+j=equiptype[i].count; /*取出该类设备的数量*/ 
+k=0; 
+nn=t+j; 
+for(;t<nn;t++) 
+if(strcmp(equipment[t].jobname,J)==0&&equipment[t].remain==1) 
+{ 
+equipment[t].remain=0; 
+k++; 
+} 
+equiptype[i].remain= equiptype[i].remain+k; 
+if(k==0) 
+printf("该作业没有使用该类设备\n"); 
+}/*设备回收函数结束*/ 
+
+main( ) 
+{ 
+char J[4]; 
+int i,mm,a; 
+char type[10]; 
+/*设备类表初始化：*/ 
+strcpy(equiptype[0].type,"input");/*输入机*/ 
+equiptype[0].count=2; 
+equiptype[0].remain=2; 
+equiptype[0].address=0; 
+strcpy(equiptype[1].type,"printer");/*打印机 */ 
+equiptype[1].count=3; 
+equiptype[1].remain=3; 
+equiptype[1].address=2; 
+strcpy(equiptype[2].type,"disk");/*磁盘机*/ 
+equiptype[2].count=4; 
+equiptype[2].remain=4; 
+equiptype[2].address=5; 
+strcpy(equiptype[3].type,"tape");/*磁带机*/ 
+equiptype[3].count=1; 
+equiptype[3].remain=1; 
+equiptype[3].address=9; 
+/*设备表初始化：*/ 
+for(i=0;i<10;i++) 
+{ 
+equipment[i].number=i; 
+equipment[i].status=1; 
+equipment[i].remain=0; 
+} 
+while(1) 
+{ 
+printf("\n0－退出，1－分配，2－回收，3－显示"); 
+printf("\n选择功能项（0~3）:"); 
+scanf("%d",&a); 
+switch(a) 
+{ 
+case 0 : /*a=0程序结束*/ 
+exit(0); 
+case 1 : /*a=1分配设备*/ 
+printf("输入作业名、作业所需设备类和设备相对号"); 
+scanf("%s%s%d",J,type,&mm); 
+allocate(J,type,mm);/*分配设备*/ 
+break; 
+case 2: /*a=2回收设备*/ 
+printf("输入作业名和作业归还的设备类"); 
+scanf("%s%s",J,type); 
+reclaim(J,type);/*回收设备*/ 
+break; 
+case 3: /*a=3 输出设备类表和设备表的内容*/ 
+printf("\n输出设备类表\n"); 
+printf(" 设备类型 设备总量 空闲好设备\n"); 
+for(i=0;i<n;i++) 
+printf("%9s%8d%9d\n",equiptype[i].type,equiptype[i].count, equiptype[i].remain); 
+printf("输出设备表:\n"); 
+printf("绝对号 好/坏 已/未分配 占用作业名 相对号\n"); 
+for(i=0;i<m;i++) 
+printf("%3d%8d%9d%12s%8d\n",equipment[i].number, equipment[i].status,equipment[i].remain,equipment[i].jobname, 
+equipment[i].lnumber); 
+} 
+} 
+}
+
+
+

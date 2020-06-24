@@ -1,0 +1,134 @@
+//先序遍历生成二叉树
+
+#include<stdlib.h>
+#include<stdio.h>
+#include<iostream.h>
+#include<string.h>
+
+typedef char DataType;
+DataType NodeList[100];
+typedef struct node{
+	DataType key;
+	struct node *lchild,*rchild;
+}BTNode;
+typedef BTNode *BTree;
+
+int num=0,leaf=0;
+int count,i=-1;
+
+void CreateBTree(BTree *t){
+	i++;
+	if(i<count){
+		DataType key = NodeList[i];
+		if(key=='0'){
+			*t = NULL;
+		}else{
+			*t = (BTNode*)malloc(sizeof(BTNode));
+			(*t)->key = key;
+			CreateBTree(&(*t)->lchild);
+			CreateBTree(&(*t)->rchild);
+		}
+	}
+}
+
+//********************先序遍历
+void Preorder(BTree t){
+	if(t){
+		cout<<t->key<<" ";
+		Preorder(t->lchild);
+		Preorder(t->rchild);
+	}
+}
+
+//********************中序遍历
+void Inorder(BTree t){
+	if(t){
+		Inorder(t->lchild);
+		cout<<t->key<<" ";
+		Inorder(t->rchild);
+	}
+}
+
+//********************后序遍历
+void Postorder(BTree t){
+	if(t){
+		Postorder(t->lchild);
+		Postorder(t->rchild);
+		cout<<t->key<<" ";
+	}
+}
+
+
+//********************叶子节点个数
+void LeafNum(BTree t){
+	if(t){
+		if(t->lchild==NULL&&t->rchild==NULL)
+			leaf++;
+		LeafNum(t->lchild);
+		LeafNum(t->rchild);
+	}
+}
+
+//********************节点个数
+void NodeNum(BTree t){
+	if(t){
+		num++;
+		NodeNum(t->lchild);
+		NodeNum(t->rchild);
+	}
+}
+
+
+//********************层次遍历
+void Levelorder(BTree t){
+	int i,j;
+	BTNode *q[100],*p;
+	p = t;
+	if(p){
+		i=0;q[i]=p;j=1;//i队首;j队尾
+	}
+
+	while(i!=j){
+		p = q[i]; 
+		cout<<" "<<p->key;
+		
+		if(p->lchild){//左子树不为空,入队
+			q[j] = p->lchild;
+			j++;
+		}
+
+		if(p->rchild){//左子树不为空,入队
+			q[j] = p->rchild;
+			j++;
+		}
+		i++;
+	}
+}
+
+main(){
+	cout<<"请输入特殊的前序节点列表:"<<endl;
+	cin>>NodeList;
+	count = strlen(NodeList);		//
+
+	BTree head;
+	CreateBTree(&head);
+
+	cout<<endl<<"先序遍历:"<<endl;
+	Preorder(head);
+
+	cout<<endl<<"中序遍历:"<<endl;
+	Inorder(head);
+
+	cout<<endl<<"后序遍历:"<<endl;
+	Postorder(head);
+
+	cout<<endl<<"层次遍历:"<<endl;
+	Levelorder(head);
+	
+	LeafNum(head);
+	cout<<endl<<"叶子结点的数目:"<<leaf<<endl;
+
+	NodeNum(head);
+	cout<<endl<<"结点的数目:"<<num<<endl;
+	getchar();
+}

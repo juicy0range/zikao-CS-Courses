@@ -1,0 +1,75 @@
+/*第一题：利用二*树扩充前序序列创建二*树，并求后序和中序以及２度节点的个数．
+例如：扩充前序序列：Ａ＊Ｂ＊＊表示：Ａ是树根，无左孩子，右孩子是Ｂ，Ｂ无子孙，＊表示空*/
+
+#include"stdio.h"
+#include"iostream.h"
+#include"stdlib.h"
+#include"string.h"
+
+
+typedef struct node{
+char b;
+struct node *lchild,*rchild;
+}Tnode;
+
+void Preorder(Tnode **r){
+char ch;
+cin>>ch;
+if(ch=='*') *r=NULL;
+else{
+  *r=new Tnode;
+  (*r)->b=ch;
+   Preorder(&(*r)->lchild);
+   Preorder(&(*r)->rchild);
+  }
+}
+
+void Postorder(Tnode *r){
+if(r){
+  Postorder(r->lchild);
+  Postorder(r->rchild);
+  cout<<r->b;
+}
+}
+
+void Inorder(Tnode *r){
+if(r){
+  Inorder(r->lchild);
+  cout<<r->b;
+  Inorder(r->rchild);
+}
+}
+
+int Erdu(Tnode *r){//求二度节点的个数
+    if(r==NULL) return 0;
+    if(r->lchild==NULL&&r->rchild==NULL)
+    return 0;
+if(r->lchild==NULL&&r->rchild!=NULL){
+   return Erdu(r->rchild);
+}
+if(r->lchild!=NULL&&r->rchild==NULL){
+  return Erdu(r->lchild);
+}
+
+    else {
+  if(r->lchild&&r->rchild)
+      return 1+Erdu(r->lchild)+Erdu(r->rchild);
+  
+}
+}
+
+
+void main(){
+Tnode *r;
+cout<<"Please input xu lie:"<<endl;
+Preorder(&r);
+cout<<"Please output Postorder:"<<endl;
+Postorder(r);
+cout<<endl;
+cout<<"Please output Inorder:"<<endl;
+Inorder(r);
+cout<<endl;
+cout<<"er du jie dian ge shu:"<<Erdu(r)<<endl;
+
+
+}

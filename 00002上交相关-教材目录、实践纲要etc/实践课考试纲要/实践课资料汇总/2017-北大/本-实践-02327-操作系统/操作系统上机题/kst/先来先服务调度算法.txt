@@ -1,0 +1,297 @@
+//               1    2    3    4   5    6   7   8   9
+//   访问柱面号:122  130  147  150 175  177  94  91  86
+//                1   2   3  4   5  6   7  8  9
+//相应移动次数为: 3   8  17  3  25  2  63  3  5
+//               86   91  94   122 130  147  150 175 177 
+#include"stdio.h"
+#include"stdlib.h"
+#include"iostream.h"
+#define maxsize 100
+/******************************************************************************/
+/*                     先来先服务调度算法
+/******************************************************************************/
+void FCFS(int array[],int m)
+{
+int sum=0,j;
+printf("\nFCFS:  ");
+for(int i=0;i<m;i++)
+{
+  printf("%5d",array[i]);
+}
+for(i=0,j=1;j<m;i++,j++)
+{
+  if(array[i]<array[j]) sum+=(array[j]-array[i]);
+  else  sum+=(array[i]-array[j]);
+}
+printf("\n移动的总道数： ");
+printf("%d",sum);
+}
+/******************************************************************************/
+/*                     最短寻道时间优先调度算法
+/******************************************************************************/
+void ShortPath(int array[],int m)
+{
+    int temp;
+int now,pos;
+int i,j,sum=0,k;
+for(i=0;i<m;i++)
+  for(j=i+1;j<m;j++)
+  {
+   if(array[i]>array[j])
+   {
+    temp=array[i];
+    array[i]=array[j];
+    array[j]=temp;
+   }
+  }
+  cout<<"请输入当前的磁道号：";
+  cin>>now;
+  for(i=0;i<m;i++)
+  {
+   if(array[i]>=now)
+   {
+    pos=i;
+    break;
+   }
+  }
+  printf("\nShortPath:  ");
+  if(i==0)                    //当前在最前前面
+  {
+         for(int i=0;i<m;i++)
+   {
+             printf("%5d",array[i]);
+   }
+         for(i=0,j=1;j<m;i++,j++)
+   {
+          if(array[i]<array[j]) sum+=(array[j]-array[i]);
+          else  sum+=(array[i]-array[j]);
+   }
+  }
+  else
+  {
+        if(i-1==m-1)                   //当前的磁道号在最后
+     {
+               for(int i=m-1;i>=0;i--)
+      {
+              printf("%5d",array[i]);
+      }
+                 for(i=m-1,j=m-2;j>=0;i--,j--)
+     {
+                   if(array[i]<array[j]) sum+=(array[j]-array[i]);
+                  else  sum+=(array[i]-array[j]);
+     }
+     }
+     else
+     {
+
+            if(array[i]==now)           //
+      {
+             printf("%d",array[i]);
+                now=array[i];
+       for(k=i;k<m;k++)
+           array[i]=array[i+1];
+                m--;
+       pos=i+1;
+       goto kk;
+      }
+            else
+      {
+      
+                while(m)
+       {
+                          sum=0; 
+        if((now-array[pos-1])<(array[pos]-now))
+         {
+               // sum+=now-array[pos-1];
+          printf("%5d",array[pos-1]);
+                now=array[pos-1];       
+kk:          if(pos-1>=m)
+          {
+             for(k=pos-1;k>0;k--)
+             array[k]=array[k-1];
+          }
+          else
+           for(k=pos-1;k<=m-1;k++)
+            array[k]=array[k+1];
+                //pos=pos;
+          m--;
+         }
+              else
+        {
+              //sum+=array[pos]-now;
+        printf("%5d",array[pos-1]);
+              now=array[pos];       
+                 if(pos>=m)
+        {
+           for(k=pos;k>=0;k--)
+                    array[k]=array[k-1];       
+        }
+        else
+         for(k=pos;k<=m-1;k++)
+          array[pos]=array[pos+1];
+              //pos=pos+1;
+               m--;
+        }
+       }
+      }
+
+     }
+  }
+// printf("\n移动的总道数： ");    
+// printf("%d",sum);
+}
+/******************************************************************************/
+/*                     电梯调度算法
+/******************************************************************************/
+void Elevator(int array[],int m) //先要给出当前磁道号和移动臂的移动方向
+{
+   int pos,now,d,sum=0,j,temp,i;
+for(i=0;i<m;i++)
+  for(j=i+1;j<m;j++)
+  {
+   if(array[i]>array[j])
+   {
+    temp=array[i];
+    array[i]=array[j];
+    array[j]=temp;
+   }
+  }
+   cout<<"请输入当前的磁道号 ：";
+   cin>>now;
+   cout<<endl;
+   for(i=0;i<m;i++)
+   {
+    if(now==array[i])
+     break;
+   }
+   pos=i;
+   cout<<"请输入当前移动臂的移动的方向 (1 表示向内 ，0表示向外) : ";
+   cin>>d;
+   printf(" Elevator :  ");
+   if(d==1)
+   {
+    for(i=pos,j=pos+1;i<m;i++)
+    {
+     printf("%5d",array[i]);
+     if(array[i]>array[j])  sum+=(array[i]-array[j]);
+     else                   sum+=(array[j]-array[i]);
+    }
+    for(i=pos-1;i>=0;i--)
+    {
+     printf("%5d",array[i]);
+           if(array[i]>array[j])  sum+=(array[i]-array[j]);
+     else                   sum+=(array[j]-array[i]);
+    }
+   }
+   if(d==0)
+   {
+    for(i=pos,j=pos+1;i>=0;i--)
+    {
+     printf("%5d",array[i]);
+     if(array[i]>array[j])  sum+=(array[i]-array[j]);
+     else                   sum+=(array[j]-array[i]);
+    }
+    for(i=pos+1,j=pos+2;i<m;i++)
+    {
+     printf("%5d",array[i]);
+     if(array[i]>array[j])  sum+=(array[i]-array[j]);
+     else                   sum+=(array[j]-array[i]);
+    }
+   }
+   if((d!=1)&&(d!=0))
+    cout<<endl<<"input error!"<<endl;
+printf("\n移动的总道数： ");    
+printf("%d",sum);
+}
+/******************************************************************************/
+/*                     单向扫描调度算法
+/******************************************************************************/
+void SCAN(int array[],int m)
+{
+   int pos,now,sum=0,j,temp,i;
+    for(i=0;i<m;i++)
+  for(j=i+1;j<m;j++)
+  {
+   if(array[i]>array[j])
+   {
+    temp=array[i];
+    array[i]=array[j];
+    array[j]=temp;
+   }
+  }
+   cout<<"请输入当前的磁道号 ：";
+   cin>>now;
+   cout<<endl;
+   for(i=0;i<m;i++)
+   {
+    if(now==array[i])
+     break;
+   }
+   pos=i;
+   printf(" SCAN :  ");
+   for(i=pos,j=pos+1;i<m;i++)
+   {
+      printf("%5d",array[i]);
+   if(array[i]>array[j])  sum+=(array[i]-array[j]);
+   else                   sum+=(array[j]-array[i]);
+   }
+   for(i=0,j=1;i<pos;i++)
+   {
+   printf("%5d",array[i]);
+      if(array[i]>array[j])  sum+=(array[i]-array[j]);
+   else                   sum+=(array[j]-array[i]);
+}
+printf("\n移动的总道数： ");    
+printf("%d",sum); 
+}
+void main()
+{
+int c;
+FILE *fp;
+int cidao[maxsize];
+int i=0,count;
+fp=fopen("cidao.txt","r+");
+    if(fp==NULL)
+{
+  cout<<"can not find file!"<<endl;
+  exit(0);
+}
+while(!feof(fp))
+{
+  fscanf(fp,"%d",&cidao[i]);
+  i++;
+}
+count=i-1;
+for(i=0;i<count;i++)
+{
+  printf("%5d",cidao[i]);
+}
+cout<<endl;
+while(1)
+{
+  cout<<endl<<"系统的菜单如下："<<endl;
+  printf("1. 先来先服务      2. 最短寻道时间优先      3. 电梯调度");
+  cout<<endl;
+  printf("4. 单向扫描        5. 退出");
+  cout<<endl;
+  cout<<"请选择：";
+  cin>>c;
+  if(c>4)
+   break;
+  switch(c)
+  {
+      case 1:
+    FCFS(cidao,count);
+    break;
+   case 2:
+    ShortPath(cidao,count);
+    break;
+   case 3:
+    Elevator(cidao,count);
+    break;
+   case 4:
+    SCAN(cidao,count);
+    break;
+  }
+}
+}

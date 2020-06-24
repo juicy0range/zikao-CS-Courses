@@ -1,0 +1,103 @@
+/************************根据输入的完全二叉树层次序列来构造该完全二叉树*****************************\
+7．  编一C程序，它能根据输入的完全二叉树层次序列来构造该完全二叉树，
+并能输出该完全二叉树的后序序列和叶结点的个数。
+（完全二叉树层次序列是从1层到最高层、同层内从左到右的次序排列的结点序列）。
+n0=[n/2]，其中[]表示上取整。可根据完全二叉树的结点总数计算出叶子结点数
+n0为0度节点，n为所有节点
+abcdef
+\*****************************************************/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream.h>
+
+typedef char DataType; /*设数据域类型为字符型*/
+DataType NodeList[100];
+int length = 0;		//节点个数
+
+typedef  struct node{
+	DataType key;
+	struct node *lchild,*rchild;	// 左子树、右子树
+}BTNode;
+typedef BTNode *BTree; //专门用来定义根节点
+
+
+
+//p为待新建节点
+//i带插入数据在数组中的下标，或者说是待插入节点位置的下标
+void CreateBT(BTNode *p,int i)
+{
+	
+	
+	if( i< length)
+	{	
+		//初始化p节点
+		p->key =  NodeList[i];
+		p->lchild = NULL;
+		p->rchild = NULL;
+		
+		
+		if(i*2+1<length)//说明有左子树(完全二叉树的特性)
+		{
+			BTNode *l = new BTNode();
+			p->lchild = l;						
+			CreateBT(p->lchild,i*2+1);
+			
+		}
+		if(i*2+2 < length)//说明有右子树(完全二叉树的特性)
+		{
+			BTNode *r = new BTNode();
+			p->rchild = r;
+			CreateBT(p->rchild,i*2+2);
+		}
+		
+	}
+	
+}
+
+
+//后序遍历 
+void ShowBT(BTree p)
+{
+	if(p)
+	{
+		ShowBT(p->lchild);
+		ShowBT(p->rchild);
+		cout<<p->key;
+	}
+	
+}
+
+//计算0度节点(即叶子节点)
+int zero(BTree t)
+{
+	if(t==NULL)//根节点为空
+		return 0;
+
+	if(t->lchild==NULL&&t->rchild==NULL){
+		return 1;
+	}else{
+		return zero(t->lchild)+zero(t->rchild);
+	}
+}
+
+void main()
+{
+	cout<<"请输入节点列表:"<<endl;
+	cin>> NodeList;
+	length = strlen(NodeList);
+
+	BTree head = NULL;
+	head = (BTNode*)malloc(sizeof(BTNode));
+	int sum = 0;
+
+	CreateBT(head,0);
+	cout<<"后序遍历为 "<<endl;
+	ShowBT(head);
+
+	sum = zero(head);
+	cout<<endl<<"叶节点个数为 "<<sum<<endl;
+
+	getchar();
+}

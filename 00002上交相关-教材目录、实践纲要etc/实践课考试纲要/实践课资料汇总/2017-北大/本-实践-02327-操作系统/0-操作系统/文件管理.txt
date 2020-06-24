@@ -1,0 +1,215 @@
+文件管理的试题比较多，主要就是模拟*作系统中的 建立文件、打开文件、读文件、写文件、、关闭文件、 、删除文件、、建立目录、、显示目录内容、显示文件内容、、改变文件属性等*作。大家可以参考书本253页的上机指导。 
+北大2001年试题： 
+建立一个树型文件目录 
+假设程序启动运行后在根目录下且根目录为空。 
+
+实习检查： 
+1、运行程序，由检查教师给出文件名，该文件中存有相应的若干命令。（程序应做提示，界面友好）。 
+2、要求实现两个命令： 
+mkdir 目录名（目录已存在，应给出错误信息。） 
+cd 目录名（目录不存在，应给出错误信息。） 
+3、你所编制的程序应读入文件，并执行其中的每一条命令。 
+4、在屏幕上显示文件目录的结构。（界面自己设计，但要清晰明了。） 
+
+2002年北京大学的试题： 
+*作系统上机考试题 
+*作系统上机考试题 
+题目：模拟文件系统 
+要求：模拟一个文件系统，包括目录文件，普通文件，并实现对它们的一些 
+基本*作。 
+假定每个目录文件最多只能占用一个块；一个目录项包括文件名（下一级目录 
+名），文件类型，文件长度，指向文件内容（下一级目录）的指针内容。普通文件可以 
+只用目录项（FCB）代表。（详细的数据结构见后面的说明） 
+程序功能方面的要求： 
+需要实现一个命令行*作界面，包含如下命令： 
+1 改变目录 
+格式：CD〈目录名〉 
+功能：工作目录转移到指定的目录下，只要求完成改变到当前目录的某一个子目录 
+下的功能，不要求实现相对目录以及绝对目录。 
+2 创建文件 
+格式：CREATE〈文件名〉〈文件长度〉 
+功能：创立一个指定名字的新文件，即在目录中增加一项，不考虑文件内容，但必 
+须能输入文件长度。 
+3 删除文件 
+格式：DEL〈希望删除的文件名〉 
+功能：删除指定的文件 
+4 显示目录 
+格式：LSALL 
+功能：显示全部目录以及文件，输出时要求先输出接近根的目录，再输出子目录。 
+图示如图。 
+5 创建目录 
+格式：MD〈目录名〉 
+功能：在当前路径下创建指定的目录 
+6 删除目录 
+格式：RD〈目录名〉 
+功能：删除当前目录下的指定目录，如果该目录为空，则可删除，否则应提示是否 
+作删除，删除*作将该目录下的全部文件和子目录都删除。 
+对于上述功能要求，完成1-4为及格，完成1-5为良，完成1-6为优。 
+
+程序实现方面的要求： 
+1 对于重名（创建时），文件不存在（删除时），目录不存在（改变目录时）等错误* 
+作情况，程序应该作出相应处理并给出错误信息，但是程序不得因此而退出。 
+2 界面友好，程序强壮。 
+3 界面的提示符为#，提示的命令以及调试的方法应和前面的要求一致。不要自己设计命 
+令或者附加不要求的功能。 
+4 在考卷的说明部分（背面）有一段程序的源代码以及对源代码的说明，考试的编码应 
+在这个程序的基础上修改而成。这段源代码中规定了文件系统使用的数据结构和需要实 
+现的函数框架，请将你的实现代码填写到合适的位置中去，可以自己添加辅助数据结构、 
+变量、常量以及函数，但是不得改变已有的代码（如数据结构的定义以及函数的名称以 
+及参数说明）。 
+5 考试提交的源程序请命名为filesys.c。 
+6 程序设计环境使用TC2.0，在DOS*作系统下完成全部程序代码。 
+
+初始化程序代码： 
+#include "stdio.h" 
+#include "string.h" 
+#include "malloc.h" 
+struct NomalFile 
+{char name[50]; /*file name*/ 
+int type; /*0-directory file,1-common file*/ 
+int size; /*file size*/}; 
+struct DirectoryNode 
+{int tag; /*0-dump node,1-real node*/ 
+char name[50]; 
+int type; /*0-directory file 1-comman file*/ 
+union 
+{struct NomalFile *p_nomFile; /*point to comman file */ 
+struct DirectoryFile *p_dirFile; /*point to dirctory file*/ 
+}p_File; /*look on initializing code*/ 
+}; 
+struct DirectoryFile 
+{/*directory file composed by a node array*/ 
+/*nodes*/ 
+struct DirectoryNode nodesArray[10]; 
+}; 
+/*initializing file system*/ 
+void init() 
+{ 
+int i,j; 
+struct DirectoryFile root; 
+struct NomalFile * newNomFile; 
+struct DirectoryNode * newNode; 
+struct DirectoryFile * newDirFile; 
+struct DirectoryFile * curDirFile; 
+
+for (i=0;i<10;i++) /*initial a directory*/ 
+root.nodesArray[i].tag=0; 
+
+newDirFile=(struct DirectoryFile*) malloc(1100); 
+for (i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[0].tag=1; strcpy(root.nodesArray[0].name,"A"); 
+root.nodesArray[0].type=0; 
+root.nodesArray[0].p_File.p_dirFile=newDirFile; 
+
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[1].tag=1; strcpy(root.nodesArray[1].name,"B"); 
+root.nodesArray[1].type=0; 
+root.nodesArray[1].p_File.p_dirFile=newDirFile; 
+
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+root.nodesArray[2].tag=1; strcpy(root.nodesArray[2].name,"C"); 
+root.nodesArray[2].type=0; 
+root.nodesArray[2].p_File.p_dirFile=newDirFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F1"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=500; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[3].tag=1; strcpy(root.nodesArray[3].name,(*newNomFile).name); 
+root.nodesArray[3].type=(*newNomFile).type; 
+root.nodesArray[3].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile *)malloc(108); 
+strcpy((*newNomFile).name,"F2"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=50; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[4].tag=1; strcpy(root.nodesArray[4].name,(*newNomFile).name); 
+root.nodesArray[4].type=(*newNomFile).type; 
+root.nodesArray[4].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F3"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=5; 
+printf("%s\n",(*newNomFile).name); 
+
+root.nodesArray[5].tag=1; strcpy(root.nodesArray[5].name,(*newNomFile).name); 
+root.nodesArray[5].type=(*newNomFile).type; 
+root.nodesArray[5].p_File.p_nomFile=newNomFile; 
+
+curDirFile=root.nodesArray[1].p_File.p_dirFile; 
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F4"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=123; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[0].tag=1; 
+strcpy(curDirFile->nodesArray[0].name,(*newNomFile).name); 
+curDirFile->nodesArray[0].type=(*newNomFile).type; 
+curDirFile->nodesArray[0].p_File.p_nomFile=newNomFile; 
+printf("%s\n",curDirFile->nodesArray[0].p_File.p_nomFile->name); 
+curDirFile=root.nodesArray[2].p_File.p_dirFile; 
+newDirFile=(struct DirectoryFile*)malloc(1100); 
+for(i=0;i<10;i++) 
+newDirFile->nodesArray[i].tag=0; 
+
+curDirFile->nodesArray[0].tag=1;strcpy(curDirFile->nodesArray[0].name,"D"); 
+curDirFile->nodesArray[0].type=0; 
+curDirFile->nodesArray[0].p_File.p_dirFile=newDirFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F5"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=321; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[1].tag=1; 
+strcpy(curDirFile->nodesArray[1].name,(*newNomFile).name); 
+curDirFile->nodesArray[1].type=(*newNomFile).type; 
+curDirFile->nodesArray[1].p_File.p_nomFile=newNomFile; 
+
+curDirFile=curDirFile->nodesArray[0].p_File.p_dirFile; 
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F6"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=10; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[0].tag=1; 
+strcpy(curDirFile->nodesArray[0].name,(*newNomFile).name); 
+curDirFile->nodesArray[0].type=(*newNomFile).type; 
+curDirFile->nodesArray[0].p_File.p_nomFile=newNomFile; 
+
+newNomFile=(struct NomalFile*)malloc(108); 
+strcpy((*newNomFile).name,"F7"); 
+(*newNomFile).type=1; 
+(*newNomFile).size=70; 
+printf("%s\n",(*newNomFile).name); 
+
+curDirFile->nodesArray[1].tag=1; 
+strcpy(curDirFile->nodesArray[1].name,(*newNomFile).name); 
+curDirFile->nodesArray[1].type=(*newNomFile).type; 
+curDirFile->nodesArray[1].p_File.p_nomFile=newNomFile; 
+} 
+int cd(char *str){return 0;} /*change current dirctory */ 
+int create(char *str,int num){return 0;} /*create file*/ 
+int delete(char *str){return 0;} /*delete file*/ 
+void lsall(){} /*display all directory files*/ 
+int md(char *str){return 0;} /*create dirctory*/ 
+int rd(char *str){return 0;} /* delete dirctory*/ 
+void main() 
+{ 
+}

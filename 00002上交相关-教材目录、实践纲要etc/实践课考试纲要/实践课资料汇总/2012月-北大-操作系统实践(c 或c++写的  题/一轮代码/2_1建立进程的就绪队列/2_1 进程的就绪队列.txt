@@ -1,0 +1,138 @@
+/*
+(2007年的) 2_1进程
+1．设计一个数据结构"进程控制块"
+进程控制块PCB记录了进程的各种管理和控制信息。
+   主要包括：进程号（系统赋予，正整数）、进程名、进程优先级（正整数）、进程状态、进程队列指针、其他信息（可以用一串字符表示）。
+优先级越高，整数值越大。
+2．建立进程就绪队列
+进程创建要求存放在一个.txt文件中。每行2个数（用空格隔开），一个是进程名，一个是进程优先级（正整数）。要求按照优先级高低建立进程就绪队列。
+程序运行流程：
+1．提示用户"输入进程创建要求文件："，读入一个.txt文件。
+2．根据读入数据建立就绪队列：
+（1）读一行数据，生成一个进程号，赋予该进程；
+（2）生成一个空的进程控制块，根据有关信息填写其内容；
+（3）将该进程控制块按照优先级高低链接到进程就绪队列中；
+（4）重复（1）-（3），直到遇到特殊字符0。
+提示：用一个指针指向进程就绪队列队首。
+3．输出进程就绪队列（一行中的数字用逗号隔开）。
+注意：1．代码中数据结构的设计要给出注释。
+2．用户输入提示要清晰。
+3．输出表格时格式要清晰
+*/
+
+#include <stdlib.h>
+#include <malloc.h>
+#include <iostream>     
+#include <String>
+using namespace std;
+
+const int maxNum=20;
+typedef struct node{
+   int pNo;            //进程号 
+   string pName;       //进程名
+   int pPriority;      //进程优先级
+   string pCondition;  //进程状态
+   struct node *first; //进程队列指针
+   string otherInfo;   //其他信息
+   struct node *next;  //指向下一个结点
+}pcbNode;
+
+void new_line();
+
+void readAndCreate();  //读文件并创建就绪队列
+
+ 
+void main()
+{
+	cout<<"创建进程的就绪队列\n";
+    readAndCreate();
+}
+
+
+void new_line()   //去掉没用字符
+{
+    char symbol;
+    do
+	{
+	   cin.get(symbol);
+	}while(symbol!='\n');
+}
+
+
+void readAndCreate()
+{
+    FILE *fStream;
+    pcbNode *pN,*first,*last,*p;
+	//string str1,str2;
+	int i;
+	char fName[50];
+
+	cout<<"\n要求就绪队列的文件:每行2个数（用空格隔开），一个是进程名，一个是进程优先级（正整数），并按照优先级高低建立进程就绪队列\n";
+	cout<<"\n请输入创建进程的文件名:";
+
+	cin.getline(fName,50,'\n');
+
+	fStream=fopen(fName,"r");
+	if(fStream==NULL)
+	{
+	   cout<<"文件不存在或错误，请检查\n";
+	   exit(1);
+	}
+
+    // 二:创建就绪队列
+    i=1;
+    while(!feof(fStream))
+	{
+		//---B1 创建结点
+		pN=(pcbNode *)malloc(sizeof(pcbNode)); 
+		fscanf(fStream,"%s %d",&(pN->pName),&(pN->pPriority));
+
+		pN->pNo=i; 	
+
+	//	str1="就绪";
+	//	str2=str1;
+    //	pN->pCondition="就绪";
+		pN->first=first;
+		//pN->otherInfo="无";        
+        pN->next=NULL;      //创建结点时，默认下一个结点为空
+        
+		//---B2关于头指针
+		if(i==1)
+		{
+		   first=pN;
+		}
+
+		//-- 关于尾指针
+		if(i==1)
+		{
+		   last=pN; 
+		}
+		else
+		{
+		   last->next=pN;
+		   last=pN;
+		}
+
+		++i;  
+	}
+	fclose(fStream);
+
+	//三输出就绪队列
+	cout<<"\n进程号,进程名,进程优先级,进程状态,进程队列指针,其他信息\n";
+    p=first;
+	while(p)
+	{
+	    cout<<p->pNo<<",  ";
+	//	cout<<p->pName<<",  ";
+		cout<<p->pPriority<<",  ";
+	//	cout<<p->pCondition<<",  ";
+		cout<<p->first<<",  ";
+        //cout<<p->otherInfo;
+        cout<<"\n";
+
+		p=p->next;
+	}
+
+
+}
+

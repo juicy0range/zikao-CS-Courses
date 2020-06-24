@@ -1,0 +1,84 @@
+操作系统上机种常使用的c函数.
+
+1.
+
+int feof(FILE *stream);
+
+测试所给stream的文件尾标记的宏。
+
+若检测到文件尾标记EOF或Ctrl-z返回非零值；否则，返回0
+
+2.
+
+FILE*fopen (const char *filemane,const char *mode);
+
+打开文件filemane返回相联系的流；出错返回NULL。
+
+mode字符串的可取值有：r，打开用于读；w，打开用于写；a，打开用于在原有内容之后写；r+，打开已存在的文件用于更新（读和写）；w+创建新文件用于更新；a+，打开用于在原有内容之后更新，若文件不存在就创建
+
+3.
+
+int fprintf(FILE *stream,const char *format[,argument,...]);
+
+照原样抄写格式串format的内容到流stream中，每遇到一个%，就按规定的格式，依次输出一个表达式argument的值到流stream中，返回写的字符个数。出错时返回EOF
+
+FILE *stream;
+
+void main( void )
+
+{
+
+long l;
+
+float fp;
+
+char s[81];
+
+char c;
+
+stream = fopen( "fscanf.txt", "w+" );
+
+if( stream == NULL )
+
+printf( "The file fscanf.out was not opened\n" );
+
+else {fprintf( stream, "%s %ld %f%c", "a-string",65000, 3.14159, 'x' );
+
+/* Set pointer to beginning of file: */
+
+fseek( stream, 0L, SEEK_SET );
+
+/* Read data back from file: */
+
+fscanf( stream, "%s", s );
+
+fscanf( stream, "%ld", &l );
+
+fscanf( stream, "%f", 
+
+fscanf( stream, "%c", &c );/* Output data read: */
+
+printf( "%s\n", s );
+
+printf( "%ld\n", l );
+
+printf( "%f\n", fp );
+
+printf( "%c\n", c );
+
+fclose( stream ); }
+
+}
+
+4.
+
+int fclose(FILE *stream);
+
+关闭一个流。
+
+成功返回0；失败是返回EOF。
+
+int fcloseall(void);
+
+关闭所有打开的流，除了stdin,stdout,stdprn,stderr和stdaux。
+

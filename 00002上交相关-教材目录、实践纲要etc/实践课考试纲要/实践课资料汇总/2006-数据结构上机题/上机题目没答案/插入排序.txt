@@ -1,0 +1,34 @@
+插入排序
+基本思想是，每步将一个待排序的记录，按其关键码大小，插入到前面已经排好序的记录的适当位置，从头做到尾就可以了。 
+
+　　直接插入排序
+template <class T>void InsertSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0;for (int i = 1; i < N; i++){T temp = a[I; RMN++;for (int j = i; j > 0 && ++KCN && temp < a[j - 1]; j--) { a[j] = a[j - 1]; RMN++; }a[j] = temp; RMN++;}}
+
+　　精简之后就是这样： 
+template<class T> void InsertSort(T a[], int N){for (int i = 1; i < N; i++){T temp = a[I;for (int j = i; j > 0 && temp < a[j - 1]; j--) a[j] = a[j - 1];a[j] = temp;}}
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 0msKCN=9999 KCN/N=0.9999 KCN/N^2=9.999e-005 KCN/NlogN=0.07525RMN=19998 RMN/N=1.9998 RMN/N^2=0.00019998 RMN/NlogN=0.1505Sort randomness N=10000 TimeSpared: 330msKCN=24293730 KCN/N=2429.37 KCN/N^2=0.242937 KCN/NlogN=182.829RMN=24303739 RMN/N=2430.37 RMN/N^2=0.243037 RMN/NlogN=182.904Sort descending N=10000 TimeSpared: 711msKCN=49995000 KCN/N=4999.5 KCN/N^2=0.49995 KCN/NlogN=376.25RMN=50014998 RMN/N=5001.5 RMN/N^2=0.50015 RMN/NlogN=376.4
+
+　　可以看出，平均性能近似为n2/4，书上没有骗人（废话，多少人做过多少试验才得出的结论）。
+
+　　折半插入排序
+
+　　将直插排序中的搜索策略由顺序搜索变为折半搜索，便能得到此种排序方法。显而易见，只能减少KCN，不能减少RMN，所能带来的性能提升也不会太大。
+template<class T>void BinaryInsertSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0;for (int i = 1; i < N; i++){T temp = a[I; RMN++; int low = 0, high = i - 1;while (low <= high)//折半查找{int mid = (low + high) / 2;if (++KCN && temp < a[mid]) high = mid - 1; else low = mid + 1;}for (int j = i - 1; j >= low; j--) { a[j + 1] = a[j]; RMN++; }//记录后移a[low] = temp; RMN++;//插入}} 
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 0msKCN=123617 KCN/N=12.3617 KCN/N^2=0.00123617 KCN/NlogN=0.930311RMN=19998 RMN/N=1.9998 RMN/N^2=0.00019998 RMN/NlogN=0.1505Sort randomness N=10000 TimeSpared: 320msKCN=118987 KCN/N=11.8987 KCN/N^2=0.00118987 KCN/NlogN=0.895466RMN=24303739 RMN/N=2430.37 RMN/N^2=0.243037 RMN/NlogN=182.904Sort descending N=10000 TimeSpared: 631msKCN=113631 KCN/N=11.3631 KCN/N^2=0.00113631 KCN/NlogN=0.855158RMN=50014998 RMN/N=5001.5 RMN/N^2=0.50015 RMN/NlogN=376.4
+
+　　可以看到KCN近似为nlog2n，有一定的性能提升。
+
+　　表插入排序
+
+　　如果用“指针”来表示记录间的顺序，就可以避免大量的记录移动，当然，最后还是要根据“指针”重排一下。自然的，折半查找在这里用不上了。
+template <class T>void TableInsertSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0;int* link = new int[N]; int head = 0, pre, cur, i; link[0] = -1;for (i = 1; i < N; i++){if (a[head] > a[I) { link[I = head; head = i; KCN++;}//没设表头，因此需要此判断，失败时此次判断没记入KCNelse {for (cur = head; cur != -1&& ++KCN && a[cur] <= a[I; cur = link[cur]) pre = cur;link[pre] = i; link[I = cur;}}cur = head;//重排序列for (i = 0; i < N; i++){while (cur < i) cur = link[cur];pre = link[cur];if (cur != i){swap(a[I, a[cur]); RMN += 3;link[cur] = link[I; link[I = cur;}cur = pre;}delete []link;}
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 751msKCN=49995000 KCN/N=4999.5 KCN/N^2=0.49995 KCN/NlogN=376.25RMN=0 RMN/N=0 RMN/N^2=0 RMN/NlogN=0Sort randomness N=10000 TimeSpared: 621msKCN=25721250 KCN/N=2572.13 KCN/N^2=0.257213 KCN/NlogN=193.572RMN=29955 RMN/N=2.9955 RMN/N^2=0.00029955 RMN/NlogN=0.225434Sort descending N=10000 TimeSpared: 0msKCN=9999 KCN/N=0.9999 KCN/N^2=9.999e-005 KCN/NlogN=0.07525RMN=15000 RMN/N=1.5 RMN/N^2=0.00015 RMN/NlogN=0.112886 
+
+　　可以看到，确实减少了RMN，理论上RMNmax＝3（n－1）。然而，就平均情况而言，性能还不如简单的直插——这是由于测试对象是整数的缘故。对于链表来说，这种方法就不需要最后的重排了。关于重排的算法在严蔚敏的《数据结构（C语言版）》上有详细的说明。
+

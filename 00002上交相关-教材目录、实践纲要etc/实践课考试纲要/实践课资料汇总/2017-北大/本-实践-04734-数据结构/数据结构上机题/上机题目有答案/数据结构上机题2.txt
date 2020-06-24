@@ -1,0 +1,86 @@
+数据结构上机题2
+
+/*建立二*排序树,并删除其中值为x的结点*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node
+{
+int data;
+struct node *lchild,*rchild;
+}tnode,*bitreptr;
+
+bitreptr cre_bitre()
+{
+bitreptr root,p,q,r;
+int n,exist;
+root=NULL;
+printf("please input some integers,terminate with -9999 : \n");
+do{
+exist=0;
+scanf("%d",&n);
+if(n==-9999) break;
+p=root;
+while(p)
+{
+  q=p;
+  if(q->data==n)
+    {
+     exist=1;
+     break;
+    }
+  p=(p->data>n)?p->lchild:p->rchild;
+}
+if(!exist)
+  {
+   r=(bitreptr)malloc(sizeof(tnode));
+   r->data=n;
+   r->lchild=r->rchild=NULL;
+   if(root==NULL) root=r;
+   else {
+         if(q->data>n) q->lchild=r;
+         else q->rchild=r;
+        }
+  }
+}while(1);
+return root;
+}
+
+void deltreenode(bitreptr *r,int x)
+{
+bitreptr parent,p,q,dchild;
+p=*r;
+parent=NULL;
+while(p)
+{
+if(p->data==x) break;
+parent=p;
+p=p->data>x?p->lchild:p->rchild;
+}
+if(p==NULL) printf("Error,%d is not found !\n",x);
+else{
+   q=p; /* store the pointer p into q */
+   if(p->lchild!=NULL && p->rchild!=NULL)
+     { /* find the inorder successor of x */
+       p=p->rchild;
+       parent=q;
+       while(p->lchild)
+       {
+        parent=p;
+        p=p->lchild;
+       }
+      }
+   dchild=p->lchild?p->lchild:p->rchild;
+   if(parent==NULL) *r=dchild; /* if the root is to be deleted, change r */
+   else{
+        if(p!=q) q->data=p->data;
+        if(parent->lchild==p) parent->lchild=dchild;
+        else parent->rchild=dchild;
+       } 
+  free(p);
+}
+return;
+} 
+
+

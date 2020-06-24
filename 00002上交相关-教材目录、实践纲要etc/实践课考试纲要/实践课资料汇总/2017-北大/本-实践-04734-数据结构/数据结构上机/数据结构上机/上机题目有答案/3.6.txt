@@ -1,0 +1,1174 @@
+八号下午上机题答案
+第一题答案：
+#include <stdio.h>
+#include <malloc.h>
+#include <string.h>
+
+#define max 100
+extern void exit(int);
+
+typedef struct node{
+ char d;
+ struct node * lchild, * rchild;
+}tnode;
+
+
+void mktree(char pre[],int pres,int pree,char in[],int is,int ie,tnode * * r)
+{
+ int i;
+ if(is>ie||pres>pree)
+  * r=NULL;
+ else{
+  * r=(tnode *) malloc (sizeof(tnode));
+  (* r)->d=pre[pres];
+  for(i=is;i<=ie;i++)
+      if(pre[pres]==in[i])
+   {
+  mktree(pre,pres+1,pres+i-is,in,is,i-1,&(* r)->lchild); 
+   mktree(pre,pres+i-is+1,pree,in,i+1,ie,&(* r)->rchild);
+    
+    break;
+  }
+                                                                                                                             if (i>ie){
+  printf("error:input contains an error! \n");
+  return;
+  }
+ 
+ }
+}
+
+
+void postorder(tnode * r)
+{
+ if (r){
+  
+  postorder (r->lchild);
+  postorder (r->rchild);
+  printf("%C",r->d);
+ }
+}
+
+int leaf(tnode *r)
+{
+ if (r==NULL)
+  return 0;
+ else 
+  if(r->lchild==NULL && r->rchild==NULL)
+   return 1;
+  else 
+   return (leaf(r->lchild)+leaf(r->rchild));
+}
+
+void oneleaf(tnode *r,int *n)
+{
+ if(r){
+  
+  if((r->lchild==NULL&&r->rchild!=NULL)||(r->lchild!=NULL&&r->rchild==NULL)){
+   printf("%5C",r->d);
+   ++(*n);
+   }
+  oneleaf(r->lchild,n);
+  oneleaf(r->rchild,n);
+ }
+}
+
+void main()
+{
+ tnode *r;
+ int n=0;
+ char pre[max],in[max];
+ printf("input inorder and postorder!  \n");
+ gets(pre);
+ gets(in);
+ mktree(pre,0,strlen(pre)-1,in,0,strlen(in)-1,&r);
+ printf("The preorder is as follows  \n");
+ postorder(r);
+ printf("\n There are %5d leaves in the tree. \n", leaf(r));
+ printf("\nThe one degree node is as follows:\n");
+ oneleaf(r,&n);
+ printf("\n The one degree nodes number is:%d\n",n);
+}
+
+第二题答案：
+#include <stdio.h>
+#include <string.h>
+#define max 100
+
+int find(int a[],int n)
+{
+ int i,j=0;
+ for(i=1;i<n;i++)
+  if(a[i]==a[n])
+   j++;
+  return (j);
+}
+
+void read(int a[])
+{
+ int x,i=1;
+ printf("Input the date :\n");
+ do{
+  scanf("%d",&x);
+  if(x==-9999)return;
+  a[i++]=x;
+ }while(9);
+ 
+}
+void main()
+{
+ int a[max],n;
+ read(a);
+    printf("Input n:\n");
+    scanf("%d",&n);
+ printf("\nThere are %d dimension.\n",find(a,n));
+}
+
+编辑的不是很好请大家多包涵,所有程序全部调试通过。
+ 
+ 
+ 
+ 2003-12-8 21:43:06         
+ 
+  sky7130     
+  
+  
+  等级：一星会员 
+  文章：105
+  积分：243
+  门派：自由主义派 
+  注册：2003-9-20
+              第2楼  
+ 
+
+ 
+谢谢
+你实在太厉害了
+ 
+ 
+ 2003-12-8 22:16:48          
+ 
+  泡泡鱼     
+  
+  
+  头衔：  
+  等级：二星会员 
+  文章：37
+  积分：107
+  门派：邪门歪道 
+  注册：2002-8-27
+              第3楼  
+ 
+
+ 
+5555555我可惨了,其它都没问题,就是先序,中序建树那有点问题,运行后出现内存读错误,
+气死我也,,,,这回看来没希望过了,郁闷中!!!!  
+ 
+ 2003-12-8 22:48:32          
+ 
+  tony920088     
+  
+  
+  等级：一星会员 
+  威望：2
+  文章：110
+  积分：251
+  门派：计算机专业 
+  注册：2002-12-6
+              第4楼  
+ 
+
+ 
+真是太谢谢啦！  
+ 
+ 2003-12-9 9:39:32          
+ 
+  meadow     
+  
+  
+  等级：新手上路,请多关照 
+  文章：64
+  积分：113
+  门派：橘子派 
+  注册：2002-11-25
+              第5楼  
+ 
+
+ 
+多谢  
+ 
+ 2003-12-9 11:19:07          
+ 
+  Flash_Line     
+  
+  
+  头衔：社会精英 
+  等级：新手上路,请多关照 
+  文章：74
+  积分：188
+  门派：计算机专业 
+  注册：2003-12-7
+                第6楼  
+ 
+
+ 
+很感谢了。我也需要看呢?  
+ 
+ 2003-12-9 11:52:12          
+ 
+  person997     
+  
+  
+  头衔：谁见了我谁倒霉 
+  等级：新手上路,请多关照 
+  文章：58
+  积分：125
+  门派：计算机专业 
+  注册：2003-12-5
+              第7楼  
+ 
+
+ 
+太丢人了!照抄北大上机指导?虽说不太一样,看我的非递归,不过有点毛病,就是无法查错,只能应付考试!
+
+typedef struct node
+{
+   char data;
+   struct node *lchild;
+   struct node *rchild;
+} lkTree;
+
+int IsLeft(char *m, char a, char b)
+{
+ char *p = m;
+ while (*p != 0)
+ {
+    if (*p == a)
+    return 1;
+    if (*p == b)
+    return 0;
+    p++;
+ }
+ return -1;
+}
+
+lkTree* Maketree(char *f, char *m)
+{
+ char *p = f + 1;
+ lkTree *boot = (lkTree *)malloc(sizeof (lkTree));
+ boot->data = *f;
+ boot->lchild = NULL;
+ boot->rchild = NULL;
+
+ while (*p != 0)
+ {
+    lkTree *pt = boot;
+    lkTree *pParent = NULL;
+    int flag = 0;
+    while (pt != NULL)
+    {
+    pParent = pt;
+    if (IsLeft(m, *p, pt->data) == 1)
+    {
+     flag = 1;
+     pt = pt->lchild;
+    }
+    else
+    {
+     flag = 0;
+     pt = pt->rchild;
+    }
+    }
+    pt = (lkTree *)malloc(sizeof (lkTree));
+    pt->data = *p;
+    pt->lchild = NULL;
+    pt->rchild = NULL;
+
+    if (flag == 1)
+    {
+    pParent->lchild = pt;
+    }
+    else
+    {
+    pParent->rchild = pt;
+    }
+    p++;
+ }
+ return boot;
+}
+
+ 
+ 
+------------------------------
+数据结构上机题２
+编一C程序，它能根据读入的数据构造有向图G，并输出G的DFS遍历序列（从V0开始），图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1，-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。 
+（注：程序的可执行文件名必须是 e3.exe）
+#include <stdio.h> 
+typedef enum {False,True} Boolean; 
+
+int G[100][100]; 
+int n; 
+
+void CreatG() /*建立图的邻接矩阵G[][]*/ 
+{int i,j; 
+printf("Input the number of the node:"); 
+scanf("%d",&n); 
+printf("\n"); 
+for (i=0;i<n;i++) 
+for (j=0;j<n;j++) 
+ G[i][j]=0; 
+do 
+{ scanf("%d %d",&i,&j); 
+G[i][j]=1; 
+}while ((i!=-1)&&(j!=-1)); 
+} 
+
+void TopSort() /*拓扑排序,输出拓扑序列*/ 
+{ int i,j; 
+int degree[100]; /*按照无前驱顶点优先思想,degree[]存放个节点的入度.*/ 
+Boolean visited[100],flag=True; 
+printf("The Topolgical Order as follow:"); 
+for (i=0;i<n;i++) 
+{ degree[i]=0; 
+visited[i]=False; 
+} 
+printf("\n"); 
+while(flag==True) 
+{ 
+for (i=0;i<n;i++) 
+for (j=0;j<n;j++) 
+degree[i]=G[j][i]+degree[i]; 
+i=0; 
+while ((i<n)&&(degree[i]!=0)||visited[i]==True) i++; /*最先输出入度为0的顶点.*/ 
+if (i<n) /*所有节点均已输出结束,否则说明存在环,无拓扑序列*/ 
+{printf(" %d",i); 
+visited[i]=True; 
+for(j=0;j<n;j++) 
+ {G[i][j]=0; degree[j]=0;} 
+} 
+else flag=False; 
+} 
+} 
+
+main() 
+{ CreatG(); 
+TopSort(); 
+}
+
+-------------------------------
+数据结构：哈夫曼树的应用
+
+
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<conio.h>a
+#include<graphics.h>
+#define MAXVALUE 200           /*权值的最大值*/
+#define MAXBIT  30             /*最大的编码位数*/
+#define MAXNODE 30             /*初始的最大的结点数*/
+ struct haffnode
+         {char data;
+   int weight;
+                        int flag;
+                        int parent;       /*双亲结点的下标*/
+                        int leftchild;    /*左孩子下标*/
+                        int rightchild;   /*右孩子下标*/
+         };
+ struct haffcode
+         {int bit[MAXNODE];
+                        int start;        /*编码的起始下标*/
+   char data;
+   int weight;       /*字符权值*/
+         };
+
+ 
+
+
+/*函数说明*/
+/************************************************************************/
+void pprintf(struct haffcode haffcode[],int n);
+/*输出函数*/
+void haffmantree(int weight[],int n,struct haffnode hafftree[],char data[]);
+/*建立哈夫曼树*/
+void haffmancode(struct haffnode hafftree[],int n,struct haffcode haffcode[]);
+/*求哈夫曼编码*/
+void test(struct haffcode haffcode[],int n);
+/*测试函数*/
+void end();
+/*结束界面函数*/
+/************************************************************************/
+
+ 
+
+
+void haffmantree(int weight[],int n,struct haffnode hafftree[],char data[])
+    /*建立叶结点个数为n，权值数组为weight[]的哈夫曼树*/
+    {int i,j,m1,m2,x1,x2;
+     /*哈夫曼树hafftree[]初始化，n个叶结点共有2n-1个结点*/
+         for(i=0;i<2*n-1;i++)
+        {if(i<n)  {hafftree[i].data=data[i];
+     hafftree[i].weight=weight[i];   /*叶结点*/
+           }
+         else     {hafftree[i].weight=0;           /*非叶结点*/
+     hafftree[i].data='\0';
+     }
+         hafftree[i].parent=0;                     /*初始化没有双亲结点*/
+                              hafftree[i].flag=0;
+         hafftree[i].leftchild=-1;
+                              hafftree[i].rightchild=-1;
+                             }
+   for(i=0;i<n-1;i++)                              /*构造哈夫曼树n-1个非叶结点*/
+                            {m1=m2=MAXVALUE;
+                             x1=x2=0;
+        for(j=0;j<n+i;j++)
+     {if(hafftree[j].weight<m1&&hafftree[j].flag==0)
+                                         {m2=m1;
+                                          x2=x1;
+                                          m1=hafftree[j].weight;
+                                          x1=j;
+                                         }
+      else if(hafftree[j].weight<m2&&hafftree[j].flag==0)
+                                            {m2=hafftree[j].weight;
+                                             x2=j;
+                                            }
+                                  }
+                                  hafftree[x1].parent=n+i;
+                                  hafftree[x2].parent=n+i;
+                                  hafftree[x1].flag=1;
+                                  hafftree[x2].flag=1;
+                                  hafftree[n+i].weight=hafftree[x1].weight+hafftree[x2].weight;
+                                  hafftree[n+i].leftchild=x1;
+                                  hafftree[n+i].rightchild=x2;
+
+       }
+                     }
+void haffmancode(struct haffnode hafftree[],int n,struct haffcode haffcode[])
+   {/*由n个结点的哈夫曼树hafftree[]构成的哈夫曼编码haffcode[]*/
+    int i,j,child,parent;
+    struct haffcode newcode;
+    struct haffcode *cd;
+    cd=&newcode;
+    for(i=0;i<n;i++)                                      /*求n个结点的哈夫曼编码*/
+         {cd->start=MAXBIT-1;                                  /*不等长编码的最后一位是n-1*/
+   cd->weight=hafftree[i].weight;
+   cd->data=hafftree[i].data;    /*取得编码对应值的字符*/
+                        child=i;
+                        parent=hafftree[child].parent;
+                        while(parent!=0)
+         {if(hafftree[parent].leftchild==child)
+                                    cd->bit[cd->start]=0;               /*左孩子编码为0*/
+                               else
+        cd->bit[cd->start]=1;               /*右孩子编码为1*/
+                               cd->start--;
+                               child=parent;
+                               parent=hafftree[child].parent;
+                              }
+    for(j=cd->start+1;j<MAXBIT;j++)                     /*保存每个叶结点的编码和等长编码的起始位*/
+          haffcode[i].bit[j]=cd->bit[j];
+    haffcode[i].data=cd->data;
+    haffcode[i].start=cd->start;
+    haffcode[i].weight=cd->weight;
+         }
+   }
+void pprintf(struct haffcode myhaffcode[],int n)
+       {int i,j,count=0;
+        clrscr();
+        for(i=0;i<n;i++)
+    {textcolor(YELLOW);
+     cprintf("字符=%c",myhaffcode[i].data);
+     printf("              ");
+     textcolor(YELLOW);
+     cprintf("weight=%3d",myhaffcode[i].weight);
+     printf("              ");
+     textcolor(YELLOW);
+     cprintf("haffcode=");
+     for(j=myhaffcode[i].start+1;j<MAXBIT;j++)
+          cprintf("%d",myhaffcode[i].bit[j]);
+     printf("\n");
+     count++;
+     if(count==21)
+     getch();
+
+    }
+       }
+void test(struct haffcode haffcode[],int n)
+     {int i,j,k,s;
+      char sstring[MAXNODE];
+      struct haffcode newhaffcode[MAXNODE];
+      j=0;
+      clrscr();
+      textcolor(YELLOW);
+      cprintf("请输入哈夫曼编码测试数据，在此建议为'this programme is my favorite'");
+      printf("\n");
+      cprintf("注意小写,空格由大写字母T代替，并且字符数小于27.\n");
+      scanf("%s",sstring);
+      if(strlen(sstring)>=MAXNODE)
+      {printf("you input the data number >=MAXNODE.");
+      exit(1);
+      }
+      for(i=0;i<strlen(sstring);i++)
+  {
+    for(j=0;j<MAXBIT;j++)
+     if(sstring[i]==haffcode[j].data)
+     {
+      k=j;
+      break;
+      }
+    if(k<0||k>MAXNODE-1)
+    {printf("在系统中找不到与第个%d字符相匹配的编码\n",i+1);
+     continue;
+    }
+    newhaffcode[i].start=haffcode[k].start;
+    newhaffcode[i].weight=haffcode[k].weight;
+    newhaffcode[i].data=haffcode[k].data;
+    for(s=haffcode[k].start+1;s<MAXBIT;s++)
+      newhaffcode[i].bit[s]=haffcode[k].bit[s];
+  }
+
+      pprintf(newhaffcode,strlen(sstring));
+     }
+void end()
+    {int driver,mode;
+  driver=VGA;
+  mode=VGAHI;
+  initgraph(&driver,&mode," ");
+  setlinestyle(0,0,2);
+  setfillstyle(1,9);
+  bar(120,60,520,80);
+  setfillstyle(1,9);
+  bar(90,100,550,350);
+  moveto(121,65);
+  settextstyle(5,0,6);
+  setcolor(7);
+  outtext("This programme is designed by Dou Zheren");
+  settextstyle(3,0,3);
+  setcolor(7);
+  moveto(150,200);
+  outtext("thank you use this programme.");
+  moveto(100,300);
+  settextstyle(3,0,2);
+  setcolor(7);
+  outtext("please press anykey to end this programme.");
+    }
+void main()
+     {
+       int i,j,n=27;
+       int driver=VGA,mode=VGAHI;
+       char ch;
+       int weight[27]={186,64,13,22,32,103,21,15,47,
+          57,1,5,32,20,57,63,15,1,48,
+          51,80,23,8,18,1,16,1};
+       char data[28]={'T','a','b','c','d','e','f','g','h',
+        'i','j','k','l','m','n','o','p','q',
+        'r','s','t','u','v','w','x','y','z'};
+       struct haffnode newhaffnode[2*MAXNODE-1];
+       struct haffcode newcode[MAXNODE];
+       struct haffnode *myhafftree=newhaffnode;
+       struct haffcode *myhaffcode=newcode;
+       if(n>MAXNODE)
+    {printf("you input the haffnode > MAXNODE,so you input the data is wrong");
+     printf("\n");
+                   exit(1);
+    }
+       clrscr();
+       textcolor(YELLOW);
+       cprintf("WELCOME!这是一个求哈夫曼编码的问题");
+       printf("\n");
+       cprintf("即对所有的字母进行编码后，在根据用户的需要，对用户的要求进行编码。");
+       printf("\n");
+       cprintf("注意：本程序只支持小写字母，空格用大写字母T代替!   ");
+       printf("\n");
+       getch();
+       textcolor(YELLOW);
+       cprintf("Ready?Enter,if you want to begin!\n");
+       printf("\n");
+       getch();
+       cprintf("Now，开始演示哈夫曼编码.");
+       getch();
+       haffmantree(weight,n,myhafftree,data);
+              haffmancode(myhafftree,n,myhaffcode);
+       pprintf(myhaffcode,n);
+       clrscr();
+       printf("若执行自定义编译，请输入y继续。否则程序将结束.");
+       if((ch=getch())=='y'||ch=='Y')
+       test(myhaffcode,n);
+       getch();
+       clrscr();
+       end();
+       getch();
+       exit(1);
+    }
+
+
+
+
+---------------------------------------------
+二*搜索树的实现（应该好好看看）
+实际上就是在二*树的基础上增加了插入、删除、查找。
+
+#include "BaseTree.h"
+template <class T>
+class BSTree : public BTree<T>
+{
+public:
+BTNode<T>* &find(const T &data)
+{
+BTNode<T>** p = &root; current = NULL;
+while(*p)
+{
+if ((*p)->data == data) break;
+{f ((*p)->data < data) { current = *p; p = &((*p)->right); }
+else { current = *p; p = &((*p)->left); }
+}
+return *p;
+}
+bool insert(const T &data)
+{
+BTNode<T>* &p = find(data); if (p) return false;
+p = new BTNode<T>(data, NULL, NULL, current); return true;
+}
+bool remove(const T &data)
+{
+return remove(find(data));
+}
+private:
+bool remove(BTNode<T>* &p)
+{
+if (!p) return false; BTNode<T>* t = p;
+if (!p->left || !p->right)
+{
+if (!p->left) p = p->right; else p = p->left;
+if (p) p->parent = current;
+delete t; return true;
+}
+t=p->right;while(t->left) t=t->left;p->data=t->data;current=t->parent;
+return remove(current->left==t?current->left:current->right);
+}
+}; 
+
+　　以上代码有点费解，有必要说明一下——非线性链式结构操作的实现都是很让人费神。insert和remove都是以find为基础的，因此必须让find能最大限度的被这两个操作利用。
+
+　　1、对于insert，需要修改查找失败时的指针内容，显然这是个内部指针（在双亲节点的内部，而不是象root和current那样在节点外面指向节点），这就要求find返回一个内部指针的引用。但是C++的引用绑定到一个对象之后，就不能再改变了，因此在find内部的实现是一个二重指针。insert操作还需要修改插入的新节点的parent指针域，因此在find中要产生一个能被insert访问的指向find返回值所在节点的指针，这里用的是current。实际上find返回的指针引用不是current->left就是current->right。这样一来，insert的实现就非常简单了。
+
+　　2、对于remove，需要修改查找成功时的指针内容，同样是个内部指针。在find的基础上，很容易就能得到这个内部指针的引用(BTNode<T>* &p = find(data)。
+
+　　 在p->left和p->right中至少有一个为NULL的情况下，如果p->left ==NULL，那么就重连右子树p = p->right，反之，重连左子树p = p->left。注意，左右子树全空的情况也包含在这两个操作中了——在p->left ==NULL的时候重连右子树，而这时p->right也是NULL——因此不必列出来。如果重连后p不为空，需要修改p->parent = current。
+
+　　 若p->left和p->right都不为空，可以转化为有一个为空。例如一个中序有序序列[1,2,3,4,5]，假设3既有左子树又有右子树，那么它的前驱2一定缺右子树，后继4一定缺少左子树。【注1】这样一来删除节点3就等效成从[1,2,3(4),4,5]删除节点4。这样就可以利用上面的在p->left和p->right中至少有一个为NULL的情况下的方法了。还是由于C++的引用不能改变绑定对象，这里是用利用递归来解决的，还好最多只递归一次。如果用二重指针又是满天星星了，这就是明明是尾递归却没有消去的原因。
+
+　　【注1】这是因为，如果3既有左子树又有右子树，那么2一定在3的左子树上，4一定在3的右子树上；如果2有右子树，那么在2和3之间还应该有一个节点；如果4有左子树，那么3和4之间也应该还有一个节点。
+
+-----------------------------------------
+关于DFS于BFS（两者是图的重点，笔试，上机都很重要）
+DFS和BFS
+
+　　对于非线性的结构，遍历都会首先成为一个问题。和二*树的遍历一样，图也有深度优先搜索（DFS）和广度优先搜索（BFS）两种。不同的是，图中每个顶点没有了祖先和子孙的关系，因此，前序、中序、后序不再有意义了。仿照二*树的遍历，很容易就能完成DFS和BFS，只是要注意图中可能有回路，因此，必须对访问过的顶点做标记。 
+
+　　最基本的有向带权网
+
+#ifndef Graph_H 
+#define Graph_H 
+
+#include <iostream> 
+#include <queue> 
+using namespace std; 
+#include "Graphmem.h" 
+
+template <class name, class dist, class mem> 
+class Network 
+{ 
+public: 
+Network() {} 
+Network(dist maxdist) { data.NoEdge = maxdist; } 
+~Network() {} 
+bool insertV(name v) { return data.insertV(v); } 
+bool insertE(name v1, name v2, dist cost) { return data.insertE(v1, v2, cost); } 
+name& getV(int n) { return data.getV(n); } 
+int nextV(int m, int n = -1) { return data.nextV(m, n); } 
+int vNum() { return data.vNum; } 
+int eNum() { return data.eNum; } 
+protected: 
+bool* visited; 
+static void print(name v) { cout << v; } 
+private: 
+mem data; 
+}; 
+#endif 
+
+　　你可以看到，这是在以mem方式储存的data上面加了一层外壳。在图这里，逻辑上分有向、无向，带权、不带权；储存结构上有邻接矩阵和邻接表。也就是说分开来有8个类。为了最大限度的复用代码，继承关系就非常复杂了。但是，多重继承是件很讨厌的事，什么覆盖啊，还有什么虚拟继承，我可不想花大量篇幅讲语言特性。于是，我将储存方式作为第三个模板参数，这样一来就省得涉及虚拟继承了，只是这样一来这个Network的实例化就很麻烦了，不过这可以通过typedef或者外壳类来解决，我就不写了。反正只是为了让大家明白，真正要用的时候，最好是写专门的类，比如无向无权邻接矩阵图，不要搞的继承关系乱七八糟。 
+
+　　DFS和BFS的实现
+
+public: 
+void DFS(void(*visit)(name v) = print) 
+{ 
+visited = new bool[vNum()]; 
+for (int i = 0; i < vNum(); i++) visited[i] = false; 
+DFS(0, visit); 
+delete []visited; 
+} 
+protected: 
+void DFS(int i, void(*visit)(name v) = print) 
+{ 
+visit(getV(i)); visited[i] = true; 
+for (int n = nextV(i); n != -1; n = nextV(i, n)) 
+if (!visited[n]) DFS(n, visit); 
+} 
+public: 
+void BFS(int i = 0, void(*visit)(name v) = print)//n没有越界检查 
+{ 
+visited = new bool[vNum()]; queue<int> a; int n; 
+for (n = 0; n < vNum(); n++) visited[n] = false; 
+visited[i] = true; 
+while (i != -1)//这个判断可能是无用的 
+{ 
+visit(getV(i)); 
+for (n = nextV(i); n != -1; n = nextV(i, n)) 
+if (!visited[n]) { a.push(n); visited[n] = true; } 
+if (a.empty()) break; 
+i = a.front(); a.pop(); 
+} 
+delete []visited; 
+} 
+
+　　DFS和BFS函数很难写得像树的遍历方法那么通用，这在后面就会看到，虽然我们使用了DFS和BFS的思想，但是上面的函数却不能直接使用。因为树的信息主要在节点上，而图的边上还有信息。 
+
+　　测试程序
+
+#include <iostream> 
+using namespace std; 
+#include "Graph.h" 
+int main() 
+{ 
+Network<char, int, LinkedList<char, int> > a; 
+a.insertV('A'); a.insertV('B'); 
+a.insertV('C'); a.insertV('D'); 
+a.insertE('A', 'B', 1); a.insertE('A', 'C', 2); 
+a.insertE('B', 'D', 3); 
+cout << "DFS: "; a.DFS(); cout << endl; 
+cout << "BFS: "; a.BFS(); cout << endl; 
+return 0; 
+} 
+
+　　老实说，这个类用起来真的不是很方便。不过能说明问题就好。
+
+------------------------------------------
+ 数据结构上机题５
+查找一个数是否 在一个数组里，若在，输出它在 数组中的位置，否则输出'no'。
+#include<stdio.h> 
+void main() 
+{ 
+ int a[2000],i,count,temp; 
+ printf("Input the number:\n"); 
+ scanf("%d",&temp); 
+ printf("Input a:\n"); 
+ for(i = 0;i < 2000;i++){ 
+  scanf("%d",&a[i]); 
+  if(a[i] == -9999) 
+   break; 
+ } 
+ count = i; 
+ for(i = 0;i < count;i++) 
+  if(a[i] == temp){ 
+   printf("Yes,the number is: %d\n",i); 
+   return; 
+  } 
+ printf("No!\n"); 
+} 
+=-----------------------------------------
+数据结构上机题６
+１０、 输出两个数组的差集
+#include<stdio.h> 
+void BubbleSort(int a[],int n){ 
+ int i,j,k,exchange; 
+ for(i = 0;i < n-1;i++){ 
+  exchange = 0; 
+  for(j = n - 1;j > i;j--){ 
+   if(a[j] < a[j-1]){ 
+    k = a[j]; 
+    a[j] = a[j-1]; 
+    a[j-1] = k; 
+    exchange = 1; 
+   } 
+  } 
+  if(!exchange) 
+   break; 
+ } 
+} 
+int cha(int a[],int b[],int c[],int countA,int countB){ 
+ int i,j,k = 0,flag = 0; 
+ for(i = 0;i < countA;i++){ 
+  for(j = 0;j < countB;j++){ 
+   if(a[i] == b[j]) 
+    flag = 1; 
+  } 
+  if(!flag) 
+   c[k++] = a[i]; 
+  flag = 0; 
+     
+ } 
+ return k; 
+} 
+
+
+void main() 
+{ 
+ int a[1000],b[1000],c[2000],countA,countB,i,cn; 
+ printf("Input the a:\n"); 
+ for(i = 0;i <= 1000;i++){ 
+  scanf("%d",&a[i]); 
+  if(a[i] == -9999) 
+   break; 
+ } 
+ countA = i; 
+ BubbleSort(a,countA); 
+ printf("Input the b:\n"); 
+ for(i = 0;i <= 1000;i++){ 
+  scanf("%d",&b[i]); 
+  if(b[i] == -9999) 
+   break; 
+ } 
+ countB = i; 
+ BubbleSort(b,countB); 
+ cn = cha(a,b,c,countA,countB); 
+ for(i = 0;i < cn;i++){ 
+  if(c[i] == c[i+1]) 
+   c[i+1] = -9999; 
+ } 
+ printf("Output the number:\n"); 
+ for(i = 0;i < cn;i++){ 
+  if(c[i] == -9999) 
+   continue; 
+  printf("%d ",c[i]); 
+  if((i + 1) % 10 == 0) 
+   printf("\n"); 
+ } 
+}
+=-------------------------------------------
+ 数据结构上机题４
+编一C程序，它能读入一串整数（不多于2000，并以-9999为结束标记）及另一整数n，判断n是否在那一串数中，若是，则输出yes及该数在那串整数中的序号（序号从0开始），否则输出no。(输入整数时，相邻的两个用空格隔开)。 
+（注：程序的可执行文件名必须是 e6.exe）
+#include <stdio.h> 
+
+typedef struct{ 
+ int data[2000]; 
+ int length; 
+}SeqList; 
+
+void main() 
+{ 
+ int i,k=0,num; 
+ SeqList a; 
+ printf("input data\n"); 
+ for(i=0;i<2000;i++) 
+ { 
+  scanf("%d",&a.data[i]); 
+  if(a.data[i]==-9999) 
+   break; 
+ } 
+ a.length=i-1; 
+
+ printf("input the number\n"); 
+ scanf("%d",&num); 
+for(i=0;i<=a.length;i++) 
+ { 
+  k++; 
+  if(a.data[i]==num) 
+  { 
+   printf("yes\n"); 
+   printf(" is at %d",k); 
+   printf("\n"); 
+  
+  } 
+ } 
+ printf("\nno\n"); 
+}
+
+--------------------------------------
+ 数据结构上机题
+北京大学数据结构上机考题
+
+1. 编一C程序，它能读入集合A的一串整数（以-9999为结束标记，整数个数小于1000）和集合B 的一串整数（以-9999为结束标记，整数个数小于1000），计算并以从小到大的次序输出A-B 的所有元素(为A或B输入时，同一个数可能出现多次，而A与B的差集中同一个数不能出现多次)。 （注：程序的可执行文件名必须是 e1.exe）
+
+（注：程序的可执行文件名必须是 e4.exe） 
+*/ 
+#include <stdio.h> 
+
+void BubbleSort(int r[],int n) 
+{//冒泡排序(有小到大) 
+ int i,j,k; 
+ int exchange; 
+ for(i=0;i<=n;i++) 
+ { 
+  exchange=0; 
+  for(j=n-1;j>=i;j--) 
+  if(r[j+1]<r[j]) 
+  { 
+   k=r[j+1]; 
+   r[j+1]=r[j]; 
+   r[j]=k; 
+   exchange=1; 
+  } 
+  if(!exchange) 
+  break; 
+ } 
+} 
+
+
+int DisaSameYs(int r[],int n) 
+{//消除数组r[]中的重复元素,并返回消除后数组剩余的元素个数 
+int w,x,y; 
+ for(w=0;w<=n;w++) 
+ { 
+  for(x=w+1;x<=n;x++) 
+  { 
+   if(r[w]==r[x]) 
+   { 
+    n--; 
+    for(y=x;y<=n;y++) 
+    { 
+     r[y]=r[y+1];     
+    }//endfor 
+    x--; 
+   }//endif     
+  }//endfor   
+ }//endfor 
+  
+ return n; 
+} 
+
+
+int cha(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求差集 
+ int i=0,j=0,k=0; 
+ int exch; 
+while(i<=Countaa) 
+ { 
+  exch=0;//交换变量为0 
+  for(j=0;j<=Countbb;j++) 
+  {//用集合的第一个元素分别和另一个集合的各元素相比较 
+   //然后再用第二个元素(直到最后一个元素)和另一个集合的各元素相比较 
+   if(m[i]==n[j]) 
+   {//如果相同，交换变量变为1 
+exch=1; 
+    break; 
+   }//endif 
+}//endfor 
+  if(!exch) 
+{//如果没有相同的就保存m[i]到l[]中 
+   l[k]=m[i]; 
+   k++; 
+  } 
+  i++; 
+ }//endwhile 
+
+ return k; 
+} 
+
+/* 
+void testds(int r[],int n) 
+{//测试消除数组中的重复元素的效果用下列循环输出 
+ int z; 
+ for(z=0;z<=n;z++) 
+ { 
+  printf("%d",r[z]);  
+ } 
+ printf("\n"); 
+} 
+*/ 
+
+void main() 
+{ 
+ int a[1000], b[1000],c[2000]; 
+ int exchange=0; 
+ int i,j,k,CountA,CountB,CountC; 
+
+ printf("input a\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+  break; 
+ } 
+ CountA=i-1; 
+ BubbleSort(a,CountA); 
+  
+ CountA=DisaSameYs(a,CountA); 
+// testds(a,CountA); 
+
+ printf("\ninput b\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&b[i]); 
+  if(b[i]==-9999) 
+  break; 
+ } 
+ CountB=i-1; 
+ BubbleSort(b,CountB); 
+
+CountB=DisaSameYs(b,CountB); 
+//testds(b,CountB); 
+
+ CountC=cha(a,b,c,CountA,CountB); 
+
+ printf("\n\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+} 
+
+
+
+////////////////////////////////////////////////////// 
+//模式匹配 
+
+#include <stdio.h> 
+#include <string.h> 
+
+typedef struct{ 
+// int ch[2000]; 
+ char ch[2000]; 
+ int length; 
+}SeqString; 
+
+int NaiveStrMatch(SeqString T,SeqString P) 
+{ 
+ int i,j,k; 
+ int m=P.length; 
+ int n=T.length; 
+ for(i=0;i<=n-m;i++) 
+ { 
+  j=0;k=i; 
+  while(j<m&&T.ch[k]==P.ch[j]) 
+  { 
+   k++;j++; 
+  } 
+  if(j==m) 
+   return i; 
+   
+ }//endfor 
+ return -1; 
+}//NaiveStrMatch 
+
+SeqString CreatStr(SeqString R) 
+{ 
+ int i; 
+printf("input data\n"); 
+for(i=0;i<2000;i++) 
+ { 
+//  scanf("%d",&R.ch[i]);   
+//  if(R.ch[i]==-9999)   
+  scanf("%s",&R.ch[i]); 
+  if(!(strcmp(&R.ch[i],"-9999"))) 
+  break; 
+ } 
+R.length=i-1; 
+ return R; 
+} 
+
+void main() 
+{ 
+ int n; 
+ SeqString Str1; 
+ Str1=CreatStr(Str1); 
+ SeqString Str2; 
+ Str2=CreatStr(Str2); 
+ n=NaiveStrMatch(Str1,Str2); 
+ printf("%d\n",n); 
+} 
+
+
+/* 
+
+--------------------------------------
+数据结构上机题７
+//有向图的深度优先遍历
+#include<stdio.h> 
+#define MaxSize 100 
+int visited[MaxSize] = {0}; 
+typedef struct{ 
+ int edges[MaxSize][MaxSize]; 
+ int vexs[MaxSize]; 
+ int n; 
+}MGraph; 
+void DFS(MGraph * L,int i){ 
+ int j; 
+ printf("%d ",L -> vexs[i]); 
+ visited[i] = 1; 
+ for(j = 0;j < L -> n;j++) 
+  if(L -> edges[i][j] == 1 && !visited[j]) 
+   DFS(L,j); 
+} 
+void DFSTraver(MGraph * L){ 
+ int i; 
+ for(i = 0;i < L -> n;i++) 
+  visited[i] = 0; 
+ for(i = 0;i < L -> n;i++) 
+  if(!visited[i]) 
+   DFS(L,i); 
+} 
+void MakeAdjM(MGraph * L){ 
+ int i,j,n; 
+ printf("Input the data:\n"); 
+ scanf("%d",&n); 
+ L -> n = n; 
+ for(i = 0;i < n;i++) 
+  L -> vexs[i] = i; 
+ do{ 
+  scanf("%d%d",&i,&j); 
+  if(i == -1 && j == -1) 
+   break; 
+  L -> edges[i][j] = 1; 
+ }while(1); 
+} 
+void main() 
+{ 
+ MGraph g; 
+ MakeAdjM(&g); 
+ printf("visit the vertex:\n"); 
+ DFSTraver(&g); 
+}
+------------------------------------
+数据结构上机题３
+. 编一C程序，它能读入一串整数（以-9999为结束标记）并对它们进行从小到大直接插入排序，同时输出排序时对这些整数进行比较的总次数（输入整数时，相邻的两个用空格隔开，整数个数<2000）。 （注：程序的可执行文件名必须是 e4.exe）
+#include<stdio.h> 
+
+void main() 
+{ 
+ int a[2000],i,j,k=0,CountA; 
+ printf("input data\n"); 
+for(i=1;i<=2001;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+   break; 
+ } 
+ CountA=i-1; 
+
+
+ for(i=2;i<=CountA;i++) 
+  if(a[i]<a[i-1]) 
+  { 
+   a[0]=a[i]; 
+   j=i-1; 
+    
+  do{ 
+    a[j+1]=a[j]; 
+    j--; 
+    k++; 
+   }while(a[0]<a[j]); 
+a[j+1]=a[0]; 
+  } 
+
+printf("\n"); 
+ for(i=1;i<=CountA;i++) 
+  printf("%d ",a[i]); 
+printf("\nThe times of comparing = %d",k); 
+printf("\n"); 
+}
+
+-----------------------------------
+

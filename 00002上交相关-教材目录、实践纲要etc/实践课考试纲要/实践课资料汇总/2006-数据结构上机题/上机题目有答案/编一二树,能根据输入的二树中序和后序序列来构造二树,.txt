@@ -1,0 +1,422 @@
+/*编一二*树,能根据输入的二*树中序和后序序列来构造二*树,
+       并能输出该二*树的前序序列和该二*树的深度,叶子数，一度点，2度点,结点数*/
+#include"stdio.h"
+#include"stdlib.h"
+#include"string.h"
+int num=0;
+int num1=0;
+int num2=0;
+
+
+typedef struct tree
+{
+char val;
+struct tree *lchild,*rchild;
+}T;
+
+T *create(char *s1,char *s2,int l)//s1是bs ,s2是ms ,l是len 
+{
+T *p;
+char *s;
+int k;
+if(l<=0)return NULL;
+p=(T*)malloc(sizeof(T));
+p->val=*(s1+l-1);
+for(s=s2;s<s2+l;s++)
+{
+  if(*s==*(s1+l-1))break;
+}
+k=s-s2;
+p->lchild=create(s1,s2,k);
+p->rchild=create(s1+k,s+1,l-k-1);
+return p;
+}
+
+
+void fvisit(T *tt)
+{
+if(tt==NULL)return;
+else
+{
+  printf("%c",tt->val);
+  fvisit(tt->lchild);
+  fvisit(tt->rchild);
+}
+}
+
+
+int depth(T *tt)
+{
+if(tt==NULL)return 0;
+else
+{
+  if(depth(tt->lchild)>=depth(tt->rchild))
+  {
+   num=1+depth(tt->lchild);
+  }
+  else
+  {
+   num=1+depth(tt->rchild);
+  }
+}
+return num;
+}
+
+
+int leaf(T *tt)
+{
+
+if(tt==NULL)return 0;
+else
+{
+  if(leaf(tt->lchild)==NULL&&leaf(tt->rchild)==NULL)
+  {
+   return 1;
+  }
+  else
+   return leaf(tt->lchild)+leaf(tt->rchild);
+}
+}
+
+void degree1(T *tt)
+{
+
+if(tt==NULL||(tt->lchild==NULL&&tt->rchild==NULL))return ;
+else
+{
+  if(tt->lchild==NULL&&tt->rchild!=NULL)
+  {
+   num1++;
+  degree1(tt->rchild);
+  }
+  if(tt->lchild!=NULL&&tt->rchild==NULL)
+  {
+   num1++;
+  degree1(tt->lchild);
+  }
+  if(tt->lchild!=NULL&&tt->rchild!=NULL)
+  {
+   degree1(tt->lchild);
+   degree1(tt->rchild);
+  }
+}
+
+}
+
+
+void degree2(T *tt)
+{
+if(tt==NULL)return;
+else
+{
+  if(tt->lchild!=NULL&&tt->rchild!=NULL)
+  {
+   num2++;
+   degree2(tt->lchild);
+   degree2(tt->rchild);
+  }
+  if(tt->lchild!=NULL&&tt->rchild==NULL)
+  {degree2(tt->lchild);}
+  if(tt->lchild==NULL&&tt->rchild!=NULL)
+  {degree2(tt->rchild);}
+}
+}
+
+
+int node(T *tt)
+{
+
+if(tt==NULL)return 0;
+else
+return 1+node(tt->lchild)+node(tt->rchild);
+}
+
+
+
+
+
+
+
+void main()
+{
+char ms[100],bs[100];
+T *t;
+int len;
+printf("请输入二*树中序：");
+scanf("%s",ms);
+printf("请输入二*树后序：");
+scanf("%s",bs);
+len=strlen(bs);
+t=create(bs,ms,len);
+printf("输出二*树的前序为：");
+fvisit(t);
+printf("\n该二*树的深度为：");
+depth(t);
+printf("%d",num);
+printf("\n该二*树的叶子数为：");
+printf("%d",leaf(t));
+printf("\n该二*树的1度点数为：");
+degree1(t);
+printf("%d",num1);
+printf("\n该二*树的2度点数为：");
+degree2(t);
+printf("%d",num2);
+printf("\n该二*树的总结点数为：");
+node(t);
+printf("%d\n",node(t));
+
+
+}
+
+
+
+ 
+ 
+ 2004-12-20 15:54:43          
+ 
+  guanyonggygy     
+  
+  
+  等级：新手上路,请多关照 
+  文章：8
+  积分：189
+  门派：计算机专业 
+  注册：2004-1-29
+              第 2 楼  
+ 
+ 
+
+ 
+谢！  
+ 
+ 2004-12-21 14:43:03           
+ 
+  qazwsx123456     
+  
+  
+  等级：一星会员 
+  文章：38
+  积分：219
+  门派：计算机专业 
+  注册：2003-12-5
+              第 3 楼  
+ 
+ 
+
+ 
+
+thanks!!
+
+-------------------------------------------
+
+
+ 
+ 
+ 2005-1-5 21:20:39           
+ 
+  kkkemu     
+  
+  
+  等级：一星会员 
+  文章：77
+  积分：215
+  注册：2004-11-3
+              第 4 楼  
+ 
+ 
+
+ 
+
+还好,,我也看到一个好得计算机网站,资料齐全..考题和课件
+
+www.51zk.cn
+ 
+ 
+ 2005-1-7 12:36:41           
+ 
+  a_119     
+  
+  
+  等级：一星会员 
+  文章：22
+  积分：304
+  门派：计算机侠客 
+  注册：2004-4-28
+            第 5 楼  
+ 
+ 
+
+ 
+
+程序有问题，构造树连前序123，后序312三节点的树都无法构造，我照着你的题目要求也写了一个，谢谢提出意见：
+
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+
+//定义树的结构
+typedef struct tree
+{
+    char val;
+    struct tree *lchild,*rchild;
+}tree;
+
+//根据前序、后序序列构造树
+tree *create(char *ms,char *bs,int len,char szStr[])
+{
+    tree *T;
+    char *c;
+    int szLen;
+    if (len == 0 || len < 0)
+        return NULL;
+    T = (tree *)malloc(sizeof(tree));
+    T->val = *ms;
+    printf("构造：%s = %c\n",szStr,*ms);
+    for (c=bs;c<bs+len;c++)
+    {
+        if (*c == *ms)
+            break;
+    }
+    szLen = bs + len - c - 1;
+    T->lchild = create(ms+1,c+1,szLen,"左孩子");
+    T->rchild = create(ms+szLen+1,bs,len-szLen-1,"右孩子");
+    return T;
+}
+
+//显示前序序列
+bool fs(tree *T)
+{
+    bool szFlag = false;
+    if (T->lchild != NULL)
+    {
+        szFlag = fs(T->lchild);
+        if (szFlag)
+        {
+            printf("%c",T->val);
+        }
+    }else
+    {
+        printf("%c",T->val);
+        szFlag = true;
+    }
+    if (T->rchild != NULL)
+    {
+        szFlag = fs(T->rchild);
+    }
+    return szFlag;
+}
+
+//求树的深度
+int getDepth(tree *T)
+{
+    int szLDepth = 1;
+    int szRDepth = 1;
+    if (T->lchild != NULL)
+    {
+        szLDepth += getDepth(T->lchild);
+    }
+    if (T->rchild != NULL)
+    {
+        szRDepth += getDepth(T->rchild);
+    }
+    if (szLDepth > szRDepth)
+    {
+        return szLDepth;
+    }else
+    {
+        return szRDepth;
+    }
+}
+
+//求叶子节点个数
+int getLeafNum(tree *T)
+{
+    int szLeafNum,szLLeafNum=0,szRLeafNum=0;
+    if (T->lchild != NULL)
+    {
+        szLLeafNum += getLeafNum(T->lchild);
+    }
+    if (T->rchild != NULL)
+    {
+        szRLeafNum += getLeafNum(T->rchild);
+    }
+    if (T->lchild == NULL && T->rchild == NULL)
+    {
+        szLeafNum = 1;
+    }else
+    {
+        szLeafNum = szLLeafNum + szRLeafNum;
+    }
+    return szLeafNum;
+}
+
+//一度节点个数
+int getOneChildNodeNum(tree *T)
+{
+    int szNum=0,szLNum=0,szRNum=0;
+    if (T->lchild != NULL)
+    {
+        szLNum += getOneChildNodeNum(T->lchild);
+    }
+    if (T->rchild != NULL)
+    {
+        szRNum += getOneChildNodeNum(T->rchild);
+    }
+    if ((T->rchild != NULL && T->lchild == NULL) ||
+        (T->rchild == NULL && T->lchild != NULL))
+    {
+        szNum = 1;
+    }
+    szNum += szLNum + szRNum;
+    return szNum;
+}
+
+//二度节点个数
+int getTwoChildNodeNum(tree *T)
+{
+    int szNum=0,szLNum=0,szRNum=0;
+    if (T->lchild != NULL)
+    {
+        szLNum += getTwoChildNodeNum(T->lchild);
+    }
+    if (T->rchild != NULL)
+    {
+        szRNum += getTwoChildNodeNum(T->rchild);
+    }
+    if (T->rchild != NULL && T->lchild != NULL)
+    {
+        szNum = 1;
+    }
+    szNum += szLNum + szRNum;
+    return szNum;
+}
+
+void main()
+{
+    char ms[100],bs[100];//中序遍历、后序遍历
+    int szLen;//节点个数
+    int szDepth;//树深度
+    int szLeafNum;//叶子节点个数
+    int szOneChildNodeNum;//一度节点个数
+    int szTwoChildNodeNum;//二度节点个数
+    tree *szTree;
+    printf("请输入中序序列：");
+    scanf("%s",&ms);
+    printf("请输入后序序列：");
+    scanf("%s",&bs);
+    szLen = strlen(ms);
+    szTree = create(ms,bs,szLen,"根节点");
+    printf("前序序列为：");
+    fs(szTree);
+    szDepth = getDepth(szTree);
+    printf("\n深度为：%d",szDepth);
+    szLeafNum = getLeafNum(szTree);
+    printf("\n叶子节点个数为：%d",szLeafNum);
+    szOneChildNodeNum = getOneChildNodeNum(szTree);
+    printf("\n一度节点个数为：%d",szOneChildNodeNum);
+    szTwoChildNodeNum = getTwoChildNodeNum(szTree);
+    printf("\n二度节点个数为：%d",szTwoChildNodeNum);
+    printf("\n总节点个数为：%d\n",szLen);
+}
+ 
+ 

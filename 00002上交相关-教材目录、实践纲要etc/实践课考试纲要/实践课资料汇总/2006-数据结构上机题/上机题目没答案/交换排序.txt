@@ -1,0 +1,53 @@
+交换排序
+基本思想是：两两比较待排序记录的关键码，如果发生逆序，则交换之，直到所有对象都排好为止。 
+
+　　起泡排序
+
+　　起泡排序是比较相邻的两个记录，逆序则交换。这样的做法导致小的关键码一层层的浮上来，因此得名。CSDN的论坛曾经讨论过“冒泡”和“起泡”是不是一个东西，看来这是翻译惹的祸，英文名都是Bubble Sort，具体写的时候可以正着排，也可以倒着排。（严版是从后往前排，殷版是从前往后排，好在两本书都翻译为“起泡排序”，不然就正像某些人得出的结论——一个是从后往前排，一个是从前往后排）
+template <class T>void BubbleSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0; bool exchange = true;for (int i = 1; i < N && exchange; i++)for (int j = N - 1; j >= i; j--){exchange = false;if (++KCN && a[j - 1] > a[j]) { swap(a[j - 1], a[j]); exchange = true; RMN += 3; }}}
+
+　　需要注意的是，不要写成下面这个样子，虽然结果是对的：
+template <class T>void BubbleSort2(T a[], int N){for (int i = 0; i < N; i++)for (int j = 1; j < N - i; j++)if (a[j - 1] > a[j]) swap(a[j - 1], a[j]);}
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 0msKCN=9999 KCN/N=0.9999 KCN/N^2=9.999e-005 KCN/NlogN=0.07525RMN=0 RMN/N=0 RMN/N^2=0 RMN/NlogN=0Sort randomness N=10000 TimeSpared: 1161msKCN=45409094 KCN/N=4540.91 KCN/N^2=0.454091 KCN/NlogN=341.737RMN=71526984 RMN/N=7152.7 RMN/N^2=0.71527 RMN/NlogN=538.294Sort descending N=10000 TimeSpared: 1022msKCN=49995000 KCN/N=4999.5 KCN/N^2=0.49995 KCN/NlogN=376.25RMN=149985000 RMN/N=14998.5 RMN/N^2=1.49985 RMN/NlogN=1128.75
+
+　　可以看出，效率非常的差，还不如直插排序，真不知道为什么人们对此津津乐道，难道是为了理解快速排序？另外还有一个有趣的现象，虽然逆序的KCN和RMN都比乱序的多，但是逆序花的时间却比乱序少，从这里可以看到CPU流水线的作用，这里可以给我们一个信号，一个真正好的算法需要充分利用硬件的特性。增多记录数目（N＝1000000）时，可以看出，在完全有序的情况下，起泡比直插要好一些，因为此时不需要移动记录。
+
+　　快速排序
+
+　　真为这个算法感到悲哀，连一个能表明算法实质的名字（比如直插、表插）都没有，也不像希尔排序是以发明人的名字命名的，难道就是因为它太快了？也许“快速”是对一个排序算法最高的荣誉吧。
+
+　　基本思想是：任取待排序列的某个记录作为基准，按照该关键码大小，将整个序列分成两个序列——左侧的所有记录的关键码都比基准小（或者等），右侧的都比基准大，基准则放在两个子序列之间，显然这时基准放在了最后应该放置的位置。分别对左右子序列重复上面的过程，直到最后所有的记录都放在相应的位置。
+
+　　下面的例程不容易看懂，因为这是几次改进之后的样子：
+template <class T>int Partition(T a[], int left, int right, int& KCN, int& RMN){int pivotpos = left; T pivot = a[left];//枢轴for (int i = left + 1; i <= right; i++)if (++KCN && a[I < pivot && ++pivotpos != i){ swap(a[I, a[pivotpos]); RMN += 3;}swap(a[left], a[pivotpos]); RMN += 3;return pivotpos;} 
+
+　　将计算枢轴位置单独作为一个函数，可以避免递归的时候保存无用的临时变量。当你决定使用递归的时候，都要注意这点——将一切可以放在递归外面的都放在外面。注意这个函数是怎样达到我们“枢轴左边都比它小，右边都比它大”的目的的。
+template <class T>void QSRecurve(T a[], int left, int right, int& KCN, int& RMN){if (left < right){int pivotpos = Partition<T>(a, left, right, KCN, RMN);QSRecurve<T>(a, left, pivotpos - 1, KCN, RMN);QSRecurve<T>(a, pivotpos + 1, right, KCN, RMN);}}template <class T>void QuickSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0;QSRecurve<T>(a, 0, N - 1, KCN, RMN);} 
+
+　　这两个只能算个外壳了，尤其是最后一个。
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 1051msKCN=49995000 KCN/N=4999.5 KCN/N^2=0.49995 KCN/NlogN=376.25RMN=29997 RMN/N=2.9997 RMN/N^2=0.00029997 RMN/NlogN=0.22575Sort randomness N=10000 TimeSpared: 0msKCN=155655 KCN/N=15.5655 KCN/N^2=0.00155655 KCN/NlogN=1.17142RMN=211851 RMN/N=21.1851 RMN/N^2=0.00211851 RMN/NlogN=1.59434Sort descending N=10000 TimeSpared: 1082msKCN=49995000 KCN/N=4999.5 KCN/N^2=0.49995 KCN/NlogN=376.25RMN=29997 RMN/N=2.9997 RMN/N^2=0.00029997 RMN/NlogN=0.22575
+
+　　可以看到，平均性能非常好，但是在两端的性能还不如直插。测试N＝100000的情况如下（千万记住把正序和逆序的测试注释掉，否则，到时候“死机”不要找我）
+Sort randomness N=100000 TimeSpared: 110msKCN=2123221 KCN/N=21.2322 KCN/N^2=0.000212322KCN/NlogN=1.27831RMN=3010848 RMN/N=30.1085 RMN/N^2=0.000301085RMN/NlogN=1.81271 
+
+　　确实非常的“快速”，但是它的最坏情况实在让人不能放心，万一……，并且由于使用堆栈递归，出了最坏情况没准程序就崩溃了。为了减低这种不良倾向，改进办法是“三者取中”，即选取待排序序列的第一个、最后一个、中间一个的关键码居中的那个作为基准。只要改一下Partition函数就可以了。
+template <class T>int Partition(T a[], int left, int right, int& KCN, int& RMN){int mid = (left + right) / 2;if (++KCN && a[left] > a[mid]){if (++KCN && a[left] > a[right]){if (++KCN && a[mid] > a[right]) { swap(a[mid], a[left]); RMN += 3; }else { swap(a[right], a[left]); RMN += 3; }}}else{if (++KCN && a[left] < a[right]){if (++KCN && a[mid] < a[right]) { swap(a[mid], a[left]); RMN += 3; }else { swap(a[right], a[left]); RMN += 3; }}}int pivotpos = left; T pivot = a[left];//枢轴for (int i = left + 1; i <= right; i++)if (++KCN && a[I < pivot && ++pivotpos != i) { swap(a[I, a[pivotpos]); RMN += 3;}swap(a[left], a[pivotpos]); RMN += 3;return pivotpos;}
+
+　　只是在原有的Partition函数上添加了粗体部分。下面是测试结果：
+Sort ascending N=10000 TimeSpared: 0msKCN=131343 KCN/N=13.1343 KCN/N^2=0.00131343 KCN/NlogN=0.988455RMN=35424 RMN/N=3.5424 RMN/N^2=0.00035424 RMN/NlogN=0.266592Sort randomness N=10000 TimeSpared: 0msKCN=154680 KCN/N=15.468 KCN/N^2=0.0015468 KCN/NlogN=1.16408RMN=204093 RMN/N=20.4093 RMN/N^2=0.00204093 RMN/NlogN=1.53595Sort descending N=10000 TimeSpared: 280msKCN=12517506 KCN/N=1251.75 KCN/N^2=0.125175 KCN/NlogN=94.2036RMN=45006 RMN/N=4.5006 RMN/N^2=0.00045006 RMN/NlogN=0.338704 
+
+　　下面是N＝100000的测试结果，在逆序的时候还是很尴尬，不过还算说得过去。
+Sort ascending N=100000 TimeSpared: 60msKCN=1665551 KCN/N=16.6555 KCN/N^2=0.000166555KCN/NlogN=1.00276RMN=393210 RMN/N=3.9321 RMN/N^2=3.9321e-005RMN/NlogN=0.236736Sort randomness N=100000 TimeSpared: 110msKCN=1888590 KCN/N=18.8859 KCN/N^2=0.000188859KCN/NlogN=1.13704RMN=2659857 RMN/N=26.5986 RMN/N^2=0.000265986RMN/NlogN=1.60139Sort descending N=100000 TimeSpared: 42120msKCN=1250175006 KCN/N=12501.8 KCN/N^2=0.125018 KCN/NlogN=752.68RMN=450006 RMN/N=4.50006 RMN/N^2=4.50006e-005RMN/NlogN=0.270931
+
+　　然而实际上，我们花那么多语句搞一个“三者取中”还不如直接“随便选一个”来得高效，例如将下面的语句替换掉原来的粗体语句：
+swap(a[left], a[rnd(right-left)+left]); RMN += 3;
+
+　　测试结果：
+Sort ascending N=100000 TimeSpared: 90msKCN=1917756 KCN/N=19.1776 KCN/N^2=0.000191776KCN/NlogN=1.1546RMN=378810 RMN/N=3.7881 RMN/N^2=3.7881e-005RMN/NlogN=0.228066Sort randomness N=100000 TimeSpared: 120msKCN=1979189 KCN/N=19.7919 KCN/N^2=0.000197919KCN/NlogN=1.19159RMN=3175977 RMN/N=31.7598 RMN/N^2=0.000317598RMN/NlogN=1.91213Sort descending N=100000 TimeSpared: 110msKCN=2069369 KCN/N=20.6937 KCN/N^2=0.000206937KCN/NlogN=1.24588RMN=2574174 RMN/N=25.7417 RMN/N^2=0.000257417RMN/NlogN=1.54981 
+
+　　可以看到逆序的效率有了质的飞跃，随机函数得自己写，因为库函数的rand()最大只能输出0x7fff，这是因为rand函数使用的是32bit的整数，为了不溢出（最严重的是出负数），只能输出那么大。一个不太严格的随机函数如下，最大输出值是32bit的最大正整数：
+int rnd(int n){static _int64 x;x = (2053 * x + 13849) % 0x7fffffff;return (int)x % n;}

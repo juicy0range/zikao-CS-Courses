@@ -1,0 +1,97 @@
+os上机题二
+二、 模拟存储管理中内存空间的管理和分配 
+内存空间的管理分为固定分区管理方式，可变分区管理方式，页式存储管理，段式存储管理。下面是页式存储管理和可变分区管理的两个例子： 
+如2002（？）的北京大学主考的上机试题：  
+内存被划分成2048块（页）。用32位字长的字存放位示图，为0的位表示该块尚未分配，为1的位表示该块已分配。 
+实习检查： 
+1、运行程序，由检查教师给出文件名，该文件中存有内存目前状况的位示图的数据（0和1的文件）。（程序应做提示，界面友好）。 
+2、你所编制的程序应读入数据，存放在相应的数据结构中。 
+3、显示友好的用户界面，由检查教师输入内存申请（总块数）。 
+4、根据申请和位示图状态，为用户分配内存，并建立页表。 
+5、输出位示图和页表。 
+我这个题目编了一个，但是还没有输进去，相信大家都能做出来。 
+数据结构：用一个数组来表示内存状况，页表。 
+函数定义：内存申请函数 
+以下是论坛上网友提供的另一道模拟内存分配与回收的试题的答案，具体试题不知道是什么： 
+#define n 10 /*假定系统允许的最大作业为，假定模拟实验中n值为10*/ 
+#define m 10 /*假定系统允许的空闲区表最大为m，假定模拟实验中m值为10*/ 
+#define minisize 100 
+struct 
+{ 
+float address; /*已分分区起始地址*/ 
+float length; /*已分分区长度，单位为字节*/ 
+int flag; /*已分配区表登记栏标志，用"0"表示空栏目*/ 
+}used_table[n]; /*已分配区表*/ 
+struct 
+{ 
+float address; /*空闲区起始地址*/ 
+float length; /*空闲区长度，单位为字节*/ 
+int flag; /*空闲区表登记栏标志，用"0"表示空栏目，用"1"表示未分配*/ 
+}free_table[m]; /*空闲区表*/ 
+
+allocate(J,xk) 
+char J; 
+float xk; 
+/*采用最优分配算法分配xk大小的空间*/ 
+{ 
+int i,k; 
+float ad; 
+k=-1; 
+for(i=0;i<m;i++) /*寻找空间大于xk的最小空闲区登记项k*/ 
+if(free_table[i].length>=xk&&free_table[i].flag==1) 
+if(k==-1||free_table[i].length<free_table[k].length) 
+k=i; 
+if(k==-1)/*未找到可用空闲区，返回*/ 
+{ 
+printf("无可用空闲区\n"); 
+return; 
+} 
+/*找到可用空闲区，开始分配：若空闲区大小与要求分配的空间差小于msize大小，则空闲区全部分配；若空闲区大小与要求分配的空间差大于minisize大小，则从空闲区划出一部分分配*/ 
+if(free_table[k].length-xk<=minisize) 
+{ 
+free_table[k].flag=0; 
+ad=free_table[k].address; 
+xk=free_table[k].length; 
+} 
+else 
+{ 
+free_table[k].length=free_table[k].length-xk; 
+ad=free_table[k].address+free_table[k].length; 
+} 
+/*修改已分配区表*/ 
+i=0; 
+while(used_table[i].flag!=0&&i<n) /*寻找空表目*/ 
+i++; 
+if(i>=n) /*无表目填写已分分区*/ 
+{ 
+printf("无表目填写已分分区，错误\n"); 
+/*修正空闲区表*/ 
+if(free_table[k].flag==0) 
+/*前面找到的是整个空闲分区*/ 
+free_table[k].flag=1; 
+else 
+{/*前面找到的是某个空闲分区的一部分*/ 
+free_table[k].length=free_table[k].length+xk; 
+return; 
+} 
+} 
+else 
+{/*修改已分配表*/ 
+used_table[i].address=ad; 
+used_table[i].length=xk; 
+used_table[i].flag=J; 
+} 
+return; 
+}/*主存分配函数结束*/ 
+reclaim(J) 
+char J; 
+/*回收作业名为J的作业所占主存空间*/ 
+{ 
+int i,k,j,s,t; 
+float S,L; 
+/*寻找已分配表中对应登记项*/ 
+s=0; 
+while((used_table[s].flag!=J||used_table[s].flag==0)&&s<n) 
+s++; 
+if(s>=n)/*在已分配表中找不到名字为J的作业*/ 
+{

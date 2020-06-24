@@ -1,0 +1,81 @@
+编写程序模拟LFU页面置换算法实现
+
+#include <stdio.h>
+#include <iostream.h>
+#include <stdlib.h>
+
+int p=0;
+struct {
+int pagenum;
+int usecount;
+int ifempty;
+}pagenode[3];
+
+void PageInit() {
+for(int i=0;i<3;i++) {
+  pagenode[i].pagenum=-1;
+  pagenode[i].usecount=0;
+  pagenode[i].ifempty=1;
+}
+}
+
+int SeleMin() {
+int minnum=0;
+int min=pagenode[minnum].usecount;
+for(int i=1;i<3;i++)
+if(pagenode[i].usecount<min) {
+  min=pagenode[i].usecount;
+  minnum=i;
+}
+i++;
+return minnum;
+}
+
+void LRU() {
+char filename[30];
+cout<<"please input the file name: ";
+cin>>filename;
+FILE *fp=fopen(filename,"r");
+int pagenum;
+int flag;
+while(!feof(fp)) {
+  flag=0;
+  fscanf(fp,"%d",&pagenum);
+  for(int i=0;i<3;i++) {
+   if(pagenode[i].pagenum==pagenum) {
+    cout<<"* ";
+    flag=1;
+    for(int j=0;j<3;j++)
+     pagenode[j].usecount--;
+    pagenode[i].usecount=2;
+    break;
+   }
+  }
+  if(flag==0) {
+   for(int i=0;i<3;i++) {
+    if(pagenode[i].ifempty==1) {
+    cout<<"* ";
+    flag=1;
+    pagenode[i].pagenum=pagenum;
+    pagenode[i].ifempty=0;
+    pagenode[i].usecount=i;
+    break;
+    }
+   }
+  }
+
+  if(flag==0) {
+   int i=SeleMin();
+   cout<<pagenode[i].pagenum<<" ";
+   for(int j=0;j<3;j++)
+    pagenode[j].usecount--;
+   pagenode[i].pagenum=pagenum;
+   pagenode[i].usecount=2;
+  }
+}
+}
+
+void main() {
+PageInit();
+LRU();
+}

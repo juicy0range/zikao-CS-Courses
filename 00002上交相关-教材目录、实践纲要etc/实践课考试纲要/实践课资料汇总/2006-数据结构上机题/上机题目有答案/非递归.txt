@@ -1,0 +1,72 @@
+太丢人了!照抄北大上机指导?虽说不太一样,看我的非递归,不过有点毛病,就是无法查错,只能应付考试!
+
+typedef struct node
+{
+   char data;
+   struct node *lchild;
+   struct node *rchild;
+} lkTree;
+
+int IsLeft(char *m, char a, char b)
+{
+ char *p = m;
+ while (*p != 0)
+ {
+    if (*p == a)
+    return 1;
+    if (*p == b)
+    return 0;
+    p++;
+ }
+ return -1;
+}
+
+lkTree* Maketree(char *f, char *m)
+{
+ char *p = f + 1;
+ lkTree *boot = (lkTree *)malloc(sizeof (lkTree));
+ boot->data = *f;
+ boot->lchild = NULL;
+ boot->rchild = NULL;
+
+ while (*p != 0)
+ {
+    lkTree *pt = boot;
+    lkTree *pParent = NULL;
+    int flag = 0;
+    while (pt != NULL)
+    {
+    pParent = pt;
+    if (IsLeft(m, *p, pt->data) == 1)
+    {
+     flag = 1;
+     pt = pt->lchild;
+    }
+    else
+    {
+     flag = 0;
+     pt = pt->rchild;
+    }
+    }
+    pt = (lkTree *)malloc(sizeof (lkTree));
+    pt->data = *p;
+    pt->lchild = NULL;
+    pt->rchild = NULL;
+
+    if (flag == 1)
+    {
+    pParent->lchild = pt;
+    }
+    else
+    {
+    pParent->rchild = pt;
+    }
+    p++;
+ }
+ return boot;
+}
+
+ 
+
+----------------------------------------------
+" --- 真正的程序员用VC"

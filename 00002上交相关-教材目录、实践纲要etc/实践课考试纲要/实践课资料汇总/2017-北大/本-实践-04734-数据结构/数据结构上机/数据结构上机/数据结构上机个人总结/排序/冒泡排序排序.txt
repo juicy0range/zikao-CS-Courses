@@ -1,0 +1,50 @@
+#include<stdlib.h>
+#include<stdio.h>
+#include<iostream.h>
+#include<string.h>
+
+//冒泡排序从小到大
+void BSort(int a[],int n){
+	int i,j,temp;
+	int ex;
+	
+	for(i=0;i<n-1;i++){
+		ex = 0;
+		for(j=n-2;j>=i;j--){
+			if(a[j+1]<a[j]){
+				temp = a[j+1];
+				a[j+1] = a[j];
+				a[j] = temp;
+				ex = 1;
+			}
+		}
+		if(ex==0){
+			break;
+		}
+	}
+}
+
+void print(int a[],int na){
+	for(int i=0;i<na;i++){
+		cout<< a[i] <<" ";
+	}
+	cout<<endl;
+}
+
+void main(){
+	int a[100];
+	int na=0,i;
+
+	cout<<"请输入数组a,之间用空格隔开，以-9999结束"<<endl;
+	for(i=0;i<100;i++){
+		scanf("%d",&a[i]);
+		if(a[i]==-9999){
+			break;
+		}
+	}
+	na = i;
+	BSort(a,na);
+	print(a,na);
+
+	getchar();
+}

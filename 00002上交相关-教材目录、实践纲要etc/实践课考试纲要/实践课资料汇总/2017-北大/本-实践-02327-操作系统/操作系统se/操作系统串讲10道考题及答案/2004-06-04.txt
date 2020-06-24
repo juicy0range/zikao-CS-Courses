@@ -1,0 +1,98 @@
+6月四号上午的题目及答案！阿鲲
+
+6月四号上午的考题
+模拟最高响应比优先作业调度算法
+**********************
+输入：作业流文件，其中存储的是一系列要执行的作业，
+每个作业包括三个数据项：
+作业号、作业进入系统的时间（用一整数表示，如10：10，表示成1010）、估计执行时间（单位分）
+参数用空格隔开，下面是示例：
+1 800 50
+2 815 30
+3 830 25
+4 835 20
+5 845 15
+6 900 10
+7 920 5
+其中调度时刻为最后一个作业到达系统的时间！
+输出作业号！进入内存的时间！每行输出一个作业信息！
+*********************************************
+
+我的题目中的浮点型用的赋值没有多大意义！除了以后还是整型，熊给我改改！
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+#include "iostream.h"
+#define M 20
+void main()
+{
+FILE *fp;
+char a,fname[20],buf[10];
+int i=0,j=0,job[M][3],k=0,count,flag=1;//count表示作业的数量,flag表示被调出的作业数量（也是一个标志）；
+int waittime[M],md=0,here=0;  //md代表初始化的时候的由于处理所占用的时间；
+    float call[M],max=0;        //call[M]数组用于动态存放各个作业的响应比
+printf("请输入作业申请序列的文件名！：");
+gets(fname);
+fp=fopen(fname,"r+");
+if(fp==NULL)
+{
+  cout<<"文件名错误！\n";
+  return;
+}
+while((a=fgetc(fp))!=EOF)
+{
+  if(a>='0' && a<='9')
+  {
+   buf[i++]=a;
+   continue;
+  }
+  if(a==' ')
+  {
+   buf[i]='\0';
+   job[j][k++]=atoi(buf);
+   i=0;
+   continue;
+  }
+  if(a=='\n')
+  {
+   buf[i]='\0';
+   job[j++][k]=atoi(buf);
+   i=0;k=0;
+  }
+}
+if(a==EOF)
+  if(i!=0)
+  {
+   buf[i]='\0';
+      job[j++][k]=atoi(buf);
+  }
+    count=j;
+for(i=0;i<count;i++)//初始化等待时间数组；
+  waittime[i]=job[count-1][1]-job[i][1];
+
+while(flag!=count+1)
+{
+  if(md!=0)//把各个在运行的时候所增加的等待时间加上；
+  {
+   for(i=0;i<count;i++)
+   {
+    if(waittime[i]!=-1)
+     waittime[i]+=md;
+   }
+  }
+  for(i=0;i<count;i++)//计算当前的响应比；
+   call[i]=(waittime[i]+job[i][2])/job[i][2];//这里的浮点型计算的是整型！有待改进！
+        for(i=0;i<count;i++)//找到最高相应比；
+   if(max<call[i] && waittime[i]!=-1)
+   {
+    max=call[i];
+    here=i;
+   }
+  max=0;
+  flag++;
+        waittime[here]=-1;//设置该作业已经被执行的标志；
+  printf("%d %d\n",job[here][0],job[here][1]);//输出作业；
+  md=job[here][2];//设置下一次要增加等待的时间；
+}
+}
+

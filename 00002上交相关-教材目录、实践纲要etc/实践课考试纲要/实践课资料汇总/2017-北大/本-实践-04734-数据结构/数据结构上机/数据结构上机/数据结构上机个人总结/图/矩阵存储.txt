@@ -1,0 +1,231 @@
+/*
+1.根据输入创建
+2.输出它的邻接矩阵
+3.DFS 和 BFS
+6.拓扑排序
+
+------------------
+编一C程序，它能根据读入的数据构造有向图G，并输出G的邻接矩阵及G的拓扑序列。
+图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1，-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。
+顶点名字依次是V0,V1,V2,…Vn-1； ik  jk 表示向图G的有向边<Vik,Vjk>。
+
+*/
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<iostream.h>
+void exit(int);
+#define MaxVerNum 100
+#define FALSE 0 
+#define TRUE 1 
+int visited[MaxVerNum];
+typedef struct{
+	int arcs[MaxVerNum][MaxVerNum];	//存放边
+	int vexnum;	//顶点数	
+}MGraph;//图
+
+#define Error printf 
+#define QueueSize 30 /*假定预分配的队列空间最多为30*/ 
+
+typedef int DataType; /*队列中的元素类型为型*/ 
+typedef struct{ 
+int front; /*队头指针，队非空时指向队头元素*/ 
+int rear; /*队尾指针，队非空时指向队尾元素的下一位置*/ 
+int count; /*计数器，记录队中元素总数*/ 
+DataType data[QueueSize]; 
+}CirQueue; 
+
+void InitQueue(CirQueue *Q) /*初始队列*/ 
+{
+	Q->front=Q->rear=0; 
+	Q->count=0; 
+} 
+
+int QueueEmpty(CirQueue *Q) /*判队空*/ 
+{
+	return Q->count==0; 
+} 
+
+int QueueFull(CirQueue *Q) /*判队满*/ 
+{
+	return Q->count==QueueSize; 
+} 
+
+void EnQueue(CirQueue *Q,DataType x) /*入队*/ 
+{
+	if (QueueFull(Q)) 
+		Error("Queue overflow"); /*队满上溢*/ 
+	else {
+		Q->data[Q->rear]=x; /*新元素插入队列*/ 
+		Q->count++; /*队列元素个数加1*/ 
+		Q->rear=(Q->rear+1)%QueueSize; /*循环队列的尾指针加1*/ 
+		} 
+} 
+
+DataType DeQueue(CirQueue *Q) /*出队*/ 
+{
+	DataType temp; 
+	if (QueueEmpty(Q)) 
+		Error("Queue underflow"); /*队空下溢*/ 
+	else {
+		temp=Q->data[Q->front]; 
+		Q->count--; /*队列元素个数减1*/ 
+		Q->front=(Q->front+1)%QueueSize; /*循环队列的头指针加1*/ 
+		return temp; 
+	} 
+} 
+
+
+void CreatG(MGraph *g) /*建立图的邻接矩阵G[][]*/ 
+{
+int n,i,j; 
+printf("Input the number of the node:\n"); 
+scanf("%d",&n); 
+if(n<0||n>MaxVerNum){
+		printf("顶点的个数必须在[1...%d]\n",MaxVerNum);
+		exit(-1);
+	}
+	g->vexnum=n;
+
+//初始化边表
+	for(i=0;i<n;i++)
+		for(j=0;j<n;j++)
+			g->arcs[i][j]=0; 
+	do{
+		scanf("%d%d",&i,&j);
+		if(i==-1&&j==-1)
+			break;
+		if(i<0||i>=n||j<0||j>=n){
+			printf("边的顶点i,j必须在[0...%d]\n",n-1);
+			continue;
+		}
+		g->arcs[i][j]=1;
+	}while(1);
+
+} 
+
+//输出图的邻接矩阵
+void showG(MGraph *g)
+{
+	int c=0,i,j;
+	printf("\n图G的邻接矩阵如下:\n");
+	for(i=0;i<g->vexnum;i++)
+	{
+	   for(j=0;j<g->vexnum;j++)
+	   {
+		printf("%d  ",g->arcs[i][j]);
+	   }
+	   printf("\n");
+	}
+}
+
+
+//计算各个顶点的入度存入in[]
+void cal_in(MGraph *g,int in[])
+{
+	int i,j;
+	//初始化为0
+	for(i=0;i<g->vexnum;i++)
+		in[i]=0;
+	//计算各个顶点的入度
+	for(i=0;i<g->vexnum;i++)
+		for(j=0;j<g->vexnum;j++)
+			if(g->arcs[i][j])
+				in[j]++;
+}
+
+
+//拓扑排序
+void TopSort(MGraph *g,int in[])
+{	
+	int i,j,count=0;//count记录输出的顶点数目
+	CirQueue S;
+	InitQueue(&S);
+	
+	for(i=0;i<g->vexnum;i++){
+		if(in[i]==0){
+			EnQueue(&S,i);//入度为0的顶点入队
+		}
+	}
+
+	while(!QueueEmpty(&S)){//队非空，有入度为0的点
+		i = DeQueue(&S);		//删去无前驱（入度为0）的顶点
+		printf("V%d \t",i);
+		count++;	//输出顶点i并计数
+		for(j=0;j<g->vexnum;j++){//扫描和顶点i有联系的顶点
+			if(g->arcs[i][j]!=0){//说明顶点i 和顶点j有连线
+				in[j]--;
+				if(in[j]==0){
+					EnQueue(&S,j);
+				}
+			}
+		}
+	}
+	if(count<g->vexnum){
+		printf(" 图中有环 !\n");
+	}
+}
+
+//DFSM 深度优先遍历
+void DFSM(MGraph *g,int i){
+	//以Vi为出发点对邻接矩阵表示的图g进行DFS
+	int j;
+	printf("V%d\t",i);
+	visited[i] = TRUE;
+	for(j=0;j<g->vexnum;j++){
+		if(g->arcs[i][j]==1&&!visited[j]){
+			DFSM(g,j);
+		}
+	}
+}
+ 
+
+
+//BFSM 广度优先遍历
+void BFSM(MGraph *g,int k){
+	//以Vi为出发点对邻接矩阵表示的图g进行BFS
+
+	int i,j;
+	CirQueue S2;
+	InitQueue(&S2);
+	printf("V%d\t",k);
+	visited[k] = TRUE;
+	EnQueue(&S2,k);
+	while(!QueueEmpty(&S2)){//队非空，
+		i = DeQueue(&S2);		//删去该顶点
+		for(j=0;j<g->vexnum;j++){//扫描和顶点i有联系的顶点
+			if(g->arcs[i][j]==1&&!visited[j]){//说明顶点i 和顶点j有连线
+				printf("V%d\t",j);
+				visited[j] = TRUE;
+				EnQueue(&S2,j);
+			}
+		}
+	}
+}
+
+void reV(MGraph *g) //重置visited数组
+{
+	int i; 
+	for (i=0;i<g->vexnum;i++) 
+	visited[i]=FALSE; /*标志向量初始化*/ 
+}
+
+void main()
+{
+	MGraph g;
+	int InDegree[MaxVerNum];	//存放顶点的入度
+	CreatG(&g);
+	showG(&g);
+	cal_in(&g,InDegree);
+	printf("\n拓扑排序: ");
+	TopSort(&g,InDegree);
+	printf("\n深度优先遍历: ");
+	DFSM(&g,0);
+	reV(&g);
+	printf("\n广度优先遍历: ");
+	BFSM(&g,0);
+	
+	getchar();
+}
+

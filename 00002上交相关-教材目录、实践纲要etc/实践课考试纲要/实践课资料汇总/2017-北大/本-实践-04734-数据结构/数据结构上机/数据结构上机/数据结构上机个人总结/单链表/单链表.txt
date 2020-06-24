@@ -1,0 +1,133 @@
+//现定义数据类型如下：
+/*
+typedef struct node{
+int data;
+struct node * next;
+}listnode;
+以该类型作为单链表的结点类型，编写以下5个函数：
+1 用   尾插法  建立一个带头结点的单链表，头指针作为返回值返回（说明：结点数据由键盘输入(中间以空格隔开)，输入数据为0时表示建表结束。）
+2 输出该单链表的第i个结点数据（如果存在的话） 。
+3 将值为x的新结点插入到该单链表的第i个结点的位置上。
+4	删除该单链表第i个结点数据。
+5	输出该单链表。
+然后编写一主函数，顺序调用以上函数，其中的i值由键盘输入。
+**/
+#include "stdio.h"
+#include <stdlib.h>
+#define NULL 0
+typedef struct node
+{
+	int data;
+	struct node * next;
+}listnode;
+
+//  1 尾插法建表
+listnode * createlist(void)
+{
+	int data;
+	listnode * head=(listnode *)malloc(sizeof(listnode));
+	listnode *s,*r;
+	r=head;
+	scanf("%d",&data);
+	while(data!=0)
+	{
+		s=(listnode *)malloc(sizeof(listnode));
+		s->data=data;
+		r->next=s;
+		r=s;
+		scanf("%d",& data);
+	}
+	r->next=NULL;
+
+	return head;
+}
+// 2  输出单链表第i个结点数据
+listnode * getnode(listnode * head,int i)
+{
+	int j;
+	listnode * p;
+	p=head;j=0;
+
+	while(p->next!=NULL && j<i)
+	{
+		p=p->next;
+		j++;
+	}
+	if(i==j)
+		return p;
+	else
+		return NULL;
+}
+//3 将值为x的新结点插入到该单链表的第i个结点的位置上
+void insertlist(listnode * head,int x,int i)
+{
+	listnode *p,*s;
+	p=getnode(head,i-1);
+	if(p==NULL)
+	{
+		printf("position error!");
+		exit(0);
+	}
+	s=(listnode*)malloc(sizeof(listnode));
+	s->data=x;
+	s->next=p->next;
+	p->next=s;
+}
+//4. 删除该单链表第i个结点数据
+void deletelist(listnode *head,int i)
+{
+	listnode *p,*r;
+	p=getnode(head,i-1);
+	if(p==NULL || p->next==NULL)
+	{
+		printf("positioin error!");
+		exit(0);
+	}
+	r=p->next;
+	p->next=r->next;			//r->next
+	free(r);
+}
+
+//5.输出该单链表
+void show(listnode *head)
+{
+	listnode *p;
+	printf("\n now these records are:\n");
+	p=head->next;
+	if(p!=NULL){
+		do
+		{
+			printf("%5d",p->data);
+			p=p->next;
+		}while(p!=NULL);
+	}else{
+		printf(" The list is empty! \n");
+		exit(0);
+	}
+}
+
+void main()
+{
+	listnode *head,*p;
+	int i,x;
+	printf("请输入数据,中间以节点隔开 :\n");
+	head=createlist();
+	show(head);
+	printf("\n input the getnode i is:\n");
+	scanf("%d",&i);
+	p=getnode(head,i);
+	printf("\n output the getndoe value is:\n");
+	printf("%d",p->data);
+	printf("\n input the need number of insertion i is:\n");
+	scanf("%d",&i);
+	printf("\n input the inserted number:\n");
+	scanf("%d",&x);
+	insertlist(head,x,i);
+	show(head);
+	printf("\n input the deleted number i is:\n");
+	scanf("%d",&i);
+	deletelist(head,i);
+	show(head);
+	printf("\n"); 
+	system("pause");
+}

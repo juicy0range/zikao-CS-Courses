@@ -1,0 +1,77 @@
+/*1.编一C程序，它能根据输入数据构造带权无向图G，并输出G的最小生成树。图的输入形式为n V0 Vi0 w0   V1 Vi1 w1   V2 Vi2 w2   ...Vi Vin wn  -1 -1 -1（-1，-1,-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。。
+（注：程序的可执行文件名必须是 e1.exe，存于你的账号或其debug目录下。）*/
+#include"stdafx.h"
+#include<stdio.h>
+#include<stdlib.h>
+void exit(int);
+#define MAX 100
+#define MAXINT 32767
+void read(int a[][MAX],int n)
+{
+	int i,j,w;
+	do{
+		scanf("%d%d%d",&i,&j,&w);
+		if(i==-1||j==-1||w==-1)
+			break;
+		if(i<0||i>=n||j<0||j>=n||w<=0||i==j){
+			printf("\n重新输入:权值w必须正确，i和j必须在[0..%d]\n",n-1);
+			continue;
+		}
+		a[i][j]=w;
+	}while(9);
+}
+void MST(int a[][MAX],int n)
+{
+	int c=0,i,j,min_i,min_j,min_v,sum=0;
+	printf("生成的最小生成树为:\n");
+	a[0][0]=-1;
+	for(c=0;c<n-1;c++){
+		min_v=MAXINT;
+		min_i=-1;
+		min_j=-1;
+		for(i=0;i<n;i++){
+			for(j=0;j<n;j++){
+				if(i!=j&&(a[i][i]==-1&&a[j][j]!=-1||a[i][i]!=-1&&a[j][j]==-1)&&a[i][j]<min_v){
+					min_v=a[i][j];
+					min_i=i;
+					min_j=j;
+				}
+			}
+		}
+		if(min_i!=-1){
+			printf("<V%-2d,V%-2d>",min_i,min_j);
+			sum+=min_v;
+			a[min_i][min_i]=a[min_j][min_j]=-1;
+		}
+		else{
+			printf("\n图G是不连通的!\n");
+			exit(1);
+		}
+	}
+	printf("\n各边的权值之和为:%d\n",sum);
+}
+void main()
+{
+	int a[MAX][MAX];
+	int i,j,vnum;
+	printf("请输入顶点个数和边及边的权值:\n");
+	scanf("%d",&vnum);
+	if(vnum<1||vnum>MAX){
+		printf("错误:顶点个数必须在:[1...%d]\n",MAX);
+		exit(1);
+	}
+	for(i=0;i<vnum;i++)
+		for(j=0;j<vnum;j++)
+			a[i][j]=MAXINT;
+	read(a,vnum);
+	MST(a,vnum);
+}
+
+
+
+
+
+
+
+
+

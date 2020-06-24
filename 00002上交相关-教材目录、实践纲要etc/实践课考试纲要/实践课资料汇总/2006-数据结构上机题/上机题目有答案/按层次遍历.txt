@@ -1,0 +1,162 @@
+没有错误处理机制,假如输入的中序和后序序列不能构成一个二*树,程序将会出错!
+
+#include <iostream.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <stdio.h>
+#include <string.h>
+
+#define DataSize 100
+
+typedef char DataType;
+
+typedef struct tnode{
+DataType data;
+tnode *lchild,*rchild;
+}TreeNode;
+
+typedef TreeNode * LinkTree;
+
+void CreateTree(LinkTree *T,DataType in[],int ins,int ine,DataType post[],int posts,int poste)
+{
+        int i,j;
+if(ins>ine||posts>poste)
+  *T=NULL;
+else{
+  *T=(TreeNode *)malloc(sizeof(TreeNode));
+  (*T)->data=post[poste];
+  for(i=ins;i<=ine;i++){
+   if(in[i]==post[poste]){
+    CreateTree(&((*T)->lchild),in,ins,i-1,post,posts,posts-ins+i-1);
+    CreateTree(&((*T)->rchild),in,i+1,ine,post,posts-ins+i,poste-1);
+    return;
+   }
+  }
+}
+}
+
+int Layer(TreeNode *T)
+{
+int h1,h2;
+if(T->lchild==NULL&&T->rchild==NULL)
+  return 1;
+else{
+  h1=Layer(T->lchild);
+  h2=Layer(T->rchild);
+}
+if(h1>h2)
+  return 1+h1;
+else
+  return 1+h2;
+}
+
+void PreOrder(TreeNode *T)
+{
+if(T){
+  cout<<T->data;
+  PreOrder(T->lchild);
+  PreOrder(T->rchild);
+}
+}
+
+void InOrder(TreeNode *T)
+{
+if(T){
+  InOrder(T->lchild);
+  cout<<T->data;
+                InOrder(T->rchild);
+}
+}
+
+void PostOrder(TreeNode *T)
+{
+if(T){
+  PostOrder(T->lchild);
+  PostOrder(T->rchild);
+  cout<<T->data;
+}
+}
+
+void LevelOrder(TreeNode *T)
+{
+/*按层次遍历二*树T*/
+int i,j; 
+TreeNode *q[20],*p; /*q[20]用于模拟队列，存储入队的结点*/
+p=T; 
+if(p!=NULL) {i=1;q[i]=p;j=2;} /*i为队首位置，j为队尾位置*/ 
+while(i!=j){
+  p=q[i];printf("%3c",p->data); /*访问队首元素*/ 
+  if (p->lchild!=NULL){
+   q[j]=p->lchild;
+   j++;
+  }    /*若队首元素左链域不为空，则将其入队列*/ 
+  if (p->rchild!=NULL) {
+   q[j]=p->rchild;
+   j++;
+  }    /*若队首元素右链域不为空，则将其入队列*/ 
+  i++; /*将队首移到下一个位置*/ 
+} 
+}
+
+void Leaf(TreeNode *T,int *n)
+{
+        if(T){
+  if(T->lchild==NULL&&T->rchild==NULL)
+   *n=*n+1;
+  else{
+   Leaf(T->lchild,n);
+   Leaf(T->rchild,n);
+                }
+} 
+}
+
+void Leaf1(TreeNode *T,int *n)
+{
+        if(T){
+  if((T->lchild==NULL&&T->rchild!=NULL)||(T->lchild!=NULL&&T->rchild==NULL))
+   *n=*n+1;
+  Leaf1(T->lchild,n);
+  Leaf1(T->rchild,n);
+                
+} 
+}
+
+void Leaf2(TreeNode *T,int *n)
+{
+        if(T){
+  if(T->lchild!=NULL&&T->rchild!=NULL)
+   *n=*n+1;
+  Leaf2(T->lchild,n);
+  Leaf2(T->rchild,n);
+                
+} 
+}
+
+
+void main()
+{
+int i;
+        int n=0,n1=0,n2=0;
+        TreeNode *T;
+DataType in[DataSize],post[DataSize];
+cout<<"请输入二*树的中序序列(以回车结束):"<<endl;
+gets(in);
+cout<<"请输入二*树的后序序列(以回车结束):"<<endl;
+gets(post);
+CreateTree(&T,in,0,strlen(in)-1,post,0,strlen(post)-1);
+cout<<endl<<"二*树的前序序列为:"<<endl;
+PreOrder(T);
+cout<<endl<<endl<<"二*树的中序序列为:"<<endl;
+InOrder(T);
+cout<<endl<<endl<<"二*树的后序序列为:"<<endl;
+PostOrder(T);
+cout<<endl<<endl<<"二*树的层次序列为:"<<endl;
+LevelOrder(T);
+cout<<endl<<endl<<"二*树的层数为:"<<Layer(T)<<endl;
+        Leaf(T,&n);
+cout<<endl<<"叶子结点数为:"<<n<<endl;
+Leaf1(T,&n1);
+cout<<endl<<"一度结点数为:"<<n1<<endl;
+Leaf2(T,&n2);
+cout<<endl<<"二度结点数为:"<<n2<<endl;
+}

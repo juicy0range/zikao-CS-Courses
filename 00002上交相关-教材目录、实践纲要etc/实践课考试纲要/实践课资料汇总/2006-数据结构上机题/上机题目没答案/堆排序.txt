@@ -1,0 +1,8 @@
+堆排序
+堆排序
+
+　　锦标排序的附加储存太多了，而高效的寻找最大值或最小值（O(logn)），我们还有一种方法是堆。这里使用了最大堆，用待排记录的空间充当堆空间，将堆顶的记录（目前最大）和堆的最后一个记录交换，当堆逐渐缩小成1的时候，记录就排序完成了。显而易见的，时间复杂度为O(nlogn)，并且没有很糟的情况。
+template <class T>void FilterDown(T a[], int i, int N, int& KCN, int& RMN){int child = 2 * i + 1; T temp = a[I;while (child < N){if (child < N - 1 && a[child] < a[child+1]) child++;if (++KCN && temp >= a[child]) break;//不需调整，结束调整a[I = a[child]; RMN++;i = child; child = 2 * i + 1;}a[I = temp; RMN++;}template <class T>void HeapSort(T a[], int N, int& KCN, int& RMN){int i;for (i = (N - 2)/2; i >= 0; i--) FilterDown<T>(a, i, N, KCN, RMN);//生成最大堆for (i = N - 1; i > 0; i--){swap(a[0], a[I); RMN += 3;FilterDown(a, 0, i, KCN, RMN);}}
+
+　　测试结果，直接测试的是N=100000：
+Sort ascending N=100000 TimeSpared: 110msKCN=1556441 KCN/N=15.5644 KCN/N^2=0.000155644KCN/NlogN=0.937071RMN=2000851 RMN/N=20.0085 RMN/N^2=0.000200085RMN/NlogN=1.20463Sort randomness N=100000 TimeSpared: 160msKCN=3047006 KCN/N=30.4701 KCN/N^2=0.000304701KCN/NlogN=1.83448RMN=3898565 RMN/N=38.9857 RMN/N^2=0.000389857RMN/NlogN=2.34717Sort descending N=100000 TimeSpared: 90msKCN=4510383 KCN/N=45.1038 KCN/N^2=0.000451038KCN/NlogN=2.71552RMN=5745996 RMN/N=57.46 RMN/N^2=0.0005746 RMN/NlogN=3.45943

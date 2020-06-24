@@ -1,0 +1,14 @@
+ 希尔排序
+前面的算法的平均效率都不怎么好，但我们注意到直插排序在关键码基本有序的情况下，效率是最好的，并且，在关键码的数量很少的时候，n和n2的差距也不是那么的明显。基于以上的事实，D.L.Shell在1959年（老古董了）提出了缩小增量排序，基本思想是：取一个间隔（gap），将序列分成若干的子序列，对每个子序列进行直插排序；然后逐渐缩小间隔，重复以上过程，直到间隔为1。在开始的时候，每个子序列里关键码很少，直插的效率很高；随着间隔的缩小，子序列的关键码越来越多，但是在前面的排序基础上，关键码已经基本有序，直插的效率依然很高。
+
+　　希尔排序的时间复杂度不好估量，gap的选取也没有定论，gap＝[gap/2]的程序是最好写的，至于为什么，写写就知道了。
+template <class T>void ShellSort(T a[], int N, int& KCN, int& RMN){KCN = 0; RMN = 0;for (int gap = N/2; gap; gap = gap/2)for (int i = gap; i < N; i++){T temp = a[I; RMN++;for (int j = i; j >= gap && ++KCN && temp < a[j - gap]; j -= gap){ a[j] = a[j - gap]; RMN++; }a[j] = temp; RMN++;}}
+
+　　测试结果：
+Sort ascending N=10000 TimeSpared: 0msKCN=120005 KCN/N=12.0005 KCN/N^2=0.00120005 KCN/NlogN=0.903128RMN=240010 RMN/N=24.001 RMN/N^2=0.0024001 RMN/NlogN=1.80626Sort randomness N=10000 TimeSpared: 10msKCN=258935 KCN/N=25.8935 KCN/N^2=0.00258935 KCN/NlogN=1.94868RMN=383849 RMN/N=38.3849 RMN/N^2=0.00383849 RMN/NlogN=2.88875Sort descending N=10000 TimeSpared: 10msKCN=172578 KCN/N=17.2578 KCN/N^2=0.00172578 KCN/NlogN=1.29878RMN=302570 RMN/N=30.257 RMN/N^2=0.0030257 RMN/NlogN=2.27707
+
+　　注意到这时的测试结果很不准确了，10000个整数的排序已经测试不出什么来了（估计新机器都是0ms，我这里也有个别的时候全是0）。因此，下面用100000个整数的排序重新测试了一次：
+Sort ascending N=100000 TimeSpared: 140msKCN=1500006 KCN/N=15.0001 KCN/N^2=0.000150001KCN/NlogN=0.903094RMN=3000012 RMN/N=30.0001 RMN/N^2=0.000300001RMN/NlogN=1.80619Sort randomness N=100000 TimeSpared: 230msKCN=4041917 KCN/N=40.4192 KCN/N^2=0.000404192KCN/NlogN=2.43348RMN=5598883 RMN/N=55.9888 RMN/N^2=0.000559888RMN/NlogN=3.37086Sort descending N=100000 TimeSpared: 151msKCN=2244585 KCN/N=22.4459 KCN/N^2=0.000224459KCN/NlogN=1.35137RMN=3844572 RMN/N=38.4457 RMN/N^2=0.000384457RMN/NlogN=2.31466
+
+　　这个结果表明，希尔排序几乎没有最坏情况，无论是正序、逆序、乱序，所用时间都不是很多，附加储存是O(1)，的确非常不错。在没搞清楚快速排序、堆排序之前，它的确是个很好的选择，我当年一直用它。
+

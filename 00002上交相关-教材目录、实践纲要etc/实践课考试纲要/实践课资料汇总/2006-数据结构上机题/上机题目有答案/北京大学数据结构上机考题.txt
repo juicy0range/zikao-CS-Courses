@@ -1,0 +1,1983 @@
+北京大学数据结构上机考题
+
+ 
+
+1. 编一C程序，它能读入集合A的一串整数（以-9999为结束标记，整数个数小于1000）和集合B 的一串整数（以-9999为结束标记，整数个数小于1000），计算并以从小到大的次序输出A-B 的所有元素(为A或B输入时，同一个数可能出现多次，而A与B的差集中同一个数不能出现多次)。 （注：程序的可执行文件名必须是 e1.exe）
+
+（注：程序的可执行文件名必须是 e4.exe） 
+*/ 
+#include <stdio.h> 
+
+void BubbleSort(int r[],int n) 
+{//冒泡排序(有小到大) 
+ int i,j,k; 
+ int exchange; 
+ for(i=0;i<=n;i++) 
+ { 
+  exchange=0; 
+  for(j=n-1;j>=i;j--) 
+  if(r[j+1]<r[j]) 
+  { 
+   k=r[j+1]; 
+   r[j+1]=r[j]; 
+   r[j]=k; 
+   exchange=1; 
+  } 
+  if(!exchange) 
+  break; 
+ } 
+} 
+
+
+int DisaSameYs(int r[],int n) 
+{//消除数组r[]中的重复元素,并返回消除后数组剩余的元素个数 
+int w,x,y; 
+ for(w=0;w<=n;w++) 
+ { 
+  for(x=w+1;x<=n;x++) 
+  { 
+   if(r[w]==r[x]) 
+   { 
+    n--; 
+    for(y=x;y<=n;y++) 
+    { 
+     r[y]=r[y+1];     
+    }//endfor 
+    x--; 
+   }//endif     
+  }//endfor   
+ }//endfor 
+  
+ return n; 
+} 
+
+
+int cha(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求差集 
+ int i=0,j=0,k=0; 
+ int exch; 
+while(i<=Countaa) 
+ { 
+  exch=0;//交换变量为0 
+  for(j=0;j<=Countbb;j++) 
+  {//用集合的第一个元素分别和另一个集合的各元素相比较 
+   //然后再用第二个元素(直到最后一个元素)和另一个集合的各元素相比较 
+   if(m[i]==n[j]) 
+   {//如果相同，交换变量变为1 
+exch=1; 
+    break; 
+   }//endif 
+}//endfor 
+  if(!exch) 
+{//如果没有相同的就保存m[i]到l[]中 
+   l[k]=m[i]; 
+   k++; 
+  } 
+  i++; 
+ }//endwhile 
+
+ return k; 
+} 
+
+/* 
+void testds(int r[],int n) 
+{//测试消除数组中的重复元素的效果用下列循环输出 
+ int z; 
+ for(z=0;z<=n;z++) 
+ { 
+  printf("%d",r[z]);  
+ } 
+ printf("\n"); 
+} 
+*/ 
+
+void main() 
+{ 
+ int a[1000], b[1000],c[2000]; 
+ int exchange=0; 
+ int i,j,k,CountA,CountB,CountC; 
+
+ printf("input a\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+  break; 
+ } 
+ CountA=i-1; 
+ BubbleSort(a,CountA); 
+  
+ CountA=DisaSameYs(a,CountA); 
+// testds(a,CountA); 
+
+ printf("\ninput b\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&b[i]); 
+  if(b[i]==-9999) 
+  break; 
+ } 
+ CountB=i-1; 
+ BubbleSort(b,CountB); 
+
+CountB=DisaSameYs(b,CountB); 
+//testds(b,CountB); 
+
+ CountC=cha(a,b,c,CountA,CountB); 
+
+ printf("\n\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+} 
+
+
+
+
+////////////////////////////////////////////////////// 
+//模式匹配 
+
+#include <stdio.h> 
+#include <string.h> 
+
+typedef struct{ 
+// int ch[2000]; 
+ char ch[2000]; 
+ int length; 
+}SeqString; 
+
+int NaiveStrMatch(SeqString T,SeqString P) 
+{ 
+ int i,j,k; 
+ int m=P.length; 
+ int n=T.length; 
+ for(i=0;i<=n-m;i++) 
+ { 
+  j=0;k=i; 
+  while(j<m&&T.ch[k]==P.ch[j]) 
+  { 
+   k++;j++; 
+  } 
+  if(j==m) 
+   return i; 
+   
+ }//endfor 
+ return -1; 
+}//NaiveStrMatch 
+
+SeqString CreatStr(SeqString R) 
+{ 
+ int i; 
+printf("input data\n"); 
+for(i=0;i<2000;i++) 
+ { 
+//  scanf("%d",&R.ch[i]);   
+//  if(R.ch[i]==-9999)   
+  scanf("%s",&R.ch[i]); 
+  if(!(strcmp(&R.ch[i],"-9999"))) 
+  break; 
+ } 
+R.length=i-1; 
+ return R; 
+} 
+
+void main() 
+{ 
+ int n; 
+ SeqString Str1; 
+ Str1=CreatStr(Str1); 
+ SeqString Str2; 
+ Str2=CreatStr(Str2); 
+ n=NaiveStrMatch(Str1,Str2); 
+ printf("%d\n",n); 
+} 
+
+
+
+
+/* 
+2、编一C程序，它能读入集合A的一串整数（以-9999为结束标记，整数个数小于1000） 
+和集合B的一串整数（以-9999为结束标记，整数个数小于1000），计算出A与B的交集， 
+并以由小到大的次序输出A与B的交集中的所有整数（输入整数时，相邻的两个用空格隔开。 为A或B输入时，同一个数可能出现多次，而A与B的交集中同一个数不能出现多次）。 （注：程序的可执行文件名必须是 e2.exe） 
+*/ 
+
+//注意调试程序时要多输入重复数据调试；本程序是根据青龙提供的程序改编，消除了重复数据的错误！； 
+
+#include <iostream.h> 
+#include <stdio.h> 
+
+void BuCountbbleSort(int r[],int n) 
+{//冒泡排序 
+ int i,j,k; 
+ int exchange; 
+ for(i=0;i<=n;i++) 
+ { 
+  exchange=0; 
+  for(j=n-1;j>=i;j--) 
+  if(r[j+1]<r[j]) 
+  { 
+   k=r[j+1]; 
+   r[j+1]=r[j]; 
+   r[j]=k; 
+   exchange=1; 
+   } 
+ if(!exchange) 
+ break; 
+ } 
+} 
+
+
+int BingJi(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求集合的并集 
+ int i=0,j=0,k=0; 
+ while(i<=Countaa&&j<=Countbb) 
+ { 
+  if(m[i]<n[j]) 
+  {//如果 m[i]<n[j]则取小的值m[i],然后i++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+  }//endif 
+  else if(m[i]>n[j]) 
+  {//如果 m[i]>n[j]则取小的值n[j],然后j++; 
+   l[k]=n[j]; 
+   k++; 
+   j++; 
+  }//end elseif 
+  else 
+  {//如果 m[i]==n[j],可以任取一个值，然后i++;j++; 
+   l[k]=m[i]; 
+   k++; 
+   i++; 
+   j++; 
+  }//endelse 
+ }//endwhile 
+
+ if(i>Countaa) 
+ {//如果i>Countaa,即数组m[i]中的元数个数较少， 
+  //则把n[j]中的剩余元素，都付给l[]。 
+  while(j<=Countbb) 
+  { 
+   l[k]=n[j]; 
+   j++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+ if(j>Countbb) 
+ {//如果j>Countbb,即数组n[i]中的元数个数较少， 
+  //则把m[j]中的剩余元素，都付给l[]。 
+  while(i<=Countaa) 
+  { 
+   l[k]=m[i]; 
+   i++; 
+   k++; 
+  }//endwhile 
+ }//endif 
+
+return k;//返回生成的数组的元数个数 
+}//end BuCountbbleSort 
+
+int JiaoJi(int m[],int n[],int l[],int Countaa,int Countbb) 
+{//求集合的交集 
+
+ /////////////////////////////////// 
+ //消除数组m[]中的重复元素 
+int w,x,y; 
+ for(w=0;w<=Countaa;w++) 
+ { 
+  for(x=w+1;x<=Countaa;x++) 
+  { 
+   if(m[w]==m[x]) 
+   { 
+    Countaa--; 
+    for(y=x;y<=Countaa;y++) 
+    { 
+     m[y]=m[y+1];     
+    }//endfor 
+    x--; 
+   }//endif     
+  }//endfor   
+ }//endfor 
+
+ /* 
+ //测试消除数组中的重复元素的效果用下列循环输出 
+ int z; 
+ for(z=0;z<=Countaa;z++) 
+ { 
+  printf("%d",m[z]);  
+ } 
+ printf("\n"); 
+ */ 
+
+ //消除结束 
+ /////////////////////////////////// 
+  
+
+/////////////////////////////////// 
+ //求交集 
+ int i=0,j=0,k=0;  
+while(i<=Countaa) 
+ { 
+  for(j=0;j<=Countbb;j++) 
+  {//用集合的第一个元素分别和另一个集合的各元素相比较 
+   //然后再用第二个元素(直到最后一个元素)和另一个集合的各元素相比较 
+   if(m[i]==n[j]) 
+   {//如果有相同的就保存到l[]中，这样同时消掉了n[]中的重复元素 
+    l[k]=m[i]; 
+    k++; 
+    break; 
+   }//endif 
+}//endfor 
+  i++; 
+ }//endwhile 
+ //求交集结束 
+ ////////////////////////////////// 
+  
+ return k; 
+} 
+
+void main() 
+{ 
+ int a[1000], b[1000],c[2000]; 
+ int exchange=0; 
+ int i,CountA,CountB,CountC; 
+
+ printf("input a\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+   break; 
+ }//endfor 
+ CountA=i-1; 
+
+ BuCountbbleSort(a,CountA);//先将集合A排序 
+
+ printf("\ninput b\n"); 
+ for(i=0;i<=1000;i++) 
+ { 
+  scanf("%d",&b[i]); 
+  if(b[i]==-9999) 
+   break; 
+ }//endfor 
+ CountB=i-1; 
+
+ BuCountbbleSort(b,CountB);//集合B排序 
+
+// CountC=BingJi(a,b,c,CountA,CountB); 
+ CountC=JiaoJi(a,b,c,CountA,CountB); 
+  
+ printf("\n\n"); 
+ for(i=0;i<=CountC-1;i++) 
+ { 
+  printf("%d ",c[i]); 
+ } 
+ printf("\n"); 
+}
+
+3. 编一C程序，它能根据读入的数据构造有向图G，并输出G的DFS遍历序列（从V0开始），图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1，-1为输入结束标记，其余的值都>=0且<n），它们都是整数，且100>n>0。 
+
+（注：程序的可执行文件名必须是 e3.exe）
+
+#include <stdio.h> 
+typedef enum {False,True} Boolean; 
+
+int G[100][100]; 
+int n; 
+
+void CreatG() /*建立图的邻接矩阵G[][]*/ 
+{int i,j; 
+printf("Input the number of the node:"); 
+scanf("%d",&n); 
+printf("\n"); 
+for (i=0;i<n;i++) 
+for (j=0;j<n;j++) 
+ G[i][j]=0; 
+do 
+{ scanf("%d %d",&i,&j); 
+G[i][j]=1; 
+}while ((i!=-1)&&(j!=-1)); 
+} 
+
+void TopSort() /*拓扑排序,输出拓扑序列*/ 
+{ int i,j; 
+int degree[100]; /*按照无前驱顶点优先思想,degree[]存放个节点的入度.*/ 
+Boolean visited[100],flag=True; 
+printf("The Topolgical Order as follow:"); 
+for (i=0;i<n;i++) 
+{ degree[i]=0; 
+visited[i]=False; 
+} 
+printf("\n"); 
+while(flag==True) 
+{ 
+for (i=0;i<n;i++) 
+for (j=0;j<n;j++) 
+degree[i]=G[j][i]+degree[i]; 
+i=0; 
+while ((i<n)&&(degree[i]!=0)||visited[i]==True) i++; /*最先输出入度为0的顶点.*/ 
+if (i<n) /*所有节点均已输出结束,否则说明存在环,无拓扑序列*/ 
+{printf(" %d",i); 
+visited[i]=True; 
+for(j=0;j<n;j++) 
+ {G[i][j]=0; degree[j]=0;} 
+} 
+else flag=False; 
+} 
+} 
+
+main() 
+{ CreatG(); 
+TopSort(); 
+}
+
+４. 编一C程序，它能读入一串整数（以-9999为结束标记）并对它们进行从小到大直接插入排序，同时输出排序时对这些整数进行比较的总次数（输入整数时，相邻的两个用空格隔开，整数个数<2000）。 （注：程序的可执行文件名必须是 e4.exe）
+
+#include<stdio.h> 
+
+void main() 
+{ 
+ int a[2000],i,j,k=0,CountA; 
+ printf("input data\n"); 
+for(i=1;i<=2001;i++) 
+ { 
+  scanf("%d",&a[i]); 
+  if(a[i]==-9999) 
+   break; 
+ } 
+ CountA=i-1; 
+
+
+ for(i=2;i<=CountA;i++) 
+  if(a[i]<a[i-1]) 
+  { 
+   a[0]=a[i]; 
+   j=i-1; 
+    
+  do{ 
+    a[j+1]=a[j]; 
+    j--; 
+    k++; 
+   }while(a[0]<a[j]); 
+a[j+1]=a[0]; 
+  } 
+
+printf("\n"); 
+ for(i=1;i<=CountA;i++) 
+  printf("%d ",a[i]); 
+printf("\nThe times of comparing = %d",k); 
+printf("\n"); 
+}
+
+5. 编一C程序，它能根据读入的数据构造有向图G，图的输入形式为n V0 Vi0 V1 Vi1 V2 Vi2...Vi Vin -1 -1（-1 -1是输入结束标记），它们都是整数，且100>n>0，其余的值都>=0且<n,输出图G的拓扑序列。 （注：程序的可执行文件名必须是 e5.exe）
+
+  
+
+6. 编一C程序，它能读入一串整数（不多于2000，并以-9999为结束标记）及另一整数n，判断n是否在那一串数中，若是，则输出yes及该数在那串整数中的序号（序号从0开始），否则输出no。(输入整数时，相邻的两个用空格隔开)。 
+（注：程序的可执行文件名必须是 e6.exe）
+
+#include <stdio.h> 
+
+typedef struct{ 
+ int data[2000]; 
+ int length; 
+}SeqList; 
+
+void main() 
+{ 
+ int i,k=0,num; 
+ SeqList a; 
+ printf("input data\n"); 
+ for(i=0;i<2000;i++) 
+ { 
+  scanf("%d",&a.data[i]); 
+  if(a.data[i]==-9999) 
+   break; 
+ } 
+ a.length=i-1; 
+
+ printf("input the number\n"); 
+ scanf("%d",&num); 
+for(i=0;i<=a.length;i++) 
+ { 
+  k++; 
+  if(a.data[i]==num) 
+  { 
+   printf("yes\n"); 
+   printf(" is at %d",k); 
+   printf("\n"); 
+  
+  } 
+ } 
+ printf("\nno\n"); 
+}
+
+7. 根据输入的中序和后序建立二叉树，用前序输出并计算树的深度。 
+8. 输入前序和中序构造二叉树，并输出后序和度为1的结点个数。 
+9. 输入一串整数，判断第N个数在前N-1个序列中出现了几次，输出次数。
+
+10．建立一个空二叉排序树，输入一串数据（以-9999 结尾），输出前序和中序遍历。其中：输入数据均为整数，输入时以空格分开
+
+11、数据结构 上机 内排序 程序 全部实现
+/*sy6.c*/ 
+#define NULL 0 
+#define n 10 
+#define Error printf 
+#define FALSE 0 
+#define TRUE 1 
+/*#include "stdio.h"*/ 
+/*#include <stdlib.h>*/ 
+#include <math.h> 
+typedef int KeyType; 
+typedef char InfoType; 
+typedef struct{ 
+KeyType key; 
+InfoType otherinfo; 
+}RecType; 
+typedef RecType Seqlist[n+1]; 
+int m,num; /*全局变量m和num存储输出的第趟结果及递归调用的次数*/ 
+Seqlist R;/*记录待排序的10个数*/ 
+void Insertsort(); 
+int Bubblesort(); 
+void Quicksort(int low,int high); 
+void Selectsort(); 
+void Heapsort(); 
+void Mergesort(); 
+void Radixsort(); 
+int Partition(int i,int j); 
+void main() 
+{Seqlist S; 
+int i; 
+char ch1,ch2; 
+printf("请输入10个待排序数据:(每个数据间用空格隔开)\n"); 
+for(i=1;i<=n;i++) 
+scanf("%d",&S[i].key); 
+ch1='y'; 
+while (ch1=='y' || ch1=='Y') 
+{ 
+printf("*****************菜单***********************\n"); 
+printf("请选择下列*作：\n"); 
+printf("1------------------更新待排序数据-----------\n"); 
+printf("2------------------直接插入排序-------------\n"); 
+printf("3------------------冒泡排序-----------------\n"); 
+printf("4------------------快速排序-----------------\n"); 
+printf("5------------------直接选择排序-------------\n"); 
+printf("6------------------堆排序-------------------\n"); 
+printf("7------------------归并排序-----------------\n"); 
+printf("8------------------基数排序-----------------\n"); 
+printf("9------------------退出---------------------\n"); 
+printf("请选择*作类别(1-9)："); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{ 
+case '1': 
+printf("请输入更新待排序数据：\n"); 
+for (i=1;i<=n;i++) 
+scanf ("%d",&S[i].key); 
+break; 
+case '2':printf("请输入要输出第几趟结果:"); 
+scanf("\n%d",&m); 
+for (i=1;i<=n;i++) 
+R[i].key=S[i].key; 
+Insertsort(); 
+break; 
+case '3': printf("请输入要输出第几趟结果:"); 
+scanf("\n%d",&m); 
+for (i=1;i<n+1;i++) 
+R[i].key=S[i].key; 
+Bubblesort(); 
+break; 
+case '4':printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m); 
+for (i=1;i<n+1;i++) 
+R[i].key=S[i].key; 
+num=0;Quicksort(1,n); 
+break; 
+case '5':printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m); 
+for (i=1;i<n+1;i++) 
+R[i].key=S[i].key; 
+Selectsort(); 
+break; 
+case '6':printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m); 
+for (i=1;i<n+1;i++) 
+R[i].key=S[i].key; 
+Heapsort(); 
+break; 
+case '7':printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m); 
+for (i=1;i<n+1;i++) 
+R[i].key=S[i].key; 
+Mergesort(); 
+break; 
+case '8':printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m); 
+for (i=0;i<n;i++) 
+R[i].key=S[i+1].key; 
+Radixsort(); 
+break; 
+case '9':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+/*******************************************************************/ 
+void Insertsort() 
+{/*对顺序表R中的记录R[1...n]按递增序进行插入排序*/ 
+int i,j,k; 
+for(i=2;i<=n;i++) 
+{ 
+if(R[i].key<R[i-1].key) 
+{ 
+R[0]=R[i]; j=i-1; 
+do 
+{/*从右向左在有序区R[1...i-1]中查找R[i]的插入位置*/ 
+R[j+1]=R[j]; 
+j--; 
+} 
+while(R[0].key<R[j].key); 
+R[j+1]=R[0]; 
+} 
+if (i-1==m) 
+{ 
+printf("第%d趟的结果是：",m); 
+for(k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+} 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+} 
+/********************************************************************/ 
+int Bubblesort() 
+{/*R[1...n]是待排序的文件，采用自下向上扫描对R做冒泡排序*/ 
+int i,j,k,m; 
+int exchange; 
+/* printf("请输入要输出第几趟结果："); 
+scanf("\n%d",&m);*/ 
+for(i=1;i<n;i++) 
+{/*最多做n-1趟排序*/ 
+exchange=FALSE; 
+for (j=n-1;j>=i;j--) 
+{ 
+if (R[j+1].key<R[j].key) 
+{ 
+R[0]=R[j+1]; 
+R[j+1]=R[j]; 
+R[j]=R[0]; 
+exchange=TRUE; 
+} 
+} 
+if((i==m)||(!exchange)) 
+{ 
+printf("第%d趟的结果是：",m); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+if(!exchange) return(1); 
+} 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+return(1); 
+}/*Bubblesort*/ 
+/*******************************************************************/ 
+int Partition(int i,int j) 
+{/*调用Partition(R,low,high)时，返回在R[low...high]中基准记录的位置*/ 
+RecType pivot=R[i]; 
+while (i<j) 
+{while(i<j && R[j].key>=pivot.key) 
+j--; 
+if (i<j) 
+R[i++]=R[j]; 
+while (i<j && R[i].key<=pivot.key) 
+i++; 
+if (i<j) 
+R[j--]=R[i]; 
+} 
+R[i]=pivot; 
+return i; 
+}/*Partition*/ 
+/*******************************************************************/ 
+void Quicksort(int low,int high) 
+{/*对R[low...high]的快速排序*/ 
+int pivotpos,k; 
+if (low<high) 
+{/*当区间长度大于1时才需排序*/ 
+pivotpos=Partition(low,high); 
+num++; 
+if(m==num) 
+{ 
+printf("第%d趟的结果是：",m); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+Quicksort(low,pivotpos-1); 
+Quicksort(pivotpos+1,high); 
+} 
+if(low==1&&high==n) 
+{ 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+/*printf("请输入还要输出第几趟结果，不想输出时请输入0：");*/ 
+/*scanf("\n%d",&m);*/ 
+} 
+}/*Quicksort*/ 
+/********************************************************************/ 
+void Selectsort() 
+{ 
+int i,j,k,h; 
+for (i=1;i<n;i++) 
+{ 
+h=i; 
+for(j=i+1;j<=n;j++) 
+{ 
+if(R[j].key<R[h].key) h=j; 
+} 
+if (h!=i) 
+{ 
+R[0]=R[i];R[i]=R[h];R[h]=R[0]; 
+} 
+if (i==m) 
+{ 
+printf("第%d趟的结果是：",m); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+} 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+}/*Selectsort*/ 
+/********************************************************************/ 
+void Heapify(int low,int high) 
+{int large; 
+RecType temp=R[low]; 
+for (large=2*low;large<=high;large*=2) 
+{if (large<high && R[large].key<R[large+1].key) 
+large++; 
+if (temp.key>=R[large].key) 
+break; 
+R[low]=R[large];low=large; 
+} 
+R[low]=temp; 
+}/*Heapify*/ 
+/********************************************************************/ 
+void BuildHeap() 
+{/*将初始文件R[1...n]构造为大根堆*/ 
+int i; 
+for (i=n/2;i>0;i--) 
+Heapify(i,n); 
+} 
+/********************************************************************/ 
+void Heapsort() 
+{/*对R[1...n]进行堆排序，用R[0]做暂存单元*/ 
+int i,k; 
+BuildHeap(); 
+for (i=n;i>1;i--) 
+{R[0]=R[1];R[1]=R[i];R[i]=R[0]; 
+if (i==(n-m+1)) 
+{printf("第%d趟的结果是：",m); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key);printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+Heapify(1,i-1); 
+} 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+}/*Heapsort*/ 
+/********************************************************************/ 
+void Merge (int low,int mm,int high) 
+{/*将两个有序序列R[low...mm]和R[mm+1...high]归并成一个有序序列*/ 
+int i=low,j=mm+1,p=0; 
+RecType *R1; 
+R1=(RecType * )malloc((high-low+1)* sizeof(RecType)); 
+if (!R1) 
+Error("Insufficient memory available!"); 
+while (i<=mm && j<=high) 
+R1[p++]=(R[i].key<=R[j].key)?R[i++]:R[j++]; 
+while (i<=mm) 
+R1[p++]=R[i++]; 
+while (j<=high) 
+R1[p++]=R[j++]; 
+for (p=0,i=low;i<=high;p++,i++) 
+R[i]=R1[p]; 
+}/*Merge*/ 
+/********************************************************************/ 
+void MergePass(int length) 
+{/*对R[1...n]做一趟归并排序*/ 
+int i; 
+for (i=1;i+2*length-1<=n;i=i+2*length) 
+Merge(i,i+length-1,i+2*length-1); 
+if (i+length-1<n) 
+Merge(i,i+length-1,n); 
+}/*MergePass*/ 
+/********************************************************************/ 
+void Mergesort() 
+{int length,k; 
+for (length=1;length<n;length*=2) 
+{MergePass(length); 
+if (m==(int)(log(length))+1) 
+{ printf("第%d趟的结果是：",m); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+} 
+printf("最终排序结果是："); 
+for (k=1;k<=n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+}/*Mergesort*/ 
+/********************************************************************/ 
+#define KeySize 3 /*设关键字位数d=3*/ 
+#define Radix 10 /*基数rd为10*/ 
+typedef struct QNode{ 
+KeyType key;/*关键字*/ 
+InfoType otherinfo;/*其他数据项*/ 
+struct QNode *next; 
+}QNode,*QueuePtr; 
+typedef struct { 
+QueuePtr front; 
+QueuePtr rear; 
+}LinkQueue; 
+LinkQueue B[Radix]; 
+int EnQueue(int k,RecType Ri); 
+int QueueEmpty(int k); 
+RecType DeQueue(int k); 
+int InitQueue(int k); 
+int EnQueue(int k,RecType Ri) 
+{ 
+QueuePtr p; 
+p=(QueuePtr)malloc(sizeof(QNode)); 
+if(!p) return(0); 
+p->key=Ri.key;p->otherinfo=Ri.otherinfo; 
+p->next=NULL;B[k].rear->next=p; 
+B[k].rear=p;return(1); 
+} 
+int InitQueue(int k) 
+{ 
+B[k].front=(QueuePtr)malloc(sizeof(QNode)); 
+if(!B[k].front) return(0); 
+B[k].rear=B[k].front; 
+B[k].front->next=NULL; 
+return(1); 
+} 
+int QueueEmpty(int k) 
+{ 
+if(B[k].front==B[k].rear) return(1); 
+else return(0); 
+} 
+RecType DeQueue(int k) 
+{ 
+RecType p; 
+QueuePtr t; 
+/*if(QueueEmpty(ptrB)) return(NULL);*/ 
+t=B[k].front->next; 
+p.key=t->key;p.otherinfo=t->otherinfo; 
+B[k].front->next=t->next; 
+if(B[k].rear==t) 
+B[k].rear=B[k].front; 
+free(t); 
+return(p); 
+} 
+/********************************************************************/ 
+void Distribute(int j) 
+{int i,k,t; 
+j=KeySize-j; 
+for (i=0;i<n;i++) 
+{k=R[i].key; 
+for (t=1;t<j;t++) k=k/10; 
+k=k%10; 
+EnQueue(k,R[i]); 
+} 
+}/*Distribute*/ 
+/********************************************************************/ 
+void Collect() 
+{int i=0,j; 
+for (j=0;j<Radix;j++) 
+while (!QueueEmpty(j)) 
+R[i++]=DeQueue(j); 
+}/*Collect*/ 
+/********************************************************************/ 
+void Radixsort() 
+{/*对R[0...n-1]进行基数排序，R[i].key为非负整数，且位数不超过KeySize*/ 
+int i,k; 
+for (i=0;i<Radix;i++) 
+InitQueue(i); 
+for (i=KeySize-1;i>=0;i--) 
+{ Distribute(i); 
+Collect(B); 
+if ((KeySize-i)==m) 
+{ 
+printf("第%d趟的结果是：",m); 
+for(k=0;k<n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+printf("请输入还要输出第几趟结果，不想输出时请输入0："); 
+scanf("\n%d",&m); 
+} 
+} 
+printf("最终排序结果是："); 
+for (k=0;k<n;k++) 
+printf("%5d",R[k].key); 
+printf("\n"); 
+}/*Radixsort*/
+
+附录：
+
+１、数据结构 上机 二叉排序树及其查找
+#include <stdio.h> 
+#include <stdlib.h> 
+typedef int KeyType; 
+typedef struct node{ 
+KeyType key; 
+struct node *lchild,*rchild; 
+}BSTNode; 
+typedef BSTNode *BSTree; 
+BSTree CreateBST(void); 
+void SearchBST(BSTree T,KeyType Key); 
+void InsertBST(BSTree *Tptr,KeyType Key); 
+void DelBSTNode(BSTree *Tptr,KeyType Key); 
+void InorderBST(BSTree T); 
+main() 
+{BSTree T; 
+char ch1,ch2; 
+KeyType Key; 
+printf("建立一棵二叉排序树的二叉链表存储\n"); 
+T=CreateBST(); 
+ch1='y'; 
+while (ch1=='y' || ch1=='Y') 
+{printf("请选择下列*作：\n"); 
+printf("1------------------更新二叉排序树存储\n"); 
+printf("2------------------二叉排序树上的查找\n"); 
+printf("3------------------二叉排序树上的插入\n"); 
+printf("4------------------二叉排序树上的删除\n"); 
+printf("5------------------二叉排序树中序输出\n"); 
+printf("6------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{case '1':T=CreateBST();break; 
+case '2':printf("\n请输入要查找的数据："); 
+scanf("\n%d",&Key); 
+SearchBST(T,Key); 
+printf("查找*作完毕。\n");break; 
+case '3': printf("\n请输入要插入的数据："); 
+scanf("\n%d",&Key); 
+InsertBST(&T,Key); 
+printf("插入*作完毕。\n");break; 
+case '4': printf("\n请输入要删除的数据："); 
+scanf("\n%d",&Key); 
+DelBSTNode(&T,Key); 
+printf("删除*作完毕。\n");break; 
+case '5': InorderBST(T); 
+printf("\n二叉排序树输出完毕。\n");break; 
+case '6':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+
+BSTree CreateBST(void) 
+{BSTree T; 
+KeyType Key; 
+T=NULL; 
+printf("请输入一个关键字(输入0时结束输入)：\n"); 
+scanf("%d",&Key); 
+while (Key) 
+{InsertBST(&T,Key); 
+printf("请输入下一个关键字(输入0时结束输入)：\n"); 
+scanf("\n%d",&Key); 
+} 
+return T; 
+} 
+void SearchBST(BSTree T, KeyType Key) 
+{ BSTNode *p=T; 
+while(p) 
+{if(p->key==Key) 
+{printf("已找到\n"); 
+return; 
+} 
+p=(Key<p->key) ? p->lchild:p->rchild; 
+} 
+printf("没有找到\n"); 
+} 
+
+void InsertBST(BSTree *T,KeyType Key) 
+{BSTNode *f,*p; 
+p=(*T); 
+while(p) 
+{if(p->key==Key) 
+{printf("树中已有Key不需插入\n"); 
+return; 
+} 
+f=p; 
+p=(Key<p->key)?p->lchild:p->rchild; 
+} 
+p=(BSTNode*)malloc(sizeof(BSTNode)); 
+p->key=Key; 
+p->lchild=p->rchild=NULL; 
+if ((*T)==NULL) (*T)=p; 
+else if (Key<f->key) f->lchild=p; 
+else f->rchild=p; 
+}/*InsertBST*/ 
+
+void DelBSTNode(BSTree *T,KeyType Key) 
+{BSTNode *parent=NULL, *p, *q,*child; 
+p=*T; 
+while(p) 
+{if(p->key==Key) break; 
+parent=p; 
+p=(Key<p->key)?p->lchild:p->rchild; 
+} 
+if (!p) {printf("没有找到要删除的结点\n");return;} 
+q=p; 
+if (q->lchild && q->rchild) 
+for (parent=q,p=q->rchild; p->lchild; parent=p,p=p->lchild); 
+child=(p->lchild)?p->lchild:p->rchild; 
+if (!parent) *T=child; 
+else {if (p==parent->lchild) 
+parent->lchild=child; 
+else parent->rchild=child; 
+if (p!=q) 
+q->key=p->key; 
+} 
+free(p); 
+} 
+void InorderBST(BSTree T) 
+{ if(T!=NULL) 
+{InorderBST(T->lchild); 
+printf("%5d",T->key); 
+InorderBST(T->rchild); 
+} 
+}
+
+２、数据结构 上机  二叉树及其遍历
+#include <stdio.h> 
+#include <stdlib.h> 
+typedef char DataType; /*设数据域类型为字符型*/ 
+typedef struct node{ 
+DataType data; 
+struct node *lchild,*rchild; /*左右链域为指向结点结构的指针类型*/ 
+}BinTNode; /*结点类型*/ 
+typedef BinTNode *BinTree; /*指向二叉树结点的指针类型*/ 
+int count; /*全局变量用于统计结点个数*/ 
+void CreateBinTree(BinTree *T); 
+void Preorder(BinTree T); 
+void Inorder(BinTree T); 
+void Postorder(BinTree T); 
+void Levelorder(BinTree T); 
+void Leafnum(BinTree T); 
+void Nodenum(BinTree T); 
+main() 
+{BinTree T; 
+char ch1,ch2; 
+printf("\n欢迎进入二叉树基本*作测试程序，请选择：\n"); 
+ch1='y'; 
+while(ch1=='y' || ch1=='Y') 
+{printf("\nA-------------------------二叉树建立"); 
+printf("\nB-------------------------先序遍历"); 
+printf("\nC-------------------------中序遍历"); 
+printf("\nD-------------------------后序遍历"); 
+printf("\nE-------------------------层次遍历"); 
+printf("\nF-------------------------求叶子数"); 
+printf("\nG-------------------------求结点总数"); 
+printf("\nH-------------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch(ch2) 
+{case 'a': 
+case 'A':printf("请按带空指针的二叉树先序输入建立二叉树存储的结点序列:\n"); 
+CreateBinTree(&T);break; 
+case 'b': 
+case 'B':printf("该二叉树的先根序遍历序列为:\n"); 
+Preorder(T);break; 
+case 'c': 
+case 'C':printf("该二叉树的中根遍历序列为:\n"); 
+Inorder(T);break; 
+case 'd': 
+case 'D':printf("该二叉树的后根遍历序列为:\n"); 
+Postorder(T);break; 
+case 'e': 
+case 'E':printf("该二叉树的层次遍历序列为:\n"); 
+Levelorder(T);break; 
+case 'f': 
+case 'F':count=0;Leafnum(T); /*count初值为0,用于统计叶结点数目*/ 
+printf("该二叉树有%d个叶子。\n",count); 
+break; 
+case 'g': 
+case 'G':count=0;Nodenum(T);/*count初值为0,用于统计结点数目*/ 
+printf("该二叉树总共有%d个结点。\n",count); 
+break; 
+case 'h': 
+case 'H':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+void CreateBinTree(BinTree *T) 
+{/*以加入结点的先序序列输入，构造二叉链表*/ 
+char ch; 
+scanf("\n%c",&ch); 
+if (ch=='0') *T=NULL; /*读入0时，将相应结点置空*/ 
+else {*T=(BinTNode*)malloc(sizeof(BinTNode)); /*生成结点空间*/ 
+(*T)->data=ch; 
+CreateBinTree(&(*T)->lchild); /*构造二叉树的左子树*/ 
+CreateBinTree(&(*T)->rchild); /*构造二叉树的右子树*/ 
+} 
+} 
+void Inorder(BinTree T) 
+{/*中序遍历二叉树T*/ 
+if (T) 
+{Inorder(T->lchild); /*中序遍历二叉树的左子树*/ 
+printf("%3c",T->data); /*访问结点的数据*/ 
+Inorder(T->rchild); /*中序遍历二叉树的右子树*/ 
+} 
+} 
+
+void Preorder(BinTree T) 
+{/*先序遍历二叉树T*/ 
+if (T) 
+{printf("%3c",T->data); /*访问结点数据*/ 
+Preorder(T->lchild); /*先序遍历二叉树T的左子树*/ 
+Preorder(T->rchild); /*先序遍历二叉树T的右子树*/ 
+} 
+} 
+
+void Postorder(BinTree T) 
+{/*后序遍历二叉树T*/ 
+if (T) 
+{Postorder(T->lchild); /*后序遍历二叉树T的左子树*/ 
+Postorder(T->rchild); /*后序遍历二叉树T的右子树*/ 
+printf("%3c",T->data); /*访问结点数据*/ 
+} 
+} 
+
+void Levelorder(BinTree T) 
+{/*按层次遍历二叉树T*/ 
+int i,j; 
+BinTNode *q[20],*p; /*q[20]用于模拟队列，存储入队的结点*/ 
+p=T; 
+if(p!=NULL) {i=1;q[i]=p;j=2;} /*i为队首位置，j为队尾位置*/ 
+while(i!=j) 
+{p=q[i];printf("%3c",p->data); /*访问队首元素*/ 
+if (p->lchild!=NULL) {q[j]=p->lchild;j++;} 
+/*若队首元素左链域不为空，则将其入队列*/ 
+if (p->rchild!=NULL) {q[j]=p->rchild;j++;} 
+/*若队首元素右链域不为空，则将其入队列*/ 
+i++; /*将队首移到下一个位置*/ 
+} 
+} 
+
+void Leafnum(BinTree T) 
+{/*统计二叉树T中叶子结点的数目*/ 
+if (T) 
+{if (T->lchild==NULL && T->rchild==NULL) 
+count++; /*若为叶子，则计数器加1*/ 
+Leafnum(T->lchild); /*统计T的左子树*/ 
+Leafnum(T->rchild); /*统计T的右子树*/ 
+} 
+} 
+
+void Nodenum(BinTree T) 
+{/*统计二叉树T的结点数目*/ 
+if (T) 
+{count++; /*若当前结点不为空，则计数器count加1*/ 
+Nodenum(T->lchild); /*统计T的左子树*/ 
+Nodenum(T->rchild); /*统计T的右子树*/ 
+} 
+}
+
+３、数据结构 上机 将十进制的N转换成B进制数
+#define StackSize 10 /*假定预分配的栈空间最多为10*/ 
+#define Error printf 
+typedef int DataType; /*栈的元素类型设为整型*/ 
+typedef struct{ 
+DataType data[StackSize]; 
+int top; 
+}SeqStack; 
+void InitStack(SeqStack *S) /*初始栈*/ 
+{ S->top=0; 
+} 
+int StackEmpty(SeqStack *S) /*判栈空*/ 
+{if (S->top==0) return 1; 
+else return 0; 
+} 
+int StackFull(SeqStack *S) /*判栈满*/ 
+{return S->top==StackSize; 
+} 
+void Push(SeqStack *S, DataType x) /*进栈*/ 
+{if(StackFull(S)) 
+Error("Stack overflow"); /*上溢退出*/ 
+else S->data[(S->top)++]=x; /*栈顶指针加1后将x进栈*/ 
+} 
+DataType Pop(SeqStack *S) /*出栈*/ 
+{if (StackEmpty(S)) 
+Error("Stack underflow"); /*下溢退出*/ 
+else return S->data[--(S->top)]; /*栈顶指针返回后将栈顶指针减1*/ 
+} 
+/* DataType StackTop(SeqStack *S) //取栈顶元素 
+{if (StackEmpty(S)) 
+Error("Stack is empty"); 
+Return S->data[S->top]; 
+} */ 
+void conversion(int N,int B); 
+main() 
+{int N,B; 
+char ch; 
+printf("进行转换请输入Y,退出请输入N:"); 
+scanf("\n%c",&ch); 
+while (ch=='Y'|| ch=='y') 
+{printf("请输入需要转换的十进制数："); 
+scanf("%d",&N); 
+printf("\n请输入想要转换的进制数："); 
+scanf("%d",&B); 
+conversion(N,B); 
+printf("继续转换请输入Y,退出请输入N"); 
+scanf("\n%c",&ch); 
+} 
+} 
+void conversion(int N,int B) /*将十进制的N转换成B进制数*/ 
+{DataType i; 
+SeqStack *S; 
+InitStack(S); 
+while (N) /*从低位向高位生成B进制数的各位数字，并将其进栈*/ 
+{Push(S,N%B); 
+N=N/B; 
+} 
+printf("转换的结果为:"); 
+while (!StackEmpty(S)) /*栈非空时退栈输出*/ 
+{i=Pop(S); 
+switch(i) 
+{case 10:printf("%c",'a');break; 
+case 11:printf("%c",'b');break; 
+case 12:printf("%c",'c');break; 
+case 13:printf("%c",'d');break; 
+case 14:printf("%c",'e');break; 
+case 15:printf("%c",'f');break; 
+default:printf("%d",i); 
+} 
+} 
+printf("\n"); 
+}
+
+４、数据结构 上机  图 邻接表 DFS BFS
+#include <stdio.h> 
+#include <stdlib.h> 
+#define MaxVertexNum 10 /*设最大顶点数为10*/ 
+typedef struct node{ /*边表结点*/ 
+int adjvex; 
+struct node *next; 
+}EdgeNode; 
+typedef char Vertextype; 
+typedef struct vnode{ /*顶点表结点*/ 
+char vertex; 
+EdgeNode *firstedge; 
+}VertexNode; 
+typedef VertexNode AdjList[10]; 
+typedef struct{ 
+AdjList adjlist; 
+int n,e; 
+}ALGraph; 
+#define FALSE 0 
+#define TRUE 1 
+#define NULL 0 
+#define Error printf 
+int visited[10]; 
+void CreateALGraph(ALGraph *G); 
+void DFSTraverseAL(ALGraph *G); 
+void BFSTraverseAL(ALGraph *G); 
+void DFSAL(ALGraph *G,int i); 
+void BFSAL(ALGraph *G,int i); 
+#define QueueSize 30 /*假定预分配的队列空间最多为30*/ 
+typedef int DataType; /*队列中的元素类型为字符型*/ 
+typedef struct{ 
+int front; /*队头指针，队非空时指向队头元素*/ 
+int rear; /*队尾指针，队非空时指向队尾元素的下一位置*/ 
+int count; /*计数器，记录队中元素总数*/ 
+DataType data[QueueSize]; 
+}CirQueue; 
+void InitQueue(CirQueue *Q) /*初始队列*/ 
+{Q->front=Q->rear=0; 
+Q->count=0; 
+} 
+int QueueEmpty(CirQueue *Q) /*判队空*/ 
+{return Q->count==0; 
+} 
+int QueueFull(CirQueue *Q) /*判队满*/ 
+{return Q->count==QueueSize; 
+} 
+void EnQueue(CirQueue *Q,DataType x) /*入队*/ 
+{if (QueueFull(Q)) 
+Error("Queue overflow"); /*队满上溢*/ 
+else {Q->count++; /*队列元素个数加1*/ 
+Q->data[Q->rear]=x; /*新元素插入队列*/ 
+Q->rear=(Q->rear+1)%QueueSize; /*循环队列的尾指针加1*/ 
+} 
+} 
+DataType DeQueue(CirQueue *Q) /*出队*/ 
+{DataType temp; 
+if (QueueEmpty(Q)) 
+Error("Queue underflow"); /*队空下溢*/ 
+else {temp=Q->data[Q->front]; 
+Q->count--; /*队列元素个数减1*/ 
+Q->front=(Q->front+1)%QueueSize; /*循环队列的头指针加1*/ 
+return temp; 
+} 
+} 
+main() 
+{ALGraph *G; 
+char ch1,ch2; 
+printf("建立一个有向图的邻接表表示\n"); 
+CreateALGraph(G); 
+printf("已创建了一个邻接表存储的图\n"); 
+ch1='y'; 
+while(ch1=='y' || ch1=='Y') 
+{printf("\n请选择下列*作："); 
+printf("\nA------------------更新邻接表存储的图"); 
+printf("\nB------------------深度优先遍历"); 
+printf("\nC------------------广度优先遍历"); 
+printf("\nD------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{case 'A': 
+case 'a':CreateALGraph(G); 
+printf("创建一个图的邻接表的*作完成。\n"); 
+break; 
+case 'B': 
+case 'b':DFSTraverseAL(G);break; 
+case 'C': 
+case 'c':BFSTraverseAL(G);break; 
+case 'D': 
+case 'd':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+
+void CreateALGraph(ALGraph *G) 
+{/*建立有向图的邻接表存储*/ 
+int i,j,k; 
+EdgeNode * s; 
+printf("请输入顶点数和边数(输入格式为:顶点数,边数)：\n"); 
+scanf("%d,%d",&(G->n),&(G->e)); /*读入顶点数和边数*/ 
+printf("请输入顶点信息(输入格式为:顶点号<CR>)：\n"); 
+for (i=0;i<G->n;i++) /*建立有n个顶点的顶点表*/ 
+{scanf("\n%c",&(G->adjlist[i].vertex)); /*读入顶点信息*/ 
+G->adjlist[i].firstedge=NULL; /*顶点的边表头指针设为空*/ 
+} 
+printf("请输入边的信息(输入格式为:i,j)：\n"); 
+for (k=0;k<G->e;k++) /*建立边表*/ 
+{scanf("\n%d,%d",&i,&j); /*读入边<Vi,Vj>的顶点对应序号*/ 
+s=(EdgeNode*)malloc(sizeof(EdgeNode)); /*生成新边表结点s*/ 
+s->adjvex=j; /*邻接点序号为j*/ 
+s->next=G->adjlist[i].firstedge; 
+/*将新边表结点s插入到顶点Vi的边表头部*/ 
+G->adjlist[i].firstedge=s; 
+} 
+}/*CreateALGraph*/ 
+
+void DFSTraverseAL(ALGraph *G) 
+{/*深度优先遍历以邻接表存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) DFSAL(G,i); /*Vi未访问过，从Vi开始DFS搜索*/ 
+}/*DFSTraveseAL*/ 
+void BFSTraverseAL(ALGraph *G) 
+{/*广度优先遍历以邻接表存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) BFSAL(G,i); /* Vi未访问过，从Vi开始BFS搜索*/ 
+}/*BFSTraverseAL*/ 
+
+void DFSAL(ALGraph *G,int i) 
+{/*以Vi为出发点对邻接表存储的图G进行DFS搜索*/ 
+EdgeNode *p; 
+printf("visit vertex:V%c\n",G->adjlist[i].vertex); /*访问顶点Vi*/ 
+visited[i]=TRUE; /*标记Vi已访问*/ 
+p=G->adjlist[i].firstedge; /*取Vi边表的头指针*/ 
+while(p) /*依次搜索Vi的邻接点Vj，j=p->adjva*/ 
+{if (!visited[p->adjvex]) 
+/*若Vj尚未访问，则以Vj为出发点向纵深搜索*/ 
+DFSAL(G,p->adjvex); 
+p=p->next; /*找Vi的下一个邻接点*/ 
+} 
+}/*DFSAL*/ 
+
+void BFSAL(ALGraph *G,int k) 
+{/*以Vk为出发点对邻接表存储的图G进行BFS搜索*/ 
+int i; 
+CirQueue Q; 
+EdgeNode *p; 
+InitQueue(&Q); /*初始化队列*/ 
+printf("visit vertex:V%c\n",G->adjlist[k].vertex); /*访问原点Vk*/ 
+visited[k]=TRUE; 
+EnQueue(&Q,k); /*访问Vk后将其序号入队列*/ 
+while(!QueueEmpty(&Q)) /*队非空则执行*/ 
+{i=DeQueue(&Q); /*相当于Vi出队*/ 
+p=G->adjlist[i].firstedge; /*取Vi的边表指针*/ 
+while(p) /*依次搜索Vi的邻接点Vj*/ 
+{if (!visited[p->adjvex]) /*若Vj未访问过访问Vj*/ 
+{printf("visit vertex:V%c\n",G->adjlist[p->adjvex].vertex); 
+visited[p->adjvex]=TRUE; /*置访问过标志*/ 
+EnQueue(&Q,p->adjvex); /*将访问过的Vj入队列*/ 
+} 
+p=p->next; /*找Vi的下一个邻接点*/ 
+} 
+} 
+}/*BFSAL*/
+
+  
+
+５、数据结构 上机 图的临接矩阵存储及其搜索
+#define MaxVertexNum 10 //设最大顶点数为10 
+#include <stdio.h> 
+#include <stdlib.h> 
+typedef char VertexType; 
+typedef int EdgeType; 
+typedef struct{ 
+char vexs[10]; 
+int edges[10][10]; 
+int n,e; 
+}MGraph; 
+#define FALSE 0 
+#define TRUE 1 
+#define Error printf 
+int visited[10]; 
+void CreateMGraph(MGraph *G); 
+void DFSTraverseM(MGraph *G); 
+void BFSTraverseM(MGraph *G); 
+void DFSM(MGraph *G,int i); 
+void BFSM(MGraph *G,int i); 
+#define QueueSize 30 /*假定预分配的队列空间最多为30*/ 
+typedef int DataType; /*队列中的元素类型为字符型*/ 
+typedef struct{ 
+int front; /*队头指针，队非空时指向队头元素*/ 
+int rear; /*队尾指针，队非空时指向队尾元素的下一位置*/ 
+int count; /*计数器，记录队中元素总数*/ 
+DataType data[QueueSize]; 
+}CirQueue; 
+void InitQueue(CirQueue *Q) /*初始队列*/ 
+{Q->front=Q->rear=0; 
+Q->count=0; 
+} 
+int QueueEmpty(CirQueue *Q) /*判队空*/ 
+{return Q->count==0; 
+} 
+int QueueFull(CirQueue *Q) /*判队满*/ 
+{return Q->count==QueueSize; 
+} 
+void EnQueue(CirQueue *Q,DataType x) /*入队*/ 
+{if (QueueFull(Q)) 
+Error("Queue overflow"); /*队满上溢*/ 
+else {Q->count++; /*队列元素个数加1*/ 
+Q->data[Q->rear]=x; /*新元素插入队列*/ 
+Q->rear=(Q->rear+1)%QueueSize; /*循环队列的尾指针加1*/ 
+} 
+} 
+DataType DeQueue(CirQueue *Q) /*出队*/ 
+{DataType temp; 
+if (QueueEmpty(Q)) 
+Error("Queue underflow"); /*队空下溢*/ 
+else {temp=Q->data[Q->front]; 
+Q->count--; /*队列元素个数减1*/ 
+Q->front=(Q->front+1)%QueueSize; /*循环队列的头指针加1*/ 
+return temp; 
+} 
+} 
+main() 
+{MGraph *G; /*定义一个以邻接矩阵为存储类型的图G*/ 
+char ch1,ch2; 
+printf("建立一个有向图的邻接矩阵表示\n"); /*创建图G的存储*/ 
+CreateMGraph(G); 
+printf("已建立了一个图的邻接矩阵存储\n"); 
+ch1='y'; 
+while(ch1=='y' || ch1=='Y') 
+{printf("请选择下列*作:\n"); 
+printf("\nA----------------更新邻接矩阵存储的图"); 
+printf("\nB----------------深度优先遍历"); 
+printf("\nC----------------广度优先遍历"); 
+printf("\nD------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{case 'A': 
+case 'a':CreateMGraph(G); 
+printf("图的邻接矩阵存储建立完毕。\n"); 
+break; 
+case 'B': 
+case 'b':DFSTraverseM(G);break; 
+case 'C': 
+case 'c':BFSTraverseM(G);break; 
+case 'D': 
+case 'd':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+void CreateMGraph(MGraph *G) 
+{/*建立有向图G的邻接矩阵存储*/ 
+int i,j,k,w; 
+char ch; 
+printf("请输入顶点数和边数(输入格式为:顶点数,边数):\n"); 
+scanf("%d,%d",&(G->n),&(G->e)); /*输入顶点数和边数*/ 
+printf("请输入顶点信息(输入格式为:顶点号<CR>):\n"); 
+for (i=0;i<G->n;i++) 
+scanf("\n%c",&(G->vexs[i])); /*输入顶点信息，建立顶点表*/ 
+for (i=0;i<G->n;i++) 
+for (j=0;j<G->n;j++) 
+G->edges[i][j]=0; /*初始化邻接矩阵*/ 
+printf("请输入每条边对应的两个顶点的序号(输入格式为:i,j):\n"); 
+for (k=0;k<G->e;k++) 
+{scanf("\n%d,%d",&i,&j); /*输入e条边，建立邻接矩阵*/ 
+G->edges[i][j]=1; 
+} 
+}/*CreateMGraph*/ 
+void DFSTraverseM(MGraph *G) 
+{/*深度优先遍历以邻接矩阵存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) DFSM(G,i);/*Vi未访问过，以Vi为原点开始DFS搜索*/ 
+}/*DFSTraverse*/ 
+
+void BFSTraverseM(MGraph *G) 
+{/*广度优先遍历邻接矩阵存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) BFSM(G,i);/*Vi未访问过，以Vi为原点开始BFS搜索*/ 
+}/*BFSTraverseM*/ 
+
+void DFSM(MGraph *G,int i) 
+{/*以Vi为出发点，对邻接矩阵存储的图G进行DFS搜索*/ 
+int j; 
+printf("visit vertex:V%c\n",G->vexs[i]); /*访问顶点Vi*/ 
+visited[i]=TRUE; 
+for (j=0;j<G->n;j++) /*依次搜索Vi的邻接点*/ 
+if (G->edges[i][j]==1 && !visited[j]) 
+DFSM(G,j); /*当<Vi,Vj>∈E,且Vj未访问过时，以Vj为新的出发点继续按深度优先遍历*/ 
+}/*DFSM*/ 
+
+void BFSM(MGraph *G,int k) 
+{/*以Vi为出发点，对邻接矩阵存储的图G进行BFS搜索*/ 
+int i,j; 
+CirQueue Q; 
+InitQueue(&Q); 
+printf("visit vertex:V%c\n",G->vexs[k]); /*访问原点Vk*/ 
+visited[k]=TRUE; 
+EnQueue(&Q,k); /*原点Vk入队列*/ 
+while (!QueueEmpty(&Q)) 
+{i=DeQueue(&Q); /*Vi出队列*/ 
+for (j=0;j<G->n;j++) /*依次搜索Vi的邻接点Vj*/ 
+if (G->edges[i][j]==1 && !visited[j]) /*若Vj未访问*/ 
+{printf("visit vertex:V%c\n",G->vexs[j]); /*访问Vj */ 
+visited[j]=TRUE; 
+EnQueue(&Q,j); /*访问过的Vj入队列*/ 
+} 
+} 
+}
+６、数据结构 上机 堆栈的应用
+[将十进制的N转换成B进制数] 
+
+#define StackSize 10 /*假定预分配的栈空间最多为10*/ 
+#define Error printf 
+typedef int DataType; /*栈的元素类型设为整型*/ 
+typedef struct{ 
+DataType data[StackSize]; 
+int top; 
+}SeqStack; 
+void InitStack(SeqStack *S) /*初始栈*/ 
+{ S->top=0; 
+} 
+int StackEmpty(SeqStack *S) /*判栈空*/ 
+{if (S->top==0) return 1; 
+else return 0; 
+} 
+int StackFull(SeqStack *S) /*判栈满*/ 
+{return S->top==StackSize; 
+} 
+void Push(SeqStack *S, DataType x) /*进栈*/ 
+{if(StackFull(S)) 
+Error("Stack overflow"); /*上溢退出*/ 
+else S->data[(S->top)++]=x; /*栈顶指针加1后将x进栈*/ 
+} 
+DataType Pop(SeqStack *S) /*出栈*/ 
+{if (StackEmpty(S)) 
+Error("Stack underflow"); /*下溢退出*/ 
+else return S->data[--(S->top)]; /*栈顶指针返回后将栈顶指针减1*/ 
+} 
+/* DataType StackTop(SeqStack *S) //取栈顶元素 
+{if (StackEmpty(S)) 
+Error("Stack is empty"); 
+Return S->data[S->top]; 
+} */ 
+void conversion(int N,int B); 
+main() 
+{int N,B; 
+char ch; 
+printf("进行转换请输入Y,退出请输入N:"); 
+scanf("\n%c",&ch); 
+while (ch=='Y'|| ch=='y') 
+{printf("请输入需要转换的十进制数："); 
+scanf("%d",&N); 
+printf("\n请输入想要转换的进制数："); 
+scanf("%d",&B); 
+conversion(N,B); 
+printf("继续转换请输入Y,退出请输入N"); 
+scanf("\n%c",&ch); 
+} 
+} 
+void conversion(int N,int B) /*将十进制的N转换成B进制数*/ 
+{DataType i; 
+SeqStack *S; 
+InitStack(S); 
+while (N) /*从低位向高位生成B进制数的各位数字，并将其进栈*/ 
+{Push(S,N%B); 
+N=N/B; 
+} 
+printf("转换的结果为:"); 
+while (!StackEmpty(S)) /*栈非空时退栈输出*/ 
+{i=Pop(S); 
+switch(i) 
+{case 10:printf("%c",'a');break; 
+case 11:printf("%c",'b');break; 
+case 12:printf("%c",'c');break; 
+case 13:printf("%c",'d');break; 
+case 14:printf("%c",'e');break; 
+case 15:printf("%c",'f');break; 
+default:printf("%d",i); 
+} 
+} 
+printf("\n"); 
+}
+
+  
+
+７、数据结构 上机 图的临接矩阵存储及其搜索
+#define MaxVertexNum 10 //设最大顶点数为10 
+#include <stdio.h> 
+#include <stdlib.h> 
+typedef char VertexType; 
+typedef int EdgeType; 
+typedef struct{ 
+char vexs[10]; 
+int edges[10][10]; 
+int n,e; 
+}MGraph; 
+#define FALSE 0 
+#define TRUE 1 
+#define Error printf 
+int visited[10]; 
+void CreateMGraph(MGraph *G); 
+void DFSTraverseM(MGraph *G); 
+void BFSTraverseM(MGraph *G); 
+void DFSM(MGraph *G,int i); 
+void BFSM(MGraph *G,int i); 
+#define QueueSize 30 /*假定预分配的队列空间最多为30*/ 
+typedef int DataType; /*队列中的元素类型为字符型*/ 
+typedef struct{ 
+int front; /*队头指针，队非空时指向队头元素*/ 
+int rear; /*队尾指针，队非空时指向队尾元素的下一位置*/ 
+int count; /*计数器，记录队中元素总数*/ 
+DataType data[QueueSize]; 
+}CirQueue; 
+void InitQueue(CirQueue *Q) /*初始队列*/ 
+{Q->front=Q->rear=0; 
+Q->count=0; 
+} 
+int QueueEmpty(CirQueue *Q) /*判队空*/ 
+{return Q->count==0; 
+} 
+int QueueFull(CirQueue *Q) /*判队满*/ 
+{return Q->count==QueueSize; 
+} 
+void EnQueue(CirQueue *Q,DataType x) /*入队*/ 
+{if (QueueFull(Q)) 
+Error("Queue overflow"); /*队满上溢*/ 
+else {Q->count++; /*队列元素个数加1*/ 
+Q->data[Q->rear]=x; /*新元素插入队列*/ 
+Q->rear=(Q->rear+1)%QueueSize; /*循环队列的尾指针加1*/ 
+} 
+} 
+DataType DeQueue(CirQueue *Q) /*出队*/ 
+{DataType temp; 
+if (QueueEmpty(Q)) 
+Error("Queue underflow"); /*队空下溢*/ 
+else {temp=Q->data[Q->front]; 
+Q->count--; /*队列元素个数减1*/ 
+Q->front=(Q->front+1)%QueueSize; /*循环队列的头指针加1*/ 
+return temp; 
+} 
+} 
+main() 
+{MGraph *G; /*定义一个以邻接矩阵为存储类型的图G*/ 
+char ch1,ch2; 
+printf("建立一个有向图的邻接矩阵表示\n"); /*创建图G的存储*/ 
+CreateMGraph(G); 
+printf("已建立了一个图的邻接矩阵存储\n"); 
+ch1='y'; 
+while(ch1=='y' || ch1=='Y') 
+{printf("请选择下列*作:\n"); 
+printf("\nA----------------更新邻接矩阵存储的图"); 
+printf("\nB----------------深度优先遍历"); 
+printf("\nC----------------广度优先遍历"); 
+printf("\nD------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{case 'A': 
+case 'a':CreateMGraph(G); 
+printf("图的邻接矩阵存储建立完毕。\n"); 
+break; 
+case 'B': 
+case 'b':DFSTraverseM(G);break; 
+case 'C': 
+case 'c':BFSTraverseM(G);break; 
+case 'D': 
+case 'd':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+void CreateMGraph(MGraph *G) 
+{/*建立有向图G的邻接矩阵存储*/ 
+int i,j,k,w; 
+char ch; 
+printf("请输入顶点数和边数(输入格式为:顶点数,边数):\n"); 
+scanf("%d,%d",&(G->n),&(G->e)); /*输入顶点数和边数*/ 
+printf("请输入顶点信息(输入格式为:顶点号<CR>):\n"); 
+for (i=0;i<G->n;i++) 
+scanf("\n%c",&(G->vexs[i])); /*输入顶点信息，建立顶点表*/ 
+for (i=0;i<G->n;i++) 
+for (j=0;j<G->n;j++) 
+G->edges[i][j]=0; /*初始化邻接矩阵*/ 
+printf("请输入每条边对应的两个顶点的序号(输入格式为:i,j):\n"); 
+for (k=0;k<G->e;k++) 
+{scanf("\n%d,%d",&i,&j); /*输入e条边，建立邻接矩阵*/ 
+G->edges[i][j]=1; 
+} 
+}/*CreateMGraph*/ 
+void DFSTraverseM(MGraph *G) 
+{/*深度优先遍历以邻接矩阵存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) DFSM(G,i);/*Vi未访问过，以Vi为原点开始DFS搜索*/ 
+}/*DFSTraverse*/ 
+
+void BFSTraverseM(MGraph *G) 
+{/*广度优先遍历邻接矩阵存储的图G*/ 
+int i; 
+for (i=0;i<G->n;i++) 
+visited[i]=FALSE; /*标志向量初始化*/ 
+for (i=0;i<G->n;i++) 
+if (!visited[i]) BFSM(G,i);/*Vi未访问过，以Vi为原点开始BFS搜索*/ 
+}/*BFSTraverseM*/ 
+
+void DFSM(MGraph *G,int i) 
+{/*以Vi为出发点，对邻接矩阵存储的图G进行DFS搜索*/ 
+int j; 
+printf("visit vertex:V%c\n",G->vexs[i]); /*访问顶点Vi*/ 
+visited[i]=TRUE; 
+for (j=0;j<G->n;j++) /*依次搜索Vi的邻接点*/ 
+if (G->edges[i][j]==1 && !visited[j]) 
+DFSM(G,j); /*当<Vi,Vj>∈E,且Vj未访问过时，以Vj为新的出发点继续按深度优先遍历*/ 
+}/*DFSM*/ 
+
+void BFSM(MGraph *G,int k) 
+{/*以Vi为出发点，对邻接矩阵存储的图G进行BFS搜索*/ 
+int i,j; 
+CirQueue Q; 
+InitQueue(&Q); 
+printf("visit vertex:V%c\n",G->vexs[k]); /*访问原点Vk*/ 
+visited[k]=TRUE; 
+EnQueue(&Q,k); /*原点Vk入队列*/ 
+while (!QueueEmpty(&Q)) 
+{i=DeQueue(&Q); /*Vi出队列*/ 
+for (j=0;j<G->n;j++) /*依次搜索Vi的邻接点Vj*/ 
+if (G->edges[i][j]==1 && !visited[j]) /*若Vj未访问*/ 
+{printf("visit vertex:V%c\n",G->vexs[j]); /*访问Vj */ 
+visited[j]=TRUE; 
+EnQueue(&Q,j); /*访问过的Vj入队列*/ 
+} 
+} 
+}/*BFSM*/
+
+  
+
+８、有向图的深度优先遍历
+#include<stdio.h> 
+#define MaxSize 100 
+int visited[MaxSize] = {0}; 
+typedef struct{ 
+ int edges[MaxSize][MaxSize]; 
+ int vexs[MaxSize]; 
+ int n; 
+}MGraph; 
+void DFS(MGraph * L,int i){ 
+ int j; 
+ printf("%d ",L -> vexs[i]); 
+ visited[i] = 1; 
+ for(j = 0;j < L -> n;j++) 
+  if(L -> edges[i][j] == 1 && !visited[j]) 
+   DFS(L,j); 
+} 
+void DFSTraver(MGraph * L){ 
+ int i; 
+ for(i = 0;i < L -> n;i++) 
+  visited[i] = 0; 
+ for(i = 0;i < L -> n;i++) 
+  if(!visited[i]) 
+   DFS(L,i); 
+} 
+void MakeAdjM(MGraph * L){ 
+ int i,j,n; 
+ printf("Input the data:\n"); 
+ scanf("%d",&n); 
+ L -> n = n; 
+ for(i = 0;i < n;i++) 
+  L -> vexs[i] = i; 
+ do{ 
+  scanf("%d%d",&i,&j); 
+  if(i == -1 && j == -1) 
+   break; 
+  L -> edges[i][j] = 1; 
+ }while(1); 
+} 
+void main() 
+{ 
+ MGraph g; 
+ MakeAdjM(&g); 
+ printf("visit the vertex:\n"); 
+ DFSTraver(&g); 
+}
+
+  
+
+９、查找一个数是否 在一个数组里，若在，输出它在 数组中的位置，否则输出'no'。
+#include<stdio.h> 
+void main() 
+{ 
+ int a[2000],i,count,temp; 
+ printf("Input the number:\n"); 
+ scanf("%d",&temp); 
+ printf("Input a:\n"); 
+ for(i = 0;i < 2000;i++){ 
+  scanf("%d",&a[i]); 
+  if(a[i] == -9999) 
+   break; 
+ } 
+ count = i; 
+ for(i = 0;i < count;i++) 
+  if(a[i] == temp){ 
+   printf("Yes,the number is: %d\n",i); 
+   return; 
+  } 
+ printf("No!\n"); 
+} 
+１０、 输出两个数组的差集
+
+#include<stdio.h> 
+void BubbleSort(int a[],int n){ 
+ int i,j,k,exchange; 
+ for(i = 0;i < n-1;i++){ 
+  exchange = 0; 
+  for(j = n - 1;j > i;j--){ 
+   if(a[j] < a[j-1]){ 
+    k = a[j]; 
+    a[j] = a[j-1]; 
+    a[j-1] = k; 
+    exchange = 1; 
+   } 
+  } 
+  if(!exchange) 
+   break; 
+ } 
+} 
+int cha(int a[],int b[],int c[],int countA,int countB){ 
+ int i,j,k = 0,flag = 0; 
+ for(i = 0;i < countA;i++){ 
+  for(j = 0;j < countB;j++){ 
+   if(a[i] == b[j]) 
+    flag = 1; 
+  } 
+  if(!flag) 
+   c[k++] = a[i]; 
+  flag = 0; 
+     
+ } 
+ return k; 
+} 
+
+
+void main() 
+{ 
+ int a[1000],b[1000],c[2000],countA,countB,i,cn; 
+ printf("Input the a:\n"); 
+ for(i = 0;i <= 1000;i++)
+{ 
+  scanf("%d",&a[i]); 
+  if(a[i] == -9999) 
+   break; 
+ } 
+ countA = i; 
+ BubbleSort(a,countA); 
+ printf("Input the b:\n"); 
+ for(i = 0;i <= 1000;i++)
+{
+ 
+  scanf("%d",&b[i]); 
+  if(b[i] == -9999) 
+   break; 
+ } 
+ countB = i; 
+ BubbleSort(b,countB); 
+ cn = cha(a,b,c,countA,countB); 
+ for(i = 0;i < cn;i++){ 
+  if(c[i] == c[i+1]) 
+   c[i+1] = -9999; 
+ } 
+ printf("Output the number:\n"); 
+ for(i = 0;i < cn;i++){ 
+  if(c[i] == -9999) 
+   continue; 
+  printf("%d ",c[i]); 
+  if((i + 1) % 10 == 0) 
+   printf("\n"); 
+ } 
+}
+
+  

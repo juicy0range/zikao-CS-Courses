@@ -1,0 +1,96 @@
+关于DFS于BFS（两者是图的重点，笔试，上机都很重要）
+DFS和BFS
+
+　　对于非线性的结构，遍历都会首先成为一个问题。和二叉树的遍历一样，图也有深度优先搜索（DFS）和广度优先搜索（BFS）两种。不同的是，图中每个顶点没有了祖先和子孙的关系，因此，前序、中序、后序不再有意义了。仿照二叉树的遍历，很容易就能完成DFS和BFS，只是要注意图中可能有回路，因此，必须对访问过的顶点做标记。 
+
+　　最基本的有向带权网
+
+#ifndef Graph_H 
+#define Graph_H 
+
+#include <iostream> 
+#include <queue> 
+using namespace std; 
+#include "Graphmem.h" 
+
+template <class name, class dist, class mem> 
+class Network 
+{ 
+public: 
+Network() {} 
+Network(dist maxdist) { data.NoEdge = maxdist; } 
+~Network() {} 
+bool insertV(name v) { return data.insertV(v); } 
+bool insertE(name v1, name v2, dist cost) { return data.insertE(v1, v2, cost); } 
+name& getV(int n) { return data.getV(n); } 
+int nextV(int m, int n = -1) { return data.nextV(m, n); } 
+int vNum() { return data.vNum; } 
+int eNum() { return data.eNum; } 
+protected: 
+bool* visited; 
+static void print(name v) { cout << v; } 
+private: 
+mem data; 
+}; 
+#endif 
+
+　　你可以看到，这是在以mem方式储存的data上面加了一层外壳。在图这里，逻辑上分有向、无向，带权、不带权；储存结构上有邻接矩阵和邻接表。也就是说分开来有8个类。为了最大限度的复用代码，继承关系就非常复杂了。但是，多重继承是件很讨厌的事，什么覆盖啊，还有什么虚拟继承，我可不想花大量篇幅讲语言特性。于是，我将储存方式作为第三个模板参数，这样一来就省得涉及虚拟继承了，只是这样一来这个Network的实例化就很麻烦了，不过这可以通过typedef或者外壳类来解决，我就不写了。反正只是为了让大家明白，真正要用的时候，最好是写专门的类，比如无向无权邻接矩阵图，不要搞的继承关系乱七八糟。 
+
+　　DFS和BFS的实现
+
+public: 
+void DFS(void(*visit)(name v) = print) 
+{ 
+visited = new bool[vNum()]; 
+for (int i = 0; i < vNum(); i++) visited[I = false; 
+DFS(0, visit); 
+delete []visited; 
+} 
+protected: 
+void DFS(int i, void(*visit)(name v) = print) 
+{ 
+visit(getV(i)); visited[I = true; 
+for (int n = nextV(i); n != -1; n = nextV(i, n)) 
+if (!visited[n]) DFS(n, visit); 
+} 
+public: 
+void BFS(int i = 0, void(*visit)(name v) = print)//n没有越界检查 
+{ 
+visited = new bool[vNum()]; queue<int> a; int n; 
+for (n = 0; n < vNum(); n++) visited[n] = false; 
+visited[I = true; 
+while (i != -1)//这个判断可能是无用的 
+{ 
+visit(getV(i)); 
+for (n = nextV(i); n != -1; n = nextV(i, n)) 
+if (!visited[n]) { a.push(n); visited[n] = true; } 
+if (a.empty()) break; 
+i = a.front(); a.pop(); 
+} 
+delete []visited; 
+} 
+
+　　DFS和BFS函数很难写得像树的遍历方法那么通用，这在后面就会看到，虽然我们使用了DFS和BFS的思想，但是上面的函数却不能直接使用。因为树的信息主要在节点上，而图的边上还有信息。 
+
+　　测试程序
+
+#include <iostream> 
+using namespace std; 
+#include "Graph.h" 
+int main() 
+{ 
+Network<char, int, LinkedList<char, int> > a; 
+a.insertV('A'); a.insertV('B'); 
+a.insertV('C'); a.insertV('D'); 
+a.insertE('A', 'B', 1); a.insertE('A', 'C', 2); 
+a.insertE('B', 'D', 3); 
+cout << "DFS: "; a.DFS(); cout << endl; 
+cout << "BFS: "; a.BFS(); cout << endl; 
+return 0; 
+} 
+
+　　老实说，这个类用起来真的不是很方便。不过能说明问题就好。
+
+ 
+
+----------------------------------------------

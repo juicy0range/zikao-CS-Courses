@@ -1,0 +1,151 @@
+/* 二叉树及其遍历
+  输入先序序列8 3 0 0 1 0 0
+*/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream.h>
+
+typedef char DataType; /*设数据域类型为字符型*/ 
+DataType NodeList[100];
+typedef struct node{ 
+DataType data; 
+struct node *lchild,*rchild; /*左右链域为指向结点结构的指针类型*/ 
+}BTNode; /*结点类型*/ 
+typedef BTNode *BTree; /*指向二叉树结点的指针类型,BinTree是指针*/ 
+int num=0,leaf=0;/*全局变量用于统计结点个数*/
+int count;  
+int i=-1;
+
+
+void CreateBTree(BTree *T) //T是指针的指针
+{/*以加入结点的先序序列输入，构造二叉链表*/ 
+
+	i++;
+if( i< count){
+	DataType key = NodeList[i];
+	if (key=='0') {*T=NULL;} /*读入0时，将相应结点指针置空*/ 
+	else {
+	
+		*T=(BTNode*)malloc(sizeof(BTNode)); /*生成结点空间*/ 
+		(*T)->data=key; 
+		CreateBTree(&(*T)->lchild); /*构造二叉树的左子树*/ 
+		CreateBTree(&(*T)->rchild); /*构造二叉树的右子树*/ 
+	}
+} 
+
+} 
+
+
+void Inorder(BTree T) 
+{/*中序遍历二叉树T*/ 
+if (T) 
+{
+	Inorder(T->lchild); /*中序遍历二叉树的左子树*/ 
+	printf("%3c",T->data); /*访问结点的数据*/ 
+	Inorder(T->rchild); /*中序遍历二叉树的右子树*/ 
+} 
+} 
+
+
+void Preorder(BTree T) 
+{
+	/*先序遍历二叉树T*/ 
+if (T) 
+{
+	printf("%3c",T->data); /*访问结点数据*/ 
+	Preorder(T->lchild); /*先序遍历二叉树T的左子树*/ 
+	Preorder(T->rchild); /*先序遍历二叉树T的右子树*/ 
+} 
+} 
+
+void Postorder(BTree T) 
+{/*后序遍历二叉树T*/ 
+if (T) 
+{
+	Postorder(T->lchild); /*后序遍历二叉树T的左子树*/ 
+	Postorder(T->rchild); /*后序遍历二叉树T的右子树*/ 
+	printf("%3c",T->data); /*访问结点数据*/ 
+} 
+} 
+
+
+
+void Levelorder(BTree T) 
+{/*按层次遍历二叉树T*/ 
+int i,j; 
+BTNode *q[100],*p;		/*q[20]用于模拟队列，存储入队的结点*/ 
+p=T; 
+if(p!=NULL) {
+	i=0;q[i]=p;j=1;
+} /*i为队首位置，j为队尾位置*/ 
+
+while(i!=j) //队列遍历完的条件，队首位置 和 队尾位置 相等
+{
+p=q[i];printf("%3c",p->data); /*访问队首元素*/ 
+
+if (p->lchild!=NULL) {
+	q[j]=p->lchild;j++;
+} 
+/*若队首元素左链域不为空，则将其入队列*/
+ 
+if (p->rchild!=NULL) {
+	q[j]=p->rchild;j++;
+} 
+/*若队首元素右链域不为空，则将其入队列*/ 
+
+i++; /*将队首移到下一个位置*/ 
+} 
+
+} 
+
+
+
+void Leafnum(BTree T) 
+{/*统计二叉树T中叶子结点的数目*/ 
+if (T) 
+{
+if (T->lchild==NULL && T->rchild==NULL) leaf++; /*若为叶子，则计数器加1*/ 
+Leafnum(T->lchild); /*统计T的左子树*/ 
+Leafnum(T->rchild); /*统计T的右子树*/ 
+} 
+} 
+
+
+
+void Nodenum(BTree T) 
+{/*统计二叉树T的结点数目*/ 
+if (T) 
+{
+num++; /*若当前结点不为空，则计数器count加1*/ 
+Nodenum(T->lchild); /*统计T的左子树*/ 
+Nodenum(T->rchild); /*统计T的右子树*/ 
+} 
+}
+
+
+
+main() 
+{
+cout<<"请输入特殊的前序节点列表:"<<endl;
+cin>> NodeList;
+count = strlen(NodeList);
+BTree head ;
+CreateBTree(&head);
+
+cout<<endl<<"先序遍历:"<<endl;
+Preorder(head);
+cout<<endl<<"中序遍历:"<<endl;
+Inorder(head);
+cout<<endl<<"后序遍历:"<<endl;
+Postorder(head);
+cout<<endl<<"层次遍历:"<<endl;
+Levelorder(head);
+
+
+Leafnum(head);
+cout<<endl<<"叶子结点的数目:"<<leaf<<endl;
+Nodenum(head);
+cout<<endl<<"结点的数目:"<<num<<endl;
+getchar();
+} 

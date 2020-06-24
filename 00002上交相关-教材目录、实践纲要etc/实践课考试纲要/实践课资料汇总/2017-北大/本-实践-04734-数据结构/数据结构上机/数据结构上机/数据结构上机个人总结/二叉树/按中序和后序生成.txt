@@ -1,0 +1,215 @@
+/*4.1.编一C程序，它能根据输入的二叉树中序和后序序列来构造该二叉树，
+并能输出
+1.该二叉树的前序序列
+2.求2度结点的个数
+3.求1度结点的个数
+4.求0度结点的个数（即叶子节点）
+5.高度
+6.能判断该二叉树是否为二叉排序树（若是输出Yes；否则输出No）。
+（输入次序是：表示中序序列的字母串、表示后序序列的字母串）。
+输入中序:dbaecf
+后序:dbefca
+输出前序:abdcef
+一度节点：1;
+二度节点：2；
+叶子节点：3
+高度(深度)或(层数) 
+*/
+
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+void exit(int);
+#define MAX 1000
+typedef struct node{
+	char d;
+	struct node *lchild,*rchild;
+}Tnode;
+//根据中序和后序生成
+void MK(char in[],int is,int ie,char post[],int posts,int poste,Tnode **r)
+{
+	int i;
+	if(is>ie||posts>poste)
+		*r=NULL;
+	else{
+		*r=(Tnode *)malloc(sizeof(Tnode));
+		(*r)->d=post[poste];
+		for(i=is;i<=ie;i++)
+			if(in[i]==post[poste]){
+			MK(in,is,i-1,post,posts,posts+i-is-1,&(*r)->lchild);
+			MK(in,i+1,ie,post,posts+i-is,poste-1,&(*r)->rchild);
+			break;
+			}
+			if(i>ie){
+				printf("输入错误!\n");
+				exit(1);
+			}
+	}
+}
+//根据前序和中序生成
+void MK(char pre[],int pres,int pree,char in[],int is,int ie,Tnode **r)
+{
+	int i;
+	if(is>ie||pres>pree)
+		*r=NULL;
+	else{
+		*r=(Tnode *)malloc(sizeof(Tnode));
+		(*r)->d=pre[0];
+		for(i=is;i<=ie;i++)
+			if(pre[i]==in[i]){
+			MK(pre,pres+1,pres+i-is,in,is,is+i-1,&(*r)->lchild);
+			MK(pre,pres+i+is+1,pree,in,is+i+1,ie,&(*r)->rchild);
+			break;
+			}
+			if(i>ie){
+				printf("输入错误!\n");
+				exit(1);
+			}
+	}
+}
+
+　void MKTree（char pre[]，int pres，int pree，char in[]，int is，int ie，Tnode **r）
+
+　　{
+
+　　int i；
+
+　　if（pres>pree||is>ie）
+
+　　*r=NULL；
+
+　　else{
+
+　　*r=malloc（sizeof（Tnode））；
+
+　　for（i=is；i<=ie；i++）
+
+　　if（pre[pres]==in[i]）
+
+　　{
+
+　　MKTree（pre，pres+1，pres+i-is，in，is，is+i-1，&（*r）->lchild）；
+
+　　MKTree（pre，pres+i+is+1，pree，in，is+i+1，ie，&（*r）->rchild）；
+
+　　break；
+
+　　}
+
+　　}
+
+　　}
+
+void preorder(Tnode *r)
+{
+	if(r){
+		printf("%c",r->d);
+	    preorder(r->lchild);
+	    preorder(r->rchild);
+	}
+}
+//计算一度节点
+int one(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))//根节点为空或它的左右子树都为空（即只有根节点）
+		return 0;
+
+	if((r->lchild)&&(r->rchild))//左右子树都不为空（左子树一度节点个数+右子树一度节点个数）
+		return one(r->lchild)+one(r->rchild);
+	else//左子树为空或右子树为空(根节点+左子树的一度节点个数或右子树一度节点个数)
+		return 1+one(r->lchild)+one(r->rchild);
+
+}
+//计算二度节点
+int two(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))//根节点为空或它的左右子树都为空（即只有根节点）
+		return 0;
+
+	if((r->lchild)&&(r->rchild))//左右子树都不为空（左子树一度节点个数+右子树一度节点个数+根节点）
+		return 1+two(r->lchild)+two(r->rchild);
+	else{
+		return two(r->lchild)+two(r->rchild);//左子树为空或右子树为空
+	}
+}
+
+//计算0度节点(即叶子节点)
+int zero(Tnode *r)
+{
+	if(r==NULL)//根节点为空或它的左右子树都为空（即只有根节点）
+		return 0;
+
+	if(r->lchild==NULL&&r->rchild==NULL){
+		return 1+zero(r->lchild)+zero(r->rchild);
+	}else{
+		return zero(r->lchild)+zero(r->rchild);
+	}
+}
+
+//求树的深度
+int getDepth(Tnode *r)
+{
+    int szLDepth = 1;
+    int szRDepth = 1;
+    if (r->lchild != NULL)
+    {
+        szLDepth += getDepth(r->lchild);
+    }
+    if (r->rchild != NULL)
+    {
+        szRDepth += getDepth(r->rchild);
+    }
+    if (szLDepth > szRDepth)
+    {
+        return szLDepth;
+    }else
+    {
+        return szRDepth;
+    }
+}
+//检查是否为二叉排序树
+int check(Tnode *r)
+{
+	if((r==NULL)||(!r->lchild)&&(!r->rchild))
+		return 1;
+	if((r->lchild)&&(!r->rchild)){//左子树不为空,右子树为空
+		if(r->lchild->d<r->d)
+			return check(r->lchild);
+		else
+			return 0;
+	}
+	else{
+		if((!r->lchild)&&(r->rchild)){//左子树为空,右子树不为空
+			if(r->rchild->d>r->d)
+				return check(r->rchild);
+			else
+				return 0;
+		}
+		if((r->lchild->d<r->d)&&(r->rchild->d>r->d))//左右子树都不为空
+			return (check(r->lchild)&&check(r->rchild));
+		else
+			return 0;
+	}
+}
+
+void main()
+{
+	Tnode *r=NULL;
+	char in[MAX],post[MAX];
+	printf("请输入中序序列:\n");
+	gets(in);
+	printf("请输入后序序列:\n");
+	gets(post);
+	MK(in,0,strlen(in)-1,post,0,strlen(post)-1,&r);
+	printf("\n该二叉树的前序遍历序列为:\n");
+	preorder(r);
+	printf("\n该二叉树的0度结点个数为:%d\n",zero(r));
+	printf("\n该二叉树的一度结点个数为:%d\n",one(r));
+	printf("\n该二叉树的二度结点个数为:%d\n",two(r));
+	printf("\n该二叉树的深度为:%d\n",getDepth(r));
+	printf("\n该二叉树是否为二叉排序树(若是输出Yes,否则输出No):\n");
+	if(check(r))
+		printf("Yes\n");
+	else
+		printf("No\n");
+}

@@ -1,0 +1,57 @@
+一、约束   
+      约束定义关于列中允许值的规则，是强制完整性的标准机制。 
+
+      使用约束优先于使用触发器、规则和默认值。查询优化器也使用约束定义生成高性能的查询执行计划。SQL Server 2005支持五类约束：  
+      1. NOT NULL指定不接受NULL值的列。       
+      2. CHECK 约束对可以放入列中的值进行限制，以强制执行域的完整性。CHECK约束拒绝所有在检测条件中取值为false的值。可以为每列指定多个CHECK约束。下例显示名为chk_id约束的创建，该约束确保只对此关键字输入指定范围内的数字，以进一步强制执行主键的域。   
+  CREATE TABLE cust_sample   
+          (   
+          cust_id int PRIMARY KEY,   
+          cust_name char(50),   
+          cust_address char(50),   
+          cust_credit_limit money,   
+          CONSTRAINT chk_id CHECK(cust_id BETWEEN 0 and 10000)   
+          )   
+     3. UNIQUE约束：对于 UNIQUE 约束中的列，表中不允许有两行包含相同的非空值。主键也强制执行唯一性，但主键不允许空值。UNIQUE   约束优先于唯一索引。    
+      4. PRIMARY KEY 约束标识列或列集，这些列或列集的值唯一标识表中的行。在一个表中，不能有两行包含相同的主键值。不能在主键内的任何列中输入NULL值。在数据库中NULL是特殊值，代表不同于空白和0值的未知值。建议使用一个小的整数列作为主键。每个表都应有一个主键。 
+      一个表中可以有一个以上的列组合，这些组合能唯一标识表中的行，每个组合就是一个候选键。数据库管理员从候选键中选择一个作为主键。例如，在part_sample表中，part_nmbr和part_name都可以是候选键，但是只将part_nmbr选作主键。   
+    
+   CREATE TABLE part_sample   
+          ( 
+           part_nmbr  int  PRIMARY   KEY,   
+           part_name char(30),   
+           part_weight decimal(6,2),   
+           part_color char(15) 
+          )   
+    
+      5. FOREIGN KEY约束标识表之间的关系。     
+  一个表的外键指向另一个表的候选键。当外键值没有候选键时，外键可防止操作保留带外键值的行。在下例中，order_part   表建立一个外键引用前面定义的part_sample表。通常情况下，order_part在order表上也有一个外键，下面只不过是一个简单示例。   
+   CREATE TABLE order_part   
+          ( 
+           order_nmbr int,   
+           part_nmbr int   
+           FOREIGN KEY REFERENCES part_sample(part_nmbr) ON DELETE NO ACTION,   
+           qty_ordered int 
+          )   
+  如果一个外键值没有候选键，则不能插入带该值（NULL除外）的行。如果尝试删除现有外键指向的行，ON DELETE子句将控制所采取的操作。 
+  ON DELETE子句有两个选项：   
+  A、NO ACTION指定删除因错误而失败。   
+  B、CASCADE 指定还将删除包含指向已删除行的外键的所有行。     
+  如果尝试更新现有外键指向的候选键值，ON UPDATE 子句将定义所采取的操作。它也支持NO ACTION和CASCADE选项。  
+
+
+  列约束和表约束   
+  约束可以是列约束或表约束：     
+  列约束被指定为列定义的一部分，并且仅适用于那个列（前面的示例中的约束就是列约束）。    
+  表约束的声明与列的定义无关，可以适用于表中一个以上的列。     
+  当一个约束中必须包含一个以上的列时，必须使用表约束。   
+  例如，如果一个表的主键内有两个或两个以上的列，则必须使用表约束将这两列加入主键内。假设有一个表记录工厂内的一台计算机上所发生的事件。假定有几类事件可以同时发生，但不能有两个同时发生的事件属于同一类型。这一点可以通过将type列和time列加入双列主键内来强制执行。   
+  CREATE TABLE factory_process   
+        ( 
+        event_type int,   
+        event_time datetime,   
+        event_site char(50),   
+        event_desc char(1024),   
+        CONSTRAINT event_key PRIMARY KEY(event_type,event_time) 
+        )   
+

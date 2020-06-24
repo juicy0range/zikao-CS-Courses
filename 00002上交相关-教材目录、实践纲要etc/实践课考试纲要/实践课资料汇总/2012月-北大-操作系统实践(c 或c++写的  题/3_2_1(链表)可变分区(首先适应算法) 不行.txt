@@ -1,0 +1,214 @@
+/*
+
+ 不写了，不好操作
+可变分区的(首次适应算法)
+ 题：
+1．程序运行时首先接收输入：空闲区数据文件，包括若干行，每行有两个数据项：起始地址、长度（均为整数），各数据项以逗号隔开。
+2．建立空闲区表并在屏幕上显示输出空闲区表内容，空闲区表中记录了内存中可供分配的空闲区的始址和长度，用标志位指出该分区是否是未分配的空闲区。
+3．从用户界面根据用户提示接收一个内存申请，格式为：作业名、申请空间的大小。
+4．按照首次(最先)适配算法选择一个空闲区，分割并分配，修改相应的数据结构（空闲区表），填写内存已分配区表（起始地址、长度、标志位），其中标志位的一个作用是指出该区域分配给哪个作业。
+5．重复3、4，直到输入为特殊字符（0）。
+6．在屏幕上显示输出新的空闲区表和已分配区表的内容。
+
+----测试用例：
+
+*/
+
+#include <stdio.h> 
+#include <stdlib.h>  
+#include <iostream>
+#include <string>
+#include <cctype>
+using namespace std;
+
+const int maxNum=10;
+//空闲区
+typedef struct  KongXianQu
+{
+  int sAddress;
+  int kxqLength;
+  int kxqFlag;
+  struct  KongXianQu *next;
+}kxq,*ptrKxq;
+
+//内存分配表
+typedef struct NeiCunFengPeiBiao
+{
+   int sAddress;
+   int ncLength;
+   string pName;
+   struct NeiCunFengPeiBiao *next;
+}NCFPB,*ptrNcfpb;
+
+void NcFirst();  //首次适应算法
+kxq readFile();  //读空闲区文件 (按地址由小到大形成链)
+void outKxq(kxq *head);
+void new_line();
+
+
+void main()
+{
+   int selNum;
+   cout<<"----------------功能：实现可变分区的首次适应算法---------------\n";
+   cout<<"按1模拟可变分区的首次适应算法 ； 按0：退出"<<endl;
+   cin>>selNum;
+   switch(selNum)
+   {
+   case 1:
+	   {
+	     NcFirst();
+		 break;
+	   }
+   case 0:
+	   {
+	     break;
+	   }
+   default:
+	   {
+	      cout<<"选择错误\n";
+		  break;
+	   }   
+   }
+
+}
+
+void NcFirst()
+{
+	kxq *head,*p;
+	char pName[10];
+	int proLength=0;
+
+    //1:读入空闲区文件的数据
+    head=readFile();
+    
+    //2:输出空闲区表内容
+    outKxq(head);
+
+	//(3)接收用户申请
+	/* cout<<"3:--------请输入作业名、申请空间的大小 完成内存的申请\n";
+	 do
+	 {
+		 cout<<"请您输入待申请内存:作业名为\n";
+		 //new_line();      //把cout语句剩下没用的字符过滤掉
+		 cin.getline(pName,20,'\n');
+		 cout<<"请输入申请空间的大小:\n";
+		 cin>>proLength;    
+ 
+	   //----开始分配(找到空闲区----------
+	    p=head->next;
+		while
+        
+  
+     }*/
+
+   //6输出结果
+
+}
+
+//在读文件时，找到 空闲区s位置后插入 再放入
+kxq readFile()
+
+{
+	char fName[50];
+	FILE *stream;
+	int  kxqNum=0;
+	kxq *s,*pre,*curr;
+	
+
+
+    cout<<"请输入空闲区数据文件名\n";
+    //new_line();
+	cin.getline(fName,50,'\n');
+	stream  = fopen( fName, "r" ); //打开文件
+	while(stream==NULL)
+    {
+       cout<<"文件名或路径错误，请重新输入文件名\n";
+	   new_line();
+	   cin.getline(fName,50,'\n');
+       stream  = fopen( fName, "r" );
+	}
+    
+	//创建表头结点
+     head=(kxq *)malloc(sizeof(kxq));
+	 if(head==NULL)
+	 {
+	     cout<<"内存分配失败\n";
+		 exit(1);
+	 }
+	 else
+	 {
+		 head->next=NULL;
+		 pre=head;		
+	 }
+    //读数据
+	while(!feof(stream))
+	{	
+        s=(kxq *)malloc(sizeof(kxq));	
+
+        if(s==NULL)
+		{
+		   cout<<"内存分配失败\n";
+		   exit(1);
+		}
+		else
+		{
+			//创建新结点s
+		    fscanf(stream,"%d,%d",&s->sAddress,&s->kxqLength);
+            s->kxqFlag=1;    
+			s->next=NULL;
+
+			//找插入的位置(当空链表时，直接插到head后边;当链表不空时，找插入位置 插入)
+            
+			if(pre==head)  //表明链表为空
+			{
+			    pre->next=s;				    
+			}
+			else
+			{
+			    curr=head->next; 
+				while(curr)
+				{
+				    if( (s->sAddress) < (curr->sAddress) )  
+					{					 
+						break;
+					}
+					
+					pre=curr;  
+                    curr=curr->next;
+				}
+                
+				s->next=pre->next;
+				pre->next=s;                
+			}		
+		}        
+	}   
+	
+    fclose(stream);	
+}
+
+void outKxq(kxq *head)
+{
+   kxq *p;
+   p=head->next;
+   cout<<"\n2:--------系统当前空闲区为:\n";
+   cout<<"起始地址\t长度\t标志位\n";
+   while(p->next)
+   {
+       cout<<p->sAddress<<"\t";
+	   cout<<p->kxqLength<<"\t";
+       cout<<p->kxqFlag<<"\n";
+
+	   p=p->next;
+   }
+
+}
+
+
+void new_line()
+{
+    char symbol;
+    do
+	{
+	   cin.get(symbol);
+	}while(symbol!='\n');
+}

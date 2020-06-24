@@ -1,0 +1,841 @@
+样题1.
+关系模式为:
+学生STUDENT( 学号,姓名,年龄,班号)
+班CLASS (班号,专业名,系名,入学年份)
+系DEPARTMENT(系号,系名)
+
+1.请使用SQL语言完成以下功能
+
+
+(1) 每个表的主外码
+
+(2) 每个班级的人数不能超过20人;
+(3) 学生的年龄介于16到30岁之间;
+(4) 学生姓名不能为空;
+(5) 只有班里没有学生的时候,才能删除该班级.
+
+
+CREATE DATABASE SCHOOL
+USE SCHOOL
+create table DEPARTMENT
+( 系号 Smallint Primary key, 系名 varchar(20) unique)
+go
+create table CLASS
+(班号 smallint primary key,专业名 varchar(20),系名 varchar(20) FOREIGN  key references DEPARTMENT(系名),入学年份 int)
+
+go 
+create table STUDENT
+(学号 smallint primary key, 姓名 varchar(10) not null, 年龄 smallint check(年龄>=16 and 年龄<=30),班号 smallint foreign key references CLASS(班号) ON DELETE no action check(20>=ALL(select count(学号) from STUDENT group by 班号)))
+
+go 
+
+2.插入如下数据:
+
+CLASS(
+
+101,软件,计算机,1995;  
+102,微电子,计算机,1996
+
+...
+
+)
+
+STUDENT(
+
+8101,张三,18,101; 
+8102,钱四,16,121;
+...
+)
+
+DEPARTMENT(001,数学
+
+...
+
+)
+
+======================================================================
+INSERT INTO DEPARTMENT(系号,系名) VALUES ('001','数学')
+INSERT INTO DEPARTMENT(系号,系名) VALUES ('002','计算机')
+INSERT INTO DEPARTMENT(系号,系名) VALUES ('003','化学')
+INSERT INTO DEPARTMENT(系号,系名) VALUES ('004','中文')
+INSERT INTO DEPARTMENT(系号,系名) VALUES ('005','经济')
+GO
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (101,'软件','计算机',1995)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (102,'微电子','计算机',1996)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (111,'无机化学','化学',1995)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (112,'分子化学','化学',1996)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (121,'统计数学','数学',1995)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (131,'现代语言','中文',1996)
+
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (141,'国际贸易','经济',1997)
+INSERT INTO CLASS(班号,专业名,系名,入学年份) VALUES (142,'国际金融','经济',1996)
+GO
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8101,'张三',18,101)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8102,'钱四',16,121)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8103,'王玲',17,131)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8105,'李飞',19,102)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8109,'赵四',18,141)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8110,'李可',20,142)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8201,'张飞',18,111)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8302,'周瑜',16,112)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8203,'王亮',17,111)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8305,'董庆',19,102)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8409,'赵龙',18,101)
+INSERT INTO STUDENT(学号,姓名,年龄,班号) VALUES (8510,'李丽',20,142)
+
+
+
+3.完成以下查询功能
+(1)找出所有姓李的学生,并按其年龄由小到大排序;
+
+SELECT * FROM STUDENT WHERE 姓名 like '李%' ORDER BY 年龄 ASC
+
+(2)列出所有开设超过两个专业的系的名字.
+SELECT 系名 FROM CLASS GROUP BY 系名 HAVING(COUNT(*)>=2)
+
+(3)列出学生人数大于等于2的系的编号和名称,
+
+第一种:
+SELECT * FROM DEPARTMENT WHERE 系名 in (SELECT 系名 FROM CLASS 	WHERE 班号 in (SELECT 班号 FROM STUDENT  GROUP BY 班号 HAVING COUNT(*)>=2))
+第二种：
+SELECT 系号,系名 FROM DEPARTMENT WHERE 系名 IN (SELECT 系名 FROM CLASS AS C,STUDENT AS S  WHERE C.班号=S.班号 GROUP BY C.系名 HAVING(COUNT(*)>=2))
+
+
+
+
+4.学生张三转到化学系111班,请更新相关的表
+
+UPDATE STUDENT SET 班号=111 WHERE 姓名='张三'
+GO
+SELECT * FROM STUDENT WHERE 姓名='张三'
+
+
+ 样题二,已知一个关系数据库的模式如下:
+职工EMP(职工号,姓名,工资,所在部门)
+部门DEPT(部门号,部门名,部门经理的职工号)
+1.使用查询分析器创建上述表,要求声明:
+(1)每个表的主外码.
+(2)职工姓名和部门名不能为空;
+(3)工资取800到5000之间整数;
+
+
+SQL:
+CREATE DATABASE Company
+3
+GO
+USE Company
+GO
+======================================================================
+CREATE TABLE DEPT
+(
+部门号 varchar(10) Primary key,
+部门名 varchar(10) not null,
+部门经理的职工号 varchar(10)
+)
+GO
+CREATE TABLE EMP
+(
+职工号 varchar(10) Primary key (这里去掉主键,因为重复的记录将不能增加)
+姓名 varchar(10) not null,
+工资 int check(工资>=800 and 工资<=5000),
+所在部门 varchar(10) FOREIGN KEY REFERENCES DEPT(部门号) 
+)
+GO
+======================================================================
+
+
+
+
+2.插入如下数据
+
+职工(E01,汤姆,4000,D02
+     ...
+     E05,比尔,3500,D01)
+部门(D01,人事,E04
+     ...
+     D04,财务,E06)
+
+INSERT INTO DEPT(部门号,部门名,部门经理的职工号) VALUES ('D01','人事','E04')
+INSERT INTO DEPT(部门号,部门名,部门经理的职工号) VALUES ('D02','信息','E01')
+INSERT INTO DEPT(部门号,部门名,部门经理的职工号) VALUES ('D03','销售','E05')
+INSERT INTO DEPT(部门号,部门名,部门经理的职工号) VALUES ('D04','财务','E06')
+
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E01','汤姆',4000,'D02')
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E02','丹尼',3000,'D02')
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E03','约翰',1000,'D01')
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E04','迪克',5000,'D03')
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E04','迪克',5000,'D01')
+INSERT INTO EMP(职工号,姓名,工资,所在部门) VALUES ('E05','比尔',3500,'D04')
+
+3.用SQL表达以下查询:
+  找出那些工资高于其所在部门经理工资的职工的姓名及其工资.
+
+SELECT S1.姓名,S1.工资
+FROM
+(SELECT * FROM EMP,DEPT WHERE EMP.所在部门=DEPT.部门号) AS S1,
+(SELECT * FROM EMP,DEPT WHERE EMP.职工号=DEPT.部门经理的职工号) AS S2
+WHERE S1.工资>S2.工资 AND S1.所在部门=S2.部门号
+
+
+
+4.用SQL完成:
+  将D01号部门经理的工资改为该部门所有职工的平均工资
+UPDATE EMP
+SET 工资=(SELECT AVG(工资)
+FROM EMP WHERE 所在部门='D01')
+WHERE 职工号 IN (SELECT 部门经理的职工号
+FROM DEPT
+4
+WHERE 部门号='D01')
+
+_________________________________________________
+只作检查是否UPDATE成功,题目并无要求写出此查询语句.
+SELECT 职工号,姓名,工资,部门名 
+FROM DEPT AS D,EMP AS E
+WHERE 部门号='D01'AND 所在部门='D01' AND D.部门经理的职工号=E.职工号
+
+
+
+5.新增加一个广告部门,编号为D06
+
+Insert into DEPT((部门号,部门名,部门经理的职工号) values ('D06','广告','')
+
+select * from DEPT
+
+
+
+
+样题三.创建如下三个基本表,表结构如下:
+BORROWER:
+借书证号  姓名   系名      班级
+03001    赵垒    信管系    03-1
+03002    刘诚    信管系    03-1
+03101    陈林    计算机系  03-2
+...
+
+LOANS:
+借书证号  图书登记号    借书日期
+03001     T00101        2004.04.01
+03002     T00102        2004.05.01
+04001     T00201        2004.05.31
+....
+
+BOOKS
+索书号    书名         作者     图书登记号      出版社     价格
+TP311.13  数据结构    李卫      T00101          科学       19.00
+
+
+1)检索借了5本书以上的学生的借书证号\姓名\系名和借书数量.
+SELECT B.借书证号, B.姓名, B.系名, COUNT(*) AS 借书数量
+FROM BORROWER AS B INNER JOIN LOANS AS L ON B.借书证号 = L.借书证号
+GROUP BY B.借书证号,B.姓名,B.系名
+HAVING (COUNT(*) >= 5)
+
+2)检索借书和赵垒同学所借图书中任意一本相同的学生的姓名\系名\书名和借书日期
+SELECT B.姓名,B.系名,K.书名,L.借书日期
+FROM BORROWER AS B,LOANS AS L,BOOKS AS K
+WHERE B.借书证号=L.借书证号
+AND L.图书登记号=K.图书登记号
+AND K.索书号 IN (SELECT 索书号
+FROM BORROWER AS B,LOANS AS L,BOOKS AS K
+WHERE B.借书证号=L.借书证号 AND L.图书登记号=K.图书登记号 AND B.姓名='赵垒')
+AND B.姓名<>'赵垒'
+
+3)建立信管系学生借书的视图SB,该视图的属性列由借书证号\姓名\班级\图书登记号\书名\出版社和借书日期组成
+
+CREATE VIEW SB
+AS SELECT X.借书证号,X.姓名,X.班级,Y.图书登记号,Z.书名,Z.出版社,Y.借书日期
+FROM BORROWER X
+INNER JOIN LOANS Y ON X.借书证号 = Y.借书证号
+INNER JOIN BOOKS Z ON Y.图书登记号 = Z.图书登记号
+WHERE (X.系名 = '信管系')
+GO
+SELECT * FROM SB
+
+
+
+样题四,现有一个学生选修课程的数据库,其中存放以下三个表:
+学生(学号,姓名,性别,年龄,系别);
+课程(课程号,课程名,任课教师);
+选修(学号,课程号,分数)
+
+请用SQL语言完成下列功能:
+1.建表,在定义中要求声明:
+(1)每个表的主外码;
+(2)学生的年龄介于16到30之间;
+(3)学生的姓名和课程名不能为空值;
+(4)选课成绩要么为空值,要么取0~100之间的整数
+
+CREATE DATABASE Elective
+GO
+USE Elective
+
+
+CREATE VIEW SB
+AS SELECT X.借书证号,X.姓名,X.班级,Y.图书登记号,Z.书名,Z.出版社,Y.借书日期
+FROM BORROWER X
+INNER JOIN LOANS Y ON X.借书证号 = Y.借书证号
+INNER JOIN BOOKS Z ON Y.图书登记号 = Z.图书登记号
+WHERE (X.系名 = '信管系')
+GO
+SELECT * FROM SB
+GO
+
+首先建立样题四使用的数据库
+IF EXISTS (SELECT * FROM master..sysdatabases WHERE name = N'Elective')
+DROP DATABASE Elective
+GO
+CREATE DATABASE Elective
+GO
+USE Elective
+GO
+======================================================================
+CREATE TABLE 学生
+(
+学号 int primary key, 
+姓名 varchar(10) NOT NULL,
+性别 char(2),
+年龄 Smallint CHECK(年龄>=16 AND 年龄<=30),
+系别 varchar(10)
+)
+GO
+CREATE TABLE 课程
+(
+课程号 int primary key, 
+课程名 varchar(20) NOT NULL,
+任课老师 varchar(10)
+)
+GO
+CREATE TABLE 选修
+(
+学号 int FOREIGN KEY REFERENCES 学生(学号), 
+课程号 int FOREIGN KEY REFERENCES 课程(课程号), 
+分数 int CHECK(分数 IS NULL OR (分数>=0 AND 分数<=100))
+)
+
+
+
+2.往表中插入数据
+
+
+
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (101,'张三','男',18,'计算机')
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (102,'李四','男',16,'数学')
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (103,'王玲','女',17,'中文')
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (105,'李飞','男',19,'计算机')
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (109,'赵四','女',18,'历史')
+INSERT INTO 学生(学号,姓名,性别,年龄,系别) VALUES (110,'李平','男',20,'化学')
+
+
+
+INSERT INTO 课程(课程号,课程名,任课老师) VALUES (203,'操作系统','程羽')
+INSERT INTO 课程(课程号,课程名,任课老师) VALUES (279,'高等数学','王备')
+INSERT INTO 课程(课程号,课程名,任课老师) VALUES (210,'现代文学','王丹')
+INSERT INTO 课程(课程号,课程名,任课老师) VALUES (243,'有机化学','沈同')
+INSERT INTO 课程(课程号,课程名,任课老师) VALUES (204,'数据结构','张青')
+
+
+
+INSERT INTO 选修(学号,课程号,分数) VALUES (101,203,82)
+INSERT INTO 选修(学号,课程号,分数) VALUES (105,203,60) 
+不及格在4小题会被删除,但5小题中需要用到
+INSERT INTO 选修(学号,课程号,分数) VALUES (102,203,59) 另加
+INSERT INTO 选修(学号,课程号,分数) VALUES (102,279,90)
+INSERT INTO 选修(学号,课程号,分数) VALUES (101,279,88)
+INSERT INTO 选修(学号,课程号,分数) VALUES (105,279,82)
+INSERT INTO 选修(学号,课程号,分数) VALUES (110,279,68)
+INSERT INTO 选修(学号,课程号,分数) VALUES (109,210,72)
+INSERT INTO 选修(学号,课程号,分数) VALUES (103,210,90)
+INSERT INTO 选修(学号,课程号,分数) VALUES (110,243,92)
+INSERT INTO 选修(学号,课程号,分数) VALUES (101,204,85)
+INSERT INTO 选修(学号,课程号,分数) VALUES (105,204,91)
+INSERT INTO 选修(学号,课程号,分数) VALUES (102,204,56)
+
+
+
+
+3.用SQL语句完成下列查询:
+(1)列出张三同学选修的所有课程的名称及其成绩;
+
+SELECT 姓名,课程名,分数
+FROM 学生 AS S,课程 AS C,选修 AS E
+WHERE S.学号=E.学号 AND E.课程号=C.课程号 AND S.姓名='张三'
+
+
+(2)列出所有课程都及格了的同学的名字;
+
+SELECT 姓名
+FROM 学生
+WHERE 学号 NOT IN (SELECT 学号 FROM 选修 WHERE 分数<60)
+
+
+(3)列出在选修张青老师所教授课程的学生中,成绩最高的学生姓名及其成绩.
+SELECT 姓名,分数
+FROM 学生 AS S,选修 AS E,课程 AS C
+WHERE S.学号=E.学号 AND C.课程号=E.课程号 AND 任课老师='张青'
+AND 分数=
+  (SELECT MAX(分数)
+   FROM 选修 AS E,课程 AS C
+   WHERE C.课程号=E.课程号 AND 
+   任课老师='张青')
+
+
+
+4.删除所有成绩不及格的选课记录.
+
+DELETE FROM 选修 WHERE 分数<60
+SELECT * FROM 选修
+
+
+
+5.将105号同学选修203号课程的成绩改为该门课程的平均成绩.
+
+UPDATE 选修
+SET 分数=(SELECT AVG(分数) FROM 选修 WHERE 课程号='203')
+WHERE 学号='105' AND 课程号='203'
+SELECT * FROM 选修
+
+
+
+样题五.创建如下两个基本表,表结构如下:
+
+Employs:
+职工编号,姓名,工作年限,职务级别,工程代号
+
+
+Project:
+工程代号,工程名称,工程负责人
+
+
+
+
+CREATE DATABASE Plans
+GO
+USE Plans
+GO
+CREATE TABLE Project
+(
+工程代号 int primary key, 主码
+工程名称 varchar(30),
+工程负责人 varchar(10) 外码
+)
+GO
+CREATE TABLE Employs
+(
+职工编号 int primary key, 主码
+姓名 varchar(10),
+工作年限 datetime,
+职务级别 Smallint,
+工程代号 int FOREIGN KEY REFERENCES Project(工程代号) 外码
+)
+
+GO
+INSERT INTO Project(工程代号,工程名称,工程负责人) VALUES (10,'人行天桥','梁家辉')
+INSERT INTO Project(工程代号,工程名称,工程负责人) VALUES (11,'东区D楼','朱世富')
+INSERT INTO Project(工程代号,工程名称,工程负责人) VALUES (12,'力学楼翻新','杨咏宏')
+INSERT INTO Project(工程代号,工程名称,工程负责人) VALUES (13,'中区校道','李家承')
+GO
+INSERT INTO Employs(职工编号,姓名,工作年限,职务级别,工程代号) VALUES (8146,'李燕华','1999-9-1',5,10)
+INSERT INTO Employs(职工编号,姓名,工作年限,职务级别,工程代号) VALUES (8234,'王宏伟','1996-8-21',2,11)
+INSERT INTO Employs(职工编号,姓名,工作年限,职务级别,工程代号) VALUES (6237,'宋晓岚','1997-6-10',4,11)
+INSERT INTO Employs(职工编号,姓名,工作年限,职务级别,工程代号) VALUES (7973,'吴敏霞','1998-9-15',3,12)
+
+
+
+1).对Employs表建立索引:(主键:职工编号,外键:工程代号)
+
+CREATE INDEX 职工索引 ON Employs(职工编号,工程代号)
+
+
+2).对Project表建立索引:(主键:工程代号)
+
+CREATE INDEX 工程索引 ON Project(工程代号)
+
+3).通过"工程代号"连接两个表
+
+SELECT E.职工编号,E.姓名,E.工作年限,E.职务级别,E.工程代号,P.工程代号,P.工程名称,P.工程负责人 
+FROM Employs AS E JOIN Project AS P ON E.工程代号=P.工程代号
+
+
+使用查询分析完成以下操作:
+
+4)查询列出职工编号\职工姓名\职务级别\工程名称.
+SELECT 职工编号,姓名,职务级别,工程名称
+FROM Employs AS E INNER JOIN Project AS P
+ON E.工程代号=P.工程代号
+
+
+5).查询列出所有参加"东区D楼"工程的职工.
+
+SELECT 职工编号,姓名,职务级别,工程名称 FROM Employs AS E,Project AS P
+WHERE E.工程代号=P.工程代号 AND P.工程名称='东区D楼'
+
+
+6).建立视图查看:职工编号\姓名\职务级别\工程名称\并按职工编号排序.
+
+
+CREATE VIEW 职工与工程视图 AS (SELECT 职工编号,姓名,职务级别,工程名称
+FROM Employs AS E INNER JOIN Project AS P ON E.工程代号=P.工程代号)
+GO
+SELECT * FROM 职工与工程视图 ORDER BY 职工编号
+
+
+样题六.创建图书借阅关系数据库的三个基本表,其结构如下:
+
+图书:
+
+
+读者:
+
+
+借阅:
+CREATE DATABASE Library1
+GO
+USE Library1
+GO
+CREATE TABLE 图书
+(
+图书号 varchar(10) primary key, 主码
+书名 varchar(20),
+作者 varchar(20),
+单价 decimal(8,1),
+库存量 smallint
+)
+GO
+CREATE TABLE 读者
+(
+读者号 varchar(10) primary key, 主码
+姓名 varchar(20),
+工作单位 varchar(30),
+地址 varchar(30),
+)
+
+
+CREATE TABLE 借阅
+(
+图书号 varchar(10) FOREIGN KEY REFERENCES 图书(图书号), 外码
+读者号 varchar(10) FOREIGN KEY REFERENCES 读者(读者号), 外码
+借期 datetime,
+还期 datetime,
+备注 varchar(30)
+)
+
+
+GO
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B1','数据结构','严苇铭','22.5',35)
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B2','数据通信','梁景宏','26.5',44)
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B3','计算机网络','谢西芬','21.0',38)
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B4','离散数学','叶晓光','18.0',65)
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B5','C程序设计','谭昊强','16.5',36)
+INSERT INTO 图书(图书号,书名,作者,单价,库存量) VALUES ('B6','Java程序设计','李文君','23.0',52)
+GO
+INSERT INTO 读者(读者号,姓名,工作单位,地址) VALUES ('R001','王海','数学系','园西区48号')
+INSERT INTO 读者(读者号,姓名,工作单位,地址) VALUES ('R003','刘宝林','科计系','东北区23号')
+INSERT INTO 读者(读者号,姓名,工作单位,地址) VALUES ('R004','程伟林','科计系','东北区25号')
+INSERT INTO 读者(读者号,姓名,工作单位,地址) VALUES ('R005','汪道晗','物理系','园西区13号')
+INSERT INTO 读者(读者号,姓名,工作单位,地址) VALUES ('R016','卞靖宇','电子系','蒲园区78号')
+GO
+INSERT INTO 借阅(图书号,读者号,借期,还期) VALUES ('B3','R004','2004-6-30',NULL)
+INSERT INTO 借阅(图书号,读者号,借期,还期) VALUES ('B1','R003','2004-3-14','2004-5-14')
+INSERT INTO 借阅(图书号,读者号,借期,还期) VALUES ('B6','R003','2004-3-14',NULL)
+INSERT INTO 借阅(图书号,读者号,借期,还期) VALUES ('B5','R016','2004-5-17',NULL)
+GO
+
+用SQL语言实现下列查询:
+1)检索读者号为R016的读者姓名\工作单位
+
+SELECT 姓名,工作单位 FROM 读者 WHERE 读者号='R016'
+
+
+2)检索借阅图书号为B5的读者姓名
+SELECT 姓名,图书号 FROM 读者 AS R,借阅 AS L
+WHERE R.读者号=L.读者号 AND 图书号='B5'
+
+
+3)检索读者"刘宝林"所借图书的书名
+
+SELECT 书名 FROM 读者 AS R,借阅 AS L,图书 AS B
+WHERE R.读者号=L.读者号 AND L.图书号=B.图书号 AND 姓名='刘宝林'
+
+4)检索读者"刘宝林"所借图书中未还的书名;
+SELECT 书名
+FROM 读者 AS R,借阅 AS L,图书 AS B
+WHERE R.读者号=L.读者号 AND L.图书号=B.图书号 AND 姓名='刘宝林' AND 还期 IS NULL
+
+
+5)将读者"刘宝林"已还图书的信息从借阅表中删除;
+DELETE FROM 借阅
+WHERE 读者号 IN (SELECT 读者号 FROM 读者 WHERE 姓名='刘宝林') AND 还期 IS NOT NULL
+GO
+SELECT * FROM 借阅
+
+
+6)建立未还图书的读者姓名和单位视图.
+
+CREATE VIEW 借阅视图 AS (SELECT 姓名,工作单位
+FROM 读者 AS R,借阅 AS L WHERE (R.读者号 = L.读者号) AND (L.还期 IS NULL))
+GO
+SELECT * FROM 借阅视图
+
+
+样题七.设某工厂数据库中有两个基本表:
+车间基本表:DEPT(DNO,DNAME, MGR_ENO), 其属性分别表示车间编号\车间名和车间主任的职工号.
+职工基本表:EMP(ENO,ENAME,AGE,SEX,SALARY,DNO),其属性分别表示职工号\姓名\年龄\性别\工资和所在车间的编号.
+1.创建上述基本表,并插入必要的数据记录;
+
+
+11
+GO
+======================================================================
+DELETE FROM 借阅
+WHERE 读者号 IN (SELECT 读者号 FROM 读者 WHERE 姓名='刘宝林') AND 还期 IS NOT NULL
+GO
+SELECT * FROM 借阅
+GO
+======================================================================
+CREATE VIEW 借阅视图 AS (SELECT 姓名,工作单位
+FROM 读者 AS R,借阅 AS L WHERE (R.读者号 = L.读者号) AND (L.还期 IS NULL))
+GO
+SELECT * FROM 借阅视图
+
+
+首先建立样题七使用的数据库
+IF EXISTS (SELECT * FROM master..sysdatabases WHERE name = N'Factory')
+DROP DATABASE Factory
+GO
+CREATE DATABASE Factory
+GO
+USE Factory
+GO
+CREATE TABLE DEPT
+(
+DNO int primary key, 主码
+DNAME varchar(20),
+MGR_ENO int
+)
+GO
+CREATE TABLE EMP
+(
+ENO int primary key, 主码
+ENAME varchar(20),
+AGE smallint,
+SEX varchar(2),
+SALARY decimal(8,2),
+DNO int FOREIGN KEY REFERENCES DEPT(DNO) 外码
+)
+GO
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('01','第一车间',001)
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('02','第二车间',005)
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('03','第三车间',004)
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('04','第四车间',013)
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('05','金工车间',035)
+INSERT INTO DEPT(DNO,DNAME,MGR_ENO) VALUES ('06','第六车间',053)
+GO
+
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (001,'王一',53,'男','3800',01)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (004,'李二',35,'男','3500',03)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (005,'张三',33,'女','3000',02)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (013,'陈五',33,'男','2800',04)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (035,'刘六',32,'女','2500',05)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (053,'赵七',31,'男','2300',06)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (002,'连八',30,'男','2000',05)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (003,'蔡九',29,'男','1800',05)
+INSERT INTO EMP(ENO,ENAME,AGE,SEX,SALARY,DNO) VALUES (006,'何十',25,'女','1800',01)
+
+
+2.使用查询分析器检索"金工车间"的男职工的职工号和姓名.
+
+SELECT ENO,ENAME FROM EMP AS E,DEPT AS D
+WHERE E.DNO=D.DNO AND D.DNAME='金工车间' AND SEX='男'
+
+
+3.建立一个有关女车间主任的职工号和姓名的视图,其结构如下:VIEW6(ENO,ENAME).编写出创建视图VIEW6的SQL语句.
+CREATE VIEW VIEW6 AS(SELECT ENO,ENAME FROM EMP WHERE SEX='女' AND ENO IN(SELECT MGR_ENO FROM DEPT))
+或：
+CREATE VIEW VIEW6 AS(SELECT ENO,ENAME FROM EMP INNER JOIN DEPT ON ENO=MGR_ENO WHERE SEX='女')
+GO
+SELECT * FROM VIEW6
+
+
+样题八.设某企业数据库中有如下三个基本表:
+职工(职工号,姓名,性别,职务,家庭地址,部门编号)
+部门(部门编号,部门名称,地址,电话)
+保健(保健卡编号,职工号,检查身体日期,健康状况)
+1.创建上述基本表,并插入必要的数据记录;
+CREATE DATABASE Enterprise
+GO
+USE Enterprise
+CREATE TABLE 部门
+(
+部门编号 int primary key, 
+部门名称 varchar(20),
+地址 varchar(40),
+电话 varchar(12),
+)
+GO
+CREATE TABLE 职工
+(
+职工号 int primary key, 
+姓名 varchar(20),
+性别 varchar(2),
+职务 varchar(10),
+
+家庭地址 varchar(40),
+部门编号 int FOREIGN KEY REFERENCES 部门(部门编号) 外码
+)
+GO
+CREATE TABLE 保健
+(
+保健卡编号 int primary key, 主码
+职工号 int FOREIGN KEY REFERENCES 职工(职工号), 外码
+检查身体日期 datetime,
+健康状况 varchar(10)
+)
+GO
+INSERT INTO 部门(部门编号,部门名称,地址,电话) VALUES (01,'办公室','一号楼','800100')
+INSERT INTO 部门(部门编号,部门名称,地址,电话) VALUES (02,'财务科','二号楼','800200')
+INSERT INTO 部门(部门编号,部门名称,地址,电话) VALUES (03,'采购部','三号楼','800300')
+INSERT INTO 部门(部门编号,部门名称,地址,电话) VALUES (04,'工程部','四号楼','800400')
+INSERT INTO 部门(部门编号,部门名称,地址,电话) VALUES (05,'人事科','五号楼','800500')
+GO
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3061,'王一','男','科长','天河区',01)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3062,'李二','男','经理','天河区',02)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3063,'张三','女','秘书','越秀区',01)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3064,'陈五','男','经理','海珠区',03)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3065,'刘六','女','经理助理','荔湾区',02)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3016,'赵七','男','工程师','越秀区',04)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3067,'连八','男','人事主管','黄埔区',05)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3068,'蔡九','男','出纳','白云区',02)
+INSERT INTO 职工(职工号,姓名,性别,职务,家庭地址,部门编号) VALUES (3069,'何十','女','会计','荔湾区',02)
+GO
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (01,3061,'2005-9-1','良好')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (02,3062,'2005-9-1','良好')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (03,3063,'2005-9-8','一般')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (04,3064,'2005-9-8','差')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (05,3065,'2005-9-9','良好')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (06,3016,'2005-9-9','差')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (07,3067,'2006-1-1','一般')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (08,3068,'2006-1-1','差')
+INSERT INTO 保健(保健卡编号,职工号,检查身体日期,健康状况) VALUES (09,3069,'2006-1-1','良好')
+
+
+2.使用查询分析器检索"办公室"的科长姓名和家庭地址;
+
+SELECT 姓名,家庭地址 FROM 职工 AS E,部门 AS D
+WHERE E.部门编号=D.部门编号 AND E.职务='科长' AND D.部门名称='办公室'
+
+
+3.使用查询分析器检索"财务科"中健康状况为"良好"的职工姓名和家庭地址;
+SELECT 姓名,家庭地址 FROM 职工 AS E,部门 AS D,保健 AS B
+WHERE E.部门编号=D.部门编号 AND E.职工号=B.职工号 AND 部门名称='财务科' AND 健康状况='良好'
+
+
+4.用SQL语句写出,删除职工关系表中职工号为"3016"
+
+DELETE FROM 保健 WHERE 职工号='3016'
+DELETE FROM 职工 WHERE 职工号='3016'
+
+SELECT * FROM 职工
+
+
+5.用SQL语句写出,将职工号为"3061"的职工号的健康状况改为"一般"
+UPDATE 保健 SET 健康状况='一般' WHERE 职工号='3061'
+SELECT * FROM 保健
+
+
+6.建立健康状况为"差"的职工的视图;
+CREATE VIEW 健康状况差视图 AS(SELECT E.职工号,姓名,部门名称,检查身体日期
+FROM 职工 AS E,部门 AS D,保健 AS B WHERE E.职工号=B.职工号 AND E.部门编号=D.部门编号 AND B.健康状况='差')
+GO
+SELECT * FROM 健康状况差视图
+
+
+样题九.设某高校数据库中有如下两个基本表:
+学生关系S(学号,姓名,年龄,班级)
+选课关系SC(学号, 课程号,成绩)
+
+1.创建上述基本表,并插入必要的数据记录;
+CREATE DATABASE Hschool
+GO
+USE Hschool
+GO
+======================================================================
+CREATE TABLE S
+学号 Smallint primary key, 
+姓名 varchar(10) not null,
+年龄 Smallint,
+班级 Smallint
+)
+GO
+
+CREATE TABLE SC
+
+(
+学号 Smallint FOREIGN KEY REFERENCES S(学号), 
+课程号 varchar(10),
+成绩 Smallint
+)
+
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8101,'张三',18,101)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8102,'钱四',16,121)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8103,'王玲',17,131)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8105,'李林',19,102)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8109,'赵四',18,141)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8110,'李可',20,142)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8201,'张飞',18,111)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8302,'周瑜',16,112)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8203,'王明',17,111)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8305,'董庆',19,102)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8409,'赵龙',18,101)
+INSERT INTO S(学号,姓名,年龄,班级) VALUES (8510,'李丽',20,142)
+GO
+INSERT INTO SC(学号,课程号,成绩) VALUES (8105,'C1',80)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8101,'C1',61)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8101,'C2',81)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8102,'C3',66)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8102,'C3',61)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8103,'C3',73)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8105,'C2',92)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8109,'C3',84)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8110,'C4',42)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8201,'C5',81)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8302,'C6',62)
+INSERT INTO SC(学号,课程号,成绩) VALUES (8203,'C2',71)
+
+
+
+
+2.使用查询分析器检索没有选C1或C2课的学生的学号;
+SELECT DISTINCT 学号 FROM SC
+WHERE 学号 NOT IN (SELECT 学号 FROM SC WHERE 课程号='C1' OR 课程号='C2')
+
+
+3.用SQL语句查询李林选了而王明没有选的课程号.
+SELECT 课程号 FROM S,SC
+WHERE S.学号=SC.学号 AND 姓名='李林'AND 课程号 NOT IN
+(SELECT 课程号 FROM S,SC WHERE S.学号=SC.学号 AND 姓名='王明')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,153 @@
+系统班OS题目及部分答案
+
+如果谁愿意将他（她）的答案告诉我，我将告诉他（她）我的最完整的答案，以此相互学习，探讨，共同进步：当时第一题，我只发了一个多小时，第二题，我只发了将近两个小时，差不多就做出来了。我的邮箱是：jsjkx_newsky@163.net
+现提供题目及部分答案如下：
+系统班练习 2004-05-19 上午 
+可变分区存储管理方案中的内存分配 
+用户提出内存空间的申请；系统根据申请者的要求，按照一定的分配策略分析内存空间的使用情况，找出能满足请求的空闲区，分给申请者；当程序执行完毕或主动归还内存资源时，系统要收回它所占用的内存空间或它归还的部分内存空间。 
+1．程序运行时首先接收输入：空闲区数据文件，包括若干行，每行有两个数据项：起始地址、长度（均为整数），各数据项以逗号隔开。 
+2．建立空闲区表并在屏幕上显示输出空闲区表内容，空闲区表中记录了内存中可供分配的空闲区的始址和长度，用标志位指出该分区是否是未分配的空闲区。 
+3．从用户界面根据用户提示接收一个内存申请，格式为：作业名、申请空间的大小。 
+4．按照最差（最坏）适配算法选择一个空闲区，分割并分配，修改相应的数据结构（空闲区表），填写内存已分配区表（起始地址、长度、标志位），其中标志位的一个作用是指出该区域分配给哪个作业。 
+5．重复3、4，直到输入为特殊字符（0）。 
+6．在屏幕上显示输出新的空闲区表和已分配区表的内容。 
+********************************** 
+请分别用FIFO、OPT算法实现“页面置换”的模拟。模拟程序的要求如下： 
+输入：页面流文件，其中存储的是一系列页面号，用来模拟待换入的页面。 
+输出：对于每一个页面流文件，标出所使用的算法，并且：每换入一个页面（即：每读入一个页面号），判断是否有页面需要被换出。若有，把被换出的页面号输出到屏幕；若没有，则要在输出中用特殊标记说明。 
+初始条件：采用三个页框，初始时均为空。 
+测试说明：测试教师将事先准备好一组文件，从中为每个程序随机指定一至三个作为输入文件（被测试者需从键盘输入指定文件的文件名），并查看程序输出结果。 
+*************************************
+第一题部分答案如下：
+从文件读取数据函数编写如下：
+void getdata()
+{
+FILE *fp;
+char *fname;
+fname = "test.txt";
+int i=0,c1,c2;
+    fp=fopen(fname,"rw");
+while(!feof(fp))
+{
+   fscanf(fp,"%d,%d",&c1,&c2);
+   table.startaddr = c1;
+   table.len = c2;
+   i++;
+   file://printf("%4d, %4d\n",c1,c2);
+   file://printf("%4d, %4d\n",table.startaddr,table.len);
+}
+cnt = i-1;
+}
+}
+第二题部分答案如下：
+void fifo(int array[],int n)
+{
+int *p;
+struct page *cp,*dp,*head,*anew;
+int count=0;
+head=create(n);
+p=array;
+  while(*p!=-1)
+  {
+    cp=dp=head;
+for(;cp->num!=*p&&cp->next!=NULL;) cp=cp->next;
+if (cp->num==*p) printf("!");
+else
+{
+      count++;
+   cp=head;
+   for(;cp->tag!=-1&&cp->next!=NULL;)cp=cp->next;
+   if (cp->tag == -1)
+   {
+        cp->num=*p;
+  cp->tag=0;
+  printf("  *   ");
+   }
+else
+{
+      anew=(struct page*)malloc(len);
+   anew->num=*p;
+   anew->tag=0;
+   anew->next=NULL;
+   cp->next=anew;
+   head=head->next;
+   printf("%d",dp->num);
+   free(dp);
+}
+  }
+  p++;
+  }
+printf("\nQueue Zongshu: %d \n",count);
+}
+void opt(int array[],int n)
+{
+  int *p,*q,count=0,i;
+  struct page *head,*cp,*dp,*anew;
+  p=array;
+  head=create(n);
+  while(*p!=-1)
+  {
+    cp=head;
+for(;cp->num!=*p&&cp->next!=NULL;) cp=cp->next;
+if (cp->num!=*p)
+{ 
+  count++;
+  cp=head;
+  for(;cp->tag!=-1&&cp->next!=NULL;) cp=cp->next;
+  if (cp->tag==-1)
+  {
+           printf(" *");
+     cp->num=*p;
+     cp->tag=0;
+  }
+  else
+  {
+          i=1;q=p;q++;cp=head;
+    while(*q!=-1&&i<n)
+   {
+     for(;*q!=-1&&i<n;)  cp=cp->next;
+     if (*q==cp->num)
+     {
+                 cp->tag=1;
+     i++;
+     }
+     q++;cp=head;
+    }
+    if (i==n)
+    {
+             for(;cp->tag!=0;) cp=cp->next;
+    printf("%d",cp->num);
+    cp->num=*p;
+    }
+    else
+    {
+             cp=head;
+    for(;cp->tag!=0;) cp=cp->next;
+    if (cp==head)
+   { 
+     for(;cp->next!=NULL;) cp=cp->next;
+     anew=(struct page*)malloc(len);
+     anew->num=*p;
+     anew->tag=0;
+     anew->next=NULL;
+     dp=head;
+     head=head->next;
+     printf("%d",dp->num);
+     free(dp);
+   }
+    else
+    {
+                 printf("%d",cp->num);
+     cp->num=*p;
+    }
+    }
+    cp=head;
+    for(;cp->next!=NULL;) {cp->tag=0;cp=cp->next;}
+    cp->tag=0;
+  }
+}
+else printf(" ! ");
+p++;
+  }
+  printf("\n Queue Zongshu: %d \n",count);
+}

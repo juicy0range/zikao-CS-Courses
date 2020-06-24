@@ -1,0 +1,168 @@
+/* 二叉树及其遍历
+  输入先序序列8 3 0 0 10 0 0
+*/
+#include <stdio.h> 
+#include <stdlib.h> 
+typedef char DataType; /*设数据域类型为字符型*/ 
+typedef struct node{ 
+DataType data; 
+struct node *lchild,*rchild; /*左右链域为指向结点结构的指针类型*/ 
+}BinTNode; /*结点类型*/ 
+typedef BinTNode *BinTree; /*指向二叉树结点的指针类型*/ 
+
+int count; /*全局变量用于统计结点个数*/ 
+void CreateBinTree(BinTree *T); 
+void Preorder(BinTree T); 
+void Inorder(BinTree T); 
+void Postorder(BinTree T); 
+void Levelorder(BinTree T); 
+void Leafnum(BinTree T); 
+void Nodenum(BinTree T); 
+
+main() 
+{
+BinTree T; 
+char ch1,ch2; 
+printf("\n欢迎进入二叉树基本*作测试程序，请选择：\n"); 
+ch1='y'; 
+while(ch1=='y' || ch1=='Y') 
+{
+printf("\nA-------------------------二叉树建立"); 
+printf("\nB-------------------------先序遍历"); 
+printf("\nC-------------------------中序遍历"); 
+printf("\nD-------------------------后序遍历"); 
+printf("\nE-------------------------层次遍历"); 
+printf("\nF-------------------------求叶子数"); 
+printf("\nG-------------------------求结点总数"); 
+printf("\nH-------------------------退出\n\n"); 
+rewind(stdin); 
+scanf("%c",&ch2); 
+switch(ch2) 
+{
+case 'a': 
+case 'A':printf("请按带空指针的二叉树先序输入建立二叉树存储的结点序列:\n"); 
+CreateBinTree(&T);break; 
+case 'b': 
+case 'B':printf("该二叉树的先根序遍历序列为:\n"); 
+Preorder(T);break; 
+case 'c': 
+case 'C':printf("该二叉树的中根遍历序列为:\n"); 
+Inorder(T);break; 
+case 'd': 
+case 'D':printf("该二叉树的后根遍历序列为:\n"); 
+Postorder(T);break; 
+case 'e': 
+case 'E':printf("该二叉树的层次遍历序列为:\n"); 
+Levelorder(T);break; 
+case 'f': 
+case 'F':count=0;Leafnum(T); /*count初值为0,用于统计叶结点数目*/ 
+printf("该二叉树有%d个叶子。\n",count); 
+break; 
+case 'g': 
+case 'G':count=0;Nodenum(T);/*count初值为0,用于统计结点数目*/ 
+printf("该二叉树总共有%d个结点。\n",count); 
+break; 
+case 'h': 
+case 'H':ch1='n';break; 
+default:ch1='n'; 
+} 
+} 
+} 
+
+
+void CreateBinTree(BinTree *T) 
+{/*以加入结点的先序序列输入，构造二叉链表*/ 
+char ch; 
+scanf("\n%c",&ch); 
+if (ch=='0') *T=NULL; /*读入0时，将相应结点置空*/ 
+else {
+	*T=(BinTNode*)malloc(sizeof(BinTNode)); /*生成结点空间*/ 
+	(*T)->data=ch; 
+	CreateBinTree(&(*T)->lchild); /*构造二叉树的左子树*/ 
+	CreateBinTree(&(*T)->rchild); /*构造二叉树的右子树*/ 
+	} 
+} 
+
+
+void Inorder(BinTree T) 
+{/*中序遍历二叉树T*/ 
+if (T) 
+{
+	Inorder(T->lchild); /*中序遍历二叉树的左子树*/ 
+	printf("%3c",T->data); /*访问结点的数据*/ 
+	Inorder(T->rchild); /*中序遍历二叉树的右子树*/ 
+} 
+} 
+
+
+void Preorder(BinTree T) 
+{
+	/*先序遍历二叉树T*/ 
+if (T) 
+{
+	printf("%3c",T->data); /*访问结点数据*/ 
+	Preorder(T->lchild); /*先序遍历二叉树T的左子树*/ 
+	Preorder(T->rchild); /*先序遍历二叉树T的右子树*/ 
+} 
+} 
+
+void Postorder(BinTree T) 
+{/*后序遍历二叉树T*/ 
+if (T) 
+{
+	Postorder(T->lchild); /*后序遍历二叉树T的左子树*/ 
+	Postorder(T->rchild); /*后序遍历二叉树T的右子树*/ 
+	printf("%3c",T->data); /*访问结点数据*/ 
+} 
+} 
+
+void Levelorder(BinTree T) 
+{/*按层次遍历二叉树T*/ 
+int i,j; 
+BinTNode *q[20],*p; /*q[20]用于模拟队列，存储入队的结点*/ 
+p=T; 
+if(p!=NULL) {
+	i=1;q[i]=p;j=2;
+} /*i为队首位置，j为队尾位置*/ 
+
+while(i!=j) 
+{
+p=q[i];printf("%3c",p->data); /*访问队首元素*/ 
+
+if (p->lchild!=NULL) {
+	q[j]=p->lchild;j++;
+} 
+/*若队首元素左链域不为空，则将其入队列*/
+ 
+if (p->rchild!=NULL) {
+	q[j]=p->rchild;j++;
+} 
+/*若队首元素右链域不为空，则将其入队列*/ 
+
+i++; /*将队首移到下一个位置*/ 
+} 
+
+} 
+
+
+void Leafnum(BinTree T) 
+{/*统计二叉树T中叶子结点的数目*/ 
+if (T) 
+{
+	if (T->lchild==NULL && T->rchild==NULL) 
+	count++; /*若为叶子，则计数器加1*/ 
+Leafnum(T->lchild); /*统计T的左子树*/ 
+Leafnum(T->rchild); /*统计T的右子树*/ 
+} 
+} 
+
+
+void Nodenum(BinTree T) 
+{/*统计二叉树T的结点数目*/ 
+if (T) 
+{
+count++; /*若当前结点不为空，则计数器count加1*/ 
+Nodenum(T->lchild); /*统计T的左子树*/ 
+Nodenum(T->rchild); /*统计T的右子树*/ 
+} 
+}

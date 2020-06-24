@@ -1,0 +1,181 @@
+//二叉排序树P178
+#include <stdio.h> 
+#include <stdlib.h> 
+#include<string.h>
+
+typedef char KeyType;
+
+typedef struct node{ 
+ KeyType key; 
+ struct node *lchild,*rchild; 
+}BSTNode; 
+typedef BSTNode *BSTree;
+
+
+//返回值：树的根节点;
+//T:   根节点
+//Key：待插入的值
+BSTree InsertBST(BSTree T,KeyType Key) 
+{
+	BSTNode *f,*p; //p:结点;f用来保存p的父节点（即待插入节点p的父节点）
+	p=T;		   //T:保存头结点，即每次查找需要插入的位置都从头结点开始
+while(p) //p不为空则
+{
+	if(p->key==Key) 
+	{
+		printf("树中已有Key不需插入\n"); 
+		return T; 
+	} 
+	f=p; 
+	p=(Key<p->key)?p->lchild:p->rchild; 
+} 
+
+//初始化p结点，即创建待插入节点
+p=(BSTNode*)malloc(sizeof(BSTNode)); //分配内存空间
+p->key=Key; 
+p->lchild=p->rchild=NULL; 
+
+//建立p结点和父节点f的关系或者p为头结点
+if (T==NULL) //T为NULL,说明树为空,则创建根结点
+T=p; 
+else if (Key<f->key) f->lchild=p; //Key小于f节点的值，故p为左孩子
+else f->rchild=p; //p为右孩子
+
+return T; 
+}
+
+
+//返回值：根节点
+BSTree CreateBST(void) 
+{
+BSTree T = NULL; //根节点
+KeyType in[100],Key;
+printf("请输入关键字序列:\n");
+gets(in);
+int len = 0,i=0;
+len = strlen(in);
+for(i=0;i<len;i++){
+	Key = in[i];
+	//printf("%c",Key);
+	T=InsertBST(T,Key);
+}
+	return T; 
+} 
+
+
+//如果成功返回该节点的位置
+//T 根节点
+//Key 待查找的值
+BSTNode * SearchBST(BSTree T, KeyType Key) 
+{ 
+	if(T==NULL||Key==T->key)//递归的终结条件
+	return T;		//若T为空，查找失败；否则成功，返回找到的节点位置
+	if(Key<T->key){
+		return SearchBST(T->lchild,Key);
+	}else{
+		return SearchBST(T->rchild,Key);
+	}
+} 
+ 
+
+//这个有点难
+void DelBSTNode(BSTree *T,KeyType Key) 
+{
+BSTNode *parent=NULL, *p, *q,*child; 
+p=*T; //p指向根节点
+while(p) 
+{
+	if(p->key==Key) 
+		break; 
+	parent=p; 
+	p=(Key<p->key)?p->lchild:p->rchild; 
+} 
+if (!p) {//如果p为空
+	printf("没有找到要删除的结点\n");
+	return;
+} 
+
+//p不为空,则找到了待删除的节点p
+q=p; 
+if (q->lchild && q->rchild){ //p的左右子树都不为空，则
+	for (parent=q,p=q->rchild; p->lchild; parent=p,p=p->lchild); 
+}
+child=(p->lchild)?p->lchild:p->rchild; 
+
+if (!parent) 
+{*T=child; }
+else {
+	if (p==parent->lchild) 
+	parent->lchild=child; 
+	else parent->rchild=child; 
+	if (p!=q) 
+	q->key=p->key; 
+} 
+	free(p); 
+} 
+
+
+void InorderBST(BSTree T) 
+{ 
+	if(T!=NULL) 
+	{
+	InorderBST(T->lchild); 
+	printf("%5c",T->key); 
+	InorderBST(T->rchild); 
+	} 
+}
+
+
+void main() 
+{
+BSTree T; 
+BSTNode *t = NULL;
+char ch1,ch2; 
+KeyType Key; 
+printf("建立一棵二叉排序树的二叉链表存储\n"); 
+T=CreateBST(); 
+ch1='y'; 
+while (ch1=='y' || ch1=='Y') 
+{
+printf("请选择下列*作：\n"); 
+printf("1------------------更新二叉排序树存储\n"); 
+printf("2------------------二叉排序树上的查找\n"); 
+printf("3------------------二叉排序树上的插入\n"); 
+printf("4------------------二叉排序树上的删除\n"); 
+printf("5------------------二叉排序树中序输出\n"); 
+printf("6------------------退出\n"); 
+scanf("\n%c",&ch2); 
+switch (ch2) 
+{
+case '1':T=CreateBST();break; 
+
+case '2':printf("\n请输入要查找的数据："); 
+scanf("\n%d",&Key); 
+t=SearchBST(T,Key); 
+if(!t){
+	printf("不存在\n");
+}else{
+	printf("存在\n");
+}
+printf("查找*作完毕。\n");break; 
+
+case '3': printf("\n请输入要插入的数据："); 
+scanf("\n%d",&Key); 
+T=InsertBST(T,Key); 
+printf("插入*作完毕。\n");break; 
+
+case '4': printf("\n请输入要删除的数据："); 
+scanf("\n%d",&Key); 
+DelBSTNode(&T,Key); 
+printf("删除*作完毕。\n");break; 
+
+case '5': InorderBST(T); 
+printf("\n二叉排序树输出完毕。\n");break; 
+
+case '6':ch1='n';break; 
+
+default:ch1='n'; 
+} 
+} 
+} 
+

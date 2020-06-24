@@ -1,0 +1,98 @@
+os上机题一一、 进程调度 进程调度算法有FIFO，优先数调度算法，时间片轮转调度算法，分级调度算法，目前主要是考FIFO和优先数调度算法（静态优先级）。  进程调度算法的数据结构主要有：进程函数定义：建立进程函数，进程调度函数一个网友做的一个FIFO调度算法的示例：#include "stdio.h" 
+#define max 100 
+#define pfree 0 /*process end*/ 
+#define running 1 /*process running status*/ 
+#define aready 2 /*process aready status */ 
+#define blocking 3 /*process aready blocking status*/ 
+--------------------------------------------------------
+typedef struct node 
+{ 
+char name; 
+int status; 
+int precendence; 
+int ax,bx,cx,dx; 
+int pc; 
+int psw; 
+struct node *next; /*pcb define*/ 
+}pcb; 
+--------------------------------------------------------
+pcb *createprocess(pcb *head) 
+{ 
+pcb *p,*q; 
+int a,b,c,d,m,n; 
+char ID; 
+int s; 
+q=NULL; 
+printf("\ninput the first seven status pcb:"); 
+
+scanf("\n%c",&ID); 
+scanf("%d%d%d%d%d%d",&a,&b,&c,&d,&m,&n); 
+
+while(ID!='*') 
+{ 
+p=(pcb*)malloc(sizeof(pcb)); 
+p->name=ID; 
+p->ax=a; 
+p->bx=b; 
+p->cx=c; 
+p->dx=d; 
+p->pc=m; 
+p->psw=n; 
+p->precendence=pre; 
+p->status=aready; 
+if(head==NULL) 
+head=p; 
+else 
+q->next=p; 
+q=p; 
+printf("\ninput the next pcb: "); 
+scanf("\n%c",&ID); 
+scanf("%d%d%d%d%d%d",&a,&b,&c,&d,&m,&n); 
+} 
+if(q!=NULL) 
+q->next=NULL; 
+q=head; 
+while(q) 
+{ 
+printf("\n peocess name. status.ax. bx. cx. dx. pc. psw.\n "); 
+printf("%10c%5d%8d%5d%5d%5d%5d%5d%5d",q->name,q->status,q->precendence,q->ax,q->bx,q->cx,q->dx,q->pc,q->psw); 
+q=q->next; 
+} 
+return head;/*createprocess end*/ 
+}
+-------------------------------------------------------- 
+void processfifo(pcb *head) /*use fifo */ 
+{ 
+pcb *p; 
+p=head; 
+printf("\n the process use fifo method.\n"); 
+printf("running the frist process:\n"); 
+while(p!=NULL) 
+{ 
+p->status=running; 
+printf("\nprocess name status. ax. bx. cx. dx. pc. psw."); 
+printf("\n%10c%5d%8d%5d%5d%5d%5d%5d",p->name,p->status,p->ax,p->bx,p->cx,p->dx,p->pc,p->psw); /*check process running status */ 
+p->status=0; 
+p=p->next; 
+} 
+printf("\ncheck weatherfer the process complete: "); 
+p=head; 
+while(p) 
+{ 
+printf("\n%3c%3d",p->name,p->status); 
+p=p->next; 
+} 
+printf("\ngame is over!\n"); 
+
+} 
+} 
+} 
+*****************************************************
+main() 
+{ 
+pcb *head; 
+head=NULL; 
+head=createprocess(head); 
+processfifo(head); 
+}
+*****************************************************

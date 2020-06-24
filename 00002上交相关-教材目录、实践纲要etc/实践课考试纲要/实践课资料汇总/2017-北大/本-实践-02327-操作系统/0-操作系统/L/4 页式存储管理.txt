@@ -1,0 +1,252 @@
+#include <iostream.h>
+#include <stdio.h>
+#include <string.h>
+const int pages=2048;
+const int word=32;
+const int wordnum=pages/word;
+typedef struct node{
+	char name[20];
+	int num;
+	int nums[pages];
+	struct node * next;
+}jobs;
+int table[wordnum][word];
+int freenum;
+jobs *head;
+//初始化函数
+void init()
+{
+	int i,j;
+	jobs *p;
+	//初始化位示图
+	for(i=0;i<wordnum;i++)
+	{
+		for(j=0;j<word;j++)
+		{
+			table[i][j]=0;
+		}
+	}
+	freenum=0;
+	//初始化作业表头
+	p=new jobs;
+	strcpy(p->name,"NULL");
+	p->num=0;
+	p->next=NULL;
+	head=p;
+
+}
+
+//读入数据函数
+int read()
+{
+	int i,j;
+	FILE *fp;
+	char fname[20];
+	cout<<"=========================================="<<endl;
+	cout<<"请输入初始位示图文件名:";
+	//cin>>fname;
+	strcpy(fname,"y.txt");
+	if((fp=fopen(fname,"r"))!=NULL)
+	{
+		for(i=0;i<wordnum;i++)
+		{
+			for(j=0;j<word;j++)
+			{
+				fscanf(fp,"%d",&table[i][j]);
+				if(table[i][j]==0)
+				{
+					freenum++;
+				}
+			}
+		}
+		cout<<"=========================================="<<endl;
+		cout<<"初始位示图为:"<<endl;
+		for(i=0;i<wordnum;i++)
+		{
+			for(j=0;j<word;j++)
+			{
+				cout<<table[i][j]<<" ";	
+			}
+			cout<<endl;
+		}
+		cout<<"=========================================="<<endl;
+		cout<<"总空闲块数为:"<<freenum<<endl;
+	
+	}
+	else
+	{
+		cout<<"文件无法打开!"<<endl;
+			return 0;
+
+	}
+		return 1;
+
+}
+
+//加入作业
+void add()
+{
+	char name[20];
+	int num;
+	jobs *p;
+	p=new jobs;
+	int i,j,k=0;
+	cout<<"请输入新加作业名:";
+	cin>>name;
+	cout<<"新加作业所需空闲块数:";
+	cin>>num;
+	if(num<=freenum)
+	{
+		freenum-=num;
+		strcpy(p->name,name);
+		p->num=num;
+		for(i=0;i<wordnum;i++)
+		{
+			for(j=0;j<word;j++)
+			{
+				if(table[i][j]==0)
+				{
+					table[i][j]=1;
+					num--;
+					p->nums[k]=i*word+j;
+					k++;
+				}
+				if(num==0)
+				{
+					i=64;
+					j=32;
+				}
+			}
+		}
+			
+	
+		p->next=head->next;	
+		head->next=p;
+	}
+	else
+	{
+		cout<<"失败,剩余空闲块数不能满足作业要求!"<<endl;
+	}
+}
+
+//完成作业函数
+void finish()
+{
+	char name[20];
+	jobs *p,*q;
+	int i,j,k,n,num;
+	cout<<"输入作业名:";
+	cin>>name;
+	q=head;
+	p=q->next;
+	while(q->next==p)
+	{
+		if(strcmp(p->name,name))
+		{
+			q=q->next;
+		}
+		p=p->next;
+	}
+	p=q->next;
+	num=p->num;
+	for(k=0;k<num;k++)
+	{
+		n=p->nums[k];
+		i=n/word;
+		j=n%word;
+		table[i][j]=0;
+	}
+	freenum+=num;
+	q->next=p->next;
+	delete p;
+}
+
+//显示位示图函数
+void view()
+{
+	int i,j;
+	cout<<"当前位示图是:"<<endl;
+	for(i=0;i<wordnum;i++)
+	{
+		for(j=0;j<word;j++)
+		{
+			cout<<table[i][j]<<" ";
+		}
+		cout<<endl;
+	}
+	cout<<"剩余空闲块数"<<freenum<<endl;
+	cout<<"=========================================="<<endl;
+}
+
+//显示页表
+void viewpage()
+{
+	jobs *p;
+	int i,j;
+	p=head->next;
+	if(p==NULL)
+	{
+		cout<<"当前无作业!"<<endl;		
+	}
+	else
+	{
+		cout<<"=========================================="<<endl;
+		cout<<"当前页表为:"<<endl;
+	}
+		while(p!=NULL)
+		{
+			cout<<"=========================================="<<endl;
+			cout<<"作业名    "<<p->name<<"    占用页数: "<<p->num<<endl;
+			cout<<"本作业的占用内存块有:";
+			j=p->num;
+			for(i=0;i<j;i++)
+			{
+				cout<<p->nums[i]<<" ";
+			}
+			cout<<endl;
+			p=p->next;
+					
+		}	
+}
+
+void main()
+{
+	int c=1,ch,n;
+	init();
+	n=read();
+if(n==1)
+{
+	while(c==1)
+	{
+		cout<<"1 新加作业"<<endl;
+		cout<<"2 完成作业"<<endl;
+		cout<<"3 当前位示图"<<endl;
+		cout<<"4 显示页表"<<endl; 
+		cout<<"5 退出"<<endl;
+		cout<<"请选择";
+		cin>>ch;
+		switch(ch)
+		{
+		case 1:
+			add();
+			break;
+		case 2:
+			finish();
+			break;
+		case 3:
+			view();
+			break;
+		case 4:
+			viewpage();
+			break;
+		case 5:
+			c=0;
+			break;
+		default:
+			cout<<"输入错误!"<<endl;
+			break;
+
+		}
+	}
+}
+}

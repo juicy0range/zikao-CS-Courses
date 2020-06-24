@@ -1,0 +1,166 @@
+/* 
+  按中序和后序生成二叉树
+*/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <iostream.h>
+
+#define max 100
+
+typedef struct node{
+	char key;
+	struct node *lchild,*rchild;
+}Tnode;
+typedef Tnode *BTree;
+
+//****************按中序和后序生成二叉树
+//is,ie;ps,pe 分别为起始下标
+void MK(char in[],int is,int ie,char post[],int ps,int pe,BTree *t){
+	int i;
+	if(is>ie||ps>pe){
+		*t = NULL;
+	}else{
+		*t = (Tnode*)malloc(sizeof(Tnode));
+		(*t)->key = post[pe];
+		for(i=is;i<=ie;i++){
+			if(in[i]==post[pe]){
+				MK(in,is,i-1,post,ps,ps+i-is-1,&(*t)->lchild);
+				MK(in,i+1,ie,post,ps+i-is,pe-1,&(*t)->rchild);
+				break;
+			}
+		}
+		if(i>ie){
+			printf("ERROR!\n");
+			exit(1);
+		}
+	}
+}
+
+//****************按中序和前序生成二叉树
+void MK2(char in[],int is,int ie,char pre[],int ps,int pe,BTree *t){
+	int i;
+	
+	if(is>ie||ps>pe){
+		*t = NULL;
+	}else{
+		*t = (Tnode*)malloc(sizeof(Tnode));
+		(*t)->key = pre[ps];
+		for(i=is;i<=ie;i++){
+			if(in[i] == pre[ps]){
+				MK2(in,is,i-1,pre,ps+1,ps+i-is,&(*t)->lchild);
+				MK2(in,i+1,ie,pre,ps+i-is+1,pe,&(*t)->rchild);
+			}
+		}
+		if(i>ie){
+			cout<<"ERROR!"<<endl;
+			exit(-1);
+		}
+	}
+}
+
+//**************0度节点
+int zero(BTree t){
+	if(t==NULL){
+		return 0;
+	}
+
+	if(t->lchild==NULL&&t->rchild==NULL){
+		return 1;
+	}else{
+		return zero(t->lchild)+zero(t->rchild);
+	}
+}
+
+//**************一度节点
+int one(BTree t){
+	if(t==NULL||(t->lchild==NULL&&t->rchild==NULL)){
+		return 0;
+	}
+
+	if(t->lchild&&t->rchild){
+		return one(t->lchild)+one(t->rchild);
+	}else{
+		return 1+one(t->lchild)+one(t->rchild);
+	}
+}
+
+//**************二度节点
+int two(BTree t){
+	if(t==NULL||(t->lchild==NULL&&t->rchild==NULL)){
+		return 0;
+	}
+
+	if(t->lchild&&t->rchild){
+		return 1+two(t->lchild)+two(t->rchild);
+	}else{
+		return two(t->lchild)+two(t->rchild);
+	}
+}
+
+//**************求树的深度
+int Depth(BTree t){
+	int ld = 1;
+	int rd = 1;
+	if(t->lchild){
+		ld += Depth(t->lchild);
+	}
+	if(t->rchild){
+		rd += Depth(t->rchild);
+	}
+	if(ld>rd){
+		return ld;
+	}else{
+		return rd;
+	}
+}
+
+//**************检查是否为二叉排序树
+int check(BTree t){
+	if(t==NULL||(t->lchild==NULL&&t->rchild==NULL)){
+		return 1;
+	}
+
+	if(t->lchild&&t->rchild==NULL){//左子树不为空，右子树为空
+		if(t->lchild->key<t->key)
+			return check(t->lchild);
+		else
+			return 0;
+	}else if(t->lchild==NULL&&t->rchild){
+		if(t->rchild->key>t->key)
+			return check(t->rchild);
+		else
+			return 0;
+	}else{
+		if((t->lchild->key<t->key)&&(t->rchild->key>t->key)){
+			return (check(t->lchild)&&check(t->rchild));
+		}else{
+			return 0;
+		}
+	}
+}
+
+void Preorder(BTree r)
+{
+	if(r){
+		printf("%5c",r->key);
+	    Preorder(r->lchild);
+	    Preorder(r->rchild);
+	}
+}
+
+void main(){
+	BTree t;
+	char in[max],post[max];
+	cout<<"请输入中序序列:"<<endl;
+	cin>>in;
+	cout<<"请输入后序序列:"<<endl;
+	cin>>post;
+
+	MK(in,0,strlen(in)-1,post,0,strlen(post)-1,&t);
+	cout<<endl<<"该二叉树的前序遍历序列为:"<<endl;
+	Preorder(t);
+
+
+	getchar();
+}

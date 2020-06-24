@@ -1,0 +1,28 @@
+/*编一C程序，它能读入一串（n个）整数（以-9999为结束标记），
+  并判断第1个整数在后(n-1)个整数中出现的次数，再输出该次数。
+  输入时，两个相邻的整数用空格隔开)。
+  注：程序的可执行文件名必须是 e2.exe，存于你的账号或其debug目录下。）
+*/
+#include"stdafx.h"
+#include<stdio.h>
+#define MAX 100
+void main()
+{
+	int a[MAX];
+	int i=0,c=0,t,k;
+	printf("请输入一串整数，以-9999作为结束标记\n");
+    do{
+		scanf("%d",&a[i]);
+		if(a[i]==-9999)
+			break;
+		i++;
+	}while(9);
+	k=i;
+	printf("\n这个整数串的第一个数是:%d\n",a[0]);
+	t=a[0];
+	for(i=1;i<k;i++){
+		if(a[i]==t)
+			c++;
+	}
+    printf("\n第一个整数在后(n-1)个整数中出现的次数为:%d\n",c);
+}

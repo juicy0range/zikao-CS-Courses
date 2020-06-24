@@ -1,0 +1,112 @@
+//1.编一C程序，它能读入两组整数（每组整数都是66个整数），它们分别是下三角矩阵A和上三角矩阵B的按行优先排列的元素（A和
+
+//B的其它元素均为零）。计算并输出矩阵A与B的乘积。 见P62
+//上三角
+// sa[k] 和 aij 的关系
+// k = i*(2*n-i+1)/2+j-i    当i<=j
+// k = n*(n+1)/2    当i>j
+//下三角
+//k = i(i+1)/2+j     i>=j
+//k = n*(n+1)/2		i<j
+	#include <stdio.h>
+	#include <stdlib.h>
+	void main()
+	{
+		int n=4;//行列数 n*(n+1)/2 =  不为0的数的个数;
+		int len = n*(n+1)/2;
+		int a[11],b[11],c[16];	//c = a*b;
+		
+		int i,j,k,s=0,m,l,p;
+		//输入数组a
+		printf("请输入10个数到a中：\n");
+		for(i=0;i<10;i++){
+			scanf("%d",&a[i]);
+		}
+		a[i] = 0;	//数组中最后一个数保存 那个常数（一般为0）
+
+		//输出数组a
+		printf("数组a：\n");
+		for(i=0;i<=10;i++){
+			printf("a[%d]=%d,",i,a[i]);
+		}
+		printf("\n矩阵a：\n");
+		for(i=0;i<n;i++){
+			for(j=0;j<n;j++){
+				if(j>=i){
+					k = i*(2*n-i+1)/2+j-i;
+					printf("%3d",a[k]);
+				}else{
+					printf("%3d",a[len]);
+				}
+			}
+			printf("\n");
+		}
+		
+		//输入数组b
+		printf("请输入10个数到b中：\n");
+		for(i=0;i<10;i++){
+			scanf("%d",&b[i]);
+		}
+		b[i] = 0;
+
+		//输出数组b
+		printf("数组b：\n");
+		for(i=0;i<=10;i++){
+			printf("a[%d]=%d,",i,a[i]);
+		}
+		printf("\n矩阵b：\n");
+		for(i=0;i<n;i++){
+			for(j=0;j<n;j++){
+				if(i>=j){
+					k = i*(i+1)/2+j;
+					printf("%3d",b[k]);
+				}else{
+					printf("%3d",b[len]);
+				}
+			}
+			printf("\n");
+		}
+
+		//计算数组c（c=a*b）注意数组乘法的定义
+		k=0;
+		for(i=0;i<n;i++){
+			for(p=0;p<n;p++){
+				for(j=0;j<n;j++){
+				//s+=a[i][j]*b[j][p]
+				if(i<=j){//上三角
+					m = i*(2*n-i+1)/2+j-i;	
+				}else{//下三角
+					m = len;	//数组的最后一个数，即0
+				}
+
+				if(j>=p){
+					l = j*(j+1)/2 +p;
+				}else{
+					l = len;	//数组的最后一个数，即0
+				}
+
+				s+=a[m]*b[l];
+				}
+
+				if(s!=0){
+					c[k++] = s;
+				}
+				s=0;
+			}
+		}
+		
+
+		//输出数组c
+		k=0;
+		printf("矩阵C=A*B:\n");
+		for(i=0;i<=16;i++){
+			printf("c[%d]=%d,",i,c[i]);
+		}
+		printf("\n矩阵c：\n");
+		for(i=0;i<n;i++){
+			for(j=0;j<n;j++){
+					printf("%5d",c[k++]);
+			}
+			printf("\n");
+		}
+	}

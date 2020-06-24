@@ -1,0 +1,66 @@
+/*
+直接选择排序(Straight Select Sorting) 也是一种简单的排序方法，它的基本思想是：第一次从R[0]~R[n-1]中
+选取最小值，与R[0]交换，第二次从R[1]~R[n-1]中选取最小值，与R[1]交换，....，
+初始状态 [ 8  3  2  1  7  4  6  5 ]       8 -- 1
+第一次  [ 1  3  2  8  7  4  6  5 ]           3 -- 2
+第二次   [ 1  2  3  8  7  4  6  5 ]          3 -- 3
+第三次   [ 1  2  3  8  7  4  6  5 ]          8 -- 4
+第四次   [ 1  2  3  4  7  8  6  5 ]          7 -- 5
+第五次   [ 1  2  3  4  5  8  6  7 ]          8 -- 6
+第六次   [ 1  2  3  4  5  6  8  7 ]          8 -- 7
+第七次   [ 1  2  3  4  5  6  7  8 ]        排序完成
+**/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream.h>
+#include <string.h>
+
+ 
+//从小到大
+void SelectSort(int a[],int n)
+{
+int i, j, m;	//m用于保存最小值的下标
+int temp;
+for(i=0; i<n-1; i++) //注意是 从0 到 <n-1;  循环n-1次
+{
+	m = i;	//刚开始假定i最小
+	for(j = i+1; j < n; j++)
+	{
+		if(a[j] < a[m])
+		m = j;
+	}
+	if(m != i)	//假定的 和 真的最小值不一样，交换
+	{
+		temp = a[i];
+		a[i] = a[m];
+		a[m] = temp;
+	}
+}
+}
+
+
+void print(int a[],int na){
+	for(int i=0;i<na;i++){
+		cout<< a[i] <<" ";
+	}
+	cout<<endl;
+}
+
+void main(){
+	int a[100];
+	int na=0,i;
+
+	cout<<"请输入数组a,之间用空格隔开，以-9999结束"<<endl;
+	for(i=0;i<100;i++){
+		scanf("%d",&a[i]);
+		if(a[i]==-9999){
+			break;
+		}
+	}
+	na = i;
+	SelectSort(a,na);
+	print(a,na);
+
+	getchar();
+}
