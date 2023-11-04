@@ -173,14 +173,19 @@ shjd-Cplusplus-practice
 https://github.com/juicy0range/shjd-Cplusplus-practice
 
 
+
 ### 交流群
 
-微信添加：Phoenix_Studio_ver7 进入群聊
-//个人小号，只负责拉人，添加请备注一下；**备注：程序员考试交流**
+因工作繁忙，微信群不再维护了，已经把可能遇到的问题都做了分享。
+
+有任何问题可以到提出到项目issue，偶尔看到的话会回。
+
+
 
 V2EX帖子地址
 https://www.v2ex.com/t/565986
-//小号不在线可去论坛@我
+
+
 
 ### 项目许可
 
